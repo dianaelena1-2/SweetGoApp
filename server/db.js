@@ -35,6 +35,7 @@ db.exec(`
         pret REAL NOT NULL,
         categorie TEXT,
         disponibil INTEGER DEFAULT 1,
+        imagine TEXT,
         FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id)
     )
 `)

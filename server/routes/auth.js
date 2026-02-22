@@ -3,7 +3,7 @@ const router = express.Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const db = require('../db')
-const upload = require('../middleware/upload_documents')
+const { upload } = require('../middleware/upload_documents')
 
 //INREGISTRARE
 router.post('/register', upload.fields([

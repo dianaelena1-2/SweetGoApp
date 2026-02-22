@@ -36,4 +36,20 @@ const upload = multer ({
     limits: { fileSize: 5 * 1024 * 1024 }
 })
 
-module.exports = upload
+const storageImaginiProduse = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'partner_documents/product_images/')
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now()
+        cb(null, `produs-${uniqueSuffix}${path.extname(file.originalname)}`)
+    }
+})
+
+const uploadImaginiProduse = multer({
+    storage: storageImaginiProduse,
+    fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }
+})
+
+module.exports = { upload, uploadImaginiProduse }
