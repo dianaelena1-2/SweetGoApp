@@ -66,4 +66,17 @@ db.exec(`
     )
 `)
 
+db.exec(`
+    CREATE TABLE IF NOT EXISTS recenzii (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id INTEGER NOT NULL,
+        cofetarie_id INTEGER NOT NULL,
+        rating INTEGER CHECK(rating BETWEEN 1 AND 5) NOT NULL,
+        comentariu TEXT,
+        creat_la DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (client_id) REFERENCES utilizatori(id),
+        FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id)
+    )
+`)
+
 module.exports = db

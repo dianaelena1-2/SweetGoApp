@@ -5,6 +5,7 @@ const authRoutes = require('./routes/auth')
 const adminRoutes = require('./routes/admin')
 const produseRoutes = require('./routes/produse')
 const comenziRoutes = require('./routes/comenzi')
+const cofetariiRoutes = require('./routes/cofetarii')
 
 dotenv.config()
 const db = require('./db')
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/produse',produseRoutes)
 app.use('/api/comenzi', comenziRoutes)
+app.use('/api/cofetarii', cofetariiRoutes)
 
 app.get('/', (req,res) => {
     res.json({ mesaj: 'Server pornit cu succes!'})
