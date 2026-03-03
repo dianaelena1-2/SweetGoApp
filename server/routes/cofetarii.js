@@ -6,7 +6,7 @@ const { verifyToken, verifyRol } = require('../middleware/auth')
 //afisare cofetarii
 router.get('/', (req, res) => {
     const cofetarii = db.prepare(`
-        SELECT c.id, c.numeCofetarie, c.adresa, c.telefon, c.descriere,
+        SELECT c.id, c.numeCofetarie, c.adresa, c.telefon,
                AVG(r.rating) as rating_mediu, 
                COUNT(r.id) as numar_recenzii
         FROM cofetarii c

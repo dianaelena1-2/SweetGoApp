@@ -23,7 +23,10 @@ import DashboardAdmin from './pages/admin/DashboardAdmin'
 import GestionareUtilizatori from './pages/admin/GestionareUtilizatori'
 
 const ProtectedRoute = ({ children, rol }) => {
-  const { utilizator } = useContext(AuthContext)
+  const { utilizator, loading } = useContext(AuthContext)
+
+  if (loading) return null
+
   if(!utilizator) return <Navigate to="/login" />
   if(rol && utilizator.rol !== rol) return <Navigate to="/login" />
   return children
