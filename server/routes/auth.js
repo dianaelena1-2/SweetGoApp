@@ -3,12 +3,13 @@ const router = express.Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const db = require('../db')
-const { upload } = require('../middleware/upload_documents')
+const { upload, uploadImaginiCofetarii } = require('../middleware/upload_documents')
 
 //INREGISTRARE
 router.post('/register', upload.fields([
     { name: 'certificat_inregistrare', maxCount: 1 },
-    { name: 'certificat_sanitar', maxCount: 1 }
+    { name: 'certificat_sanitar', maxCount: 1 },
+    { name: 'imagine_coperta', maxCount: 1 }
 ]), (req, res) => {
     const { nume, email, parola, rol, numeCofetarie, adresa, telefon } = req.body
 
@@ -37,11 +38,12 @@ router.post('/register', upload.fields([
 
         const certifInregistrare = req.files['certificat_inregistrare'][0].path
         const certifSanitar = req.files['certificat_sanitar'][0].path
+        const imagineCoperta = req.files['imagine_coperta'] ? req.files['imagine_coperta'][0].path : null
 
         db.prepare(`
-            INSERT INTO cofetarii (utilizator_id, numeCofetarie, adresa, telefon, certificat_inregistrare, certificat_sanitar)
-            VALUES (?, ?, ?, ?, ?, ?)
-        `).run(utilizatorId, numeCofetarie, adresa, telefon, certifInregistrare, certifSanitar)
+            INSERT INTO cofetarii (utilizator_id, numeCofetarie, adresa, telefon, certificat_inregistrare, certificat_sanitar, imagine_coperta)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `).run(utilizatorId, numeCofetarie, adresa, telefon, certifInregistrare, certifSanitar, imagineCoperta)
     }
 
     res.status(201).json({ mesaj: 'Cont creat cu succes', id: utilizatorId })

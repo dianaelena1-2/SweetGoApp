@@ -21,6 +21,7 @@ db.exec(`
         telefon TEXT,
         certificat_inregistrare TEXT, 
         certificat_sanitar TEXT,
+        imagine_coperta TEXT,
         status TEXT DEFAULT 'in_asteptare',
         FOREIGN KEY (utilizator_id) REFERENCES utilizatori(id)
     )

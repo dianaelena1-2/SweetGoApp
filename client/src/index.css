@@ -10,7 +10,7 @@ body {
     color: #3d2c1e;
 }
 
-/* ===== AUTH ===== */
+/* ===== AUTENTIFICARE / INREGISTRARE ===== */
 .auth-container {
     min-height: 100vh;
     display: flex;
@@ -19,6 +19,7 @@ body {
     background: linear-gradient(135deg, #fff8f0, #fdecd8);
 }
 
+/* Cardul central de login/register */
 .auth-card {
     background: white;
     padding: 2.5rem;
@@ -43,6 +44,7 @@ body {
     text-align: center;
 }
 
+/* Grup de camp din formular (label + input) */
 .form-group {
     margin-bottom: 1.2rem;
 }
@@ -72,6 +74,7 @@ body {
     border-color: #c97c2e;
 }
 
+/* Buton principal din auth card */
 .auth-card button {
     width: 100%;
     padding: 0.85rem;
@@ -112,6 +115,7 @@ body {
     text-decoration: underline;
 }
 
+/* Mesaj de eroare din formulare */
 .eroare {
     background: #fdecd8;
     color: #c97c2e;
@@ -135,12 +139,14 @@ body {
     z-index: 100;
 }
 
+/* Logo SweetGo din stanga navbar-ului */
 .navbar-logo {
     font-size: 1.5rem;
     color: #c97c2e;
     font-weight: 700;
 }
 
+/* Bara de cautare din centrul navbar-ului */
 .navbar-search input {
     padding: 0.6rem 1.2rem;
     border: 1.5px solid #f5d5a8;
@@ -156,6 +162,7 @@ body {
     border-color: #c97c2e;
 }
 
+/* Butoanele din dreapta navbar-ului */
 .navbar-actiuni {
     display: flex;
     align-items: center;
@@ -182,6 +189,7 @@ body {
     background: #f0c080;
 }
 
+/* Butonul de deconectare - stilizat diferit */
 .btn-logout {
     background: #c97c2e !important;
     color: white !important;
@@ -191,12 +199,13 @@ body {
     background: #a8621e !important;
 }
 
-/* ===== ACASA CLIENT ===== */
+/* ===== PAGINA ACASA CLIENT ===== */
 .acasa-container {
     min-height: 100vh;
     background: #fffaf5;
 }
 
+/* Zona de continut principal, centrata si cu padding */
 .acasa-continut {
     padding: 2rem;
     max-width: 1200px;
@@ -209,12 +218,14 @@ body {
     margin-bottom: 1.5rem;
 }
 
+/* Grid responsive de carduri cofetarii */
 .cofetarii-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.5rem;
 }
 
+/* Card individual cofetarie din lista */
 .cofetarie-card {
     background: white;
     border-radius: 16px;
@@ -229,6 +240,7 @@ body {
     box-shadow: 0 8px 24px rgba(180, 120, 40, 0.18);
 }
 
+/* Zona imaginii din cardul de cofetarie */
 .cofetarie-card-imagine {
     height: 160px;
     background: linear-gradient(135deg, #fdecd8, #f5d5a8);
@@ -236,8 +248,17 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 4rem;
+    overflow: hidden;
 }
 
+/* Imaginea din cardul de cofetarie - acopera tot spatiul */
+.cofetarie-card-imagine img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Zona de text din cardul de cofetarie */
 .cofetarie-card-info {
     padding: 1rem;
 }
@@ -254,6 +275,7 @@ body {
     margin-bottom: 0.5rem;
 }
 
+/* Rating cu stele */
 .rating {
     display: flex;
     align-items: center;
@@ -270,9 +292,217 @@ body {
     color: #9a7a5a;
 }
 
+/* Mesaje de incarcare sau lista goala */
 .loading, .gol {
     text-align: center;
     color: #9a7a5a;
     font-size: 1.1rem;
     margin-top: 3rem;
+}
+
+/* ===== PAGINA DETALII COFETARIE ===== */
+
+/* Butonul de inapoi - rotunjit, in cromatica aplicatiei */
+.btn-inapoi {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #fdecd8;
+    border: none;
+    color: #c97c2e;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1.2rem;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    transition: background 0.2s;
+}
+
+.btn-inapoi:hover {
+    background: #f5d5a8;
+}
+
+/* Cardul principal cu poza + informatii cofetarie */
+.cofetarie-detalii-header {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(180, 120, 40, 0.1);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+/* Zona pozei de coperta a cofetariei */
+.cofetarie-detalii-coperta {
+    width: 100%;
+    height: 280px;
+    background: linear-gradient(135deg, #fdecd8, #f5d5a8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    overflow: hidden;
+}
+
+/* Imaginea de coperta - acopera tot spatiul disponibil */
+.cofetarie-detalii-coperta img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Zona cu numele, adresa, telefonul si ratingul cofetariei */
+.cofetarie-detalii-info {
+    padding: 1.5rem;
+}
+
+.cofetarie-detalii-info h2 {
+    font-size: 1.8rem;
+    color: #3d2c1e;
+    margin-bottom: 0.5rem;
+}
+
+.cofetarie-detalii-info p {
+    color: #9a7a5a;
+    margin-bottom: 0.3rem;
+}
+
+/* Titlul sectiunii de produse */
+.sectiune-titlu {
+    font-size: 1.3rem;
+    color: #7a5230;
+    margin-bottom: 1.2rem;
+}
+
+/* ===== GRID PRODUSE ===== */
+.produse-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Card individual produs */
+.produs-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(180, 120, 40, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.produs-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Zona imaginii produsului */
+.produs-card-imagine {
+    height: 140px;
+    background: linear-gradient(135deg, #fdecd8, #f5d5a8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    overflow: hidden;
+}
+
+/* Imaginea produsului - acopera tot spatiul */
+.produs-card-imagine img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Zona de text din cardul produsului */
+.produs-card-info {
+    padding: 1rem;
+}
+
+.produs-card-info h4 {
+    font-size: 1rem;
+    color: #3d2c1e;
+    margin-bottom: 0.4rem;
+}
+
+.produs-descriere {
+    font-size: 0.85rem;
+    color: #9a7a5a;
+    margin-bottom: 0.4rem;
+}
+
+.produs-categorie {
+    font-size: 0.8rem;
+    color: #c97c2e;
+    margin-bottom: 0.8rem;
+}
+
+/* Zona de jos a cardului - pret si butoane cos */
+.produs-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.produs-pret {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #c97c2e;
+}
+
+/* Butonul de adaugare initiala in cos */
+.btn-adauga-cos {
+    padding: 0.5rem 0.8rem;
+    background: #c97c2e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-adauga-cos:hover {
+    background: #a8621e;
+}
+
+/* ===== CONTROL CANTITATE PRODUS (plus/minus) ===== */
+.cantitate-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #fdecd8;
+    border-radius: 8px;
+    padding: 0.2rem 0.4rem;
+}
+
+/* Butoanele de plus si minus */
+.cantitate-control button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: #c97c2e;
+    color: white;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.cantitate-control button:hover {
+    background: #a8621e;
+}
+
+/* Numarul de bucati selectate */
+.cantitate-control span {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 700;
+    color: #3d2c1e;
 }

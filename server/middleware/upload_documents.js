@@ -9,6 +9,9 @@ const storage = multer.diskStorage({
         else if(file.fieldname === 'certificat_sanitar'){
             cb(null, 'partner_documents/sanitary_certificates/')
         }
+        else if(file.fieldname === 'imagine_coperta'){
+            cb(null, 'partner_documents/cover_images/')
+        }
     },
     //previne suprascrierea fisierelor, creeaza un nume unic pentru fiecare
     filename: (req, file, cb) => {
@@ -52,4 +55,23 @@ const uploadImaginiProduse = multer({
     limits: { fileSize: 5 * 1024 * 1024 }
 })
 
-module.exports = { upload, uploadImaginiProduse }
+const storageImaginiCofetarii = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'partner_documents/cover_images/')
+    },
+    filename: (req, file, cb) => {
+        const numeCofetarie = req.body.numeCofetarie
+            ? req.body.numeCofetarie.replace(/\s+/g, '_').toLowerCase()
+            : 'cofetarie'
+        const uniqueSuffix = Date.now()
+        cb(null, `${numeCofetarie}-coperta-${uniqueSuffix}${path.extname(file.originalname)}`)
+    }
+})
+
+const uploadImaginiCofetarii = multer({
+    storage: storageImaginiCofetarii,
+    fileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }
+})
+
+module.exports = { upload, uploadImaginiProduse, uploadImaginiCofetarii }

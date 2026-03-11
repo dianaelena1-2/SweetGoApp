@@ -14,6 +14,7 @@ function Register() {
     })
     const [certificatInregistrare, setCertificatInregistrare] = useState(null)
     const [certificatSanitar, setCertificatSanitar] = useState(null)
+    const [imagineCoperta, setImagineCoperta] = useState(null)
     const [eroare, setEroare] = useState('')
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
@@ -23,11 +24,20 @@ function Register() {
     }
 
     const handleSubmit = async (e) => {
+        console.log('SUBMIT APASAT')
         e.preventDefault()
-        setLoading(true)
         setEroare('')
+        if (formData.rol === 'cofetarie') {
+        if (!certificatInregistrare || !certificatSanitar) {
+            setEroare('Documentele sunt obligatorii pentru cofetarii')
+            return
+        }
+        }
+        console.log('INAINTE DE API CALL')
+        setLoading(true)
 
         try {
+            console.log('IN TRY')
             const data = new FormData()
             data.append('nume', formData.nume)
             data.append('email', formData.email)
@@ -40,15 +50,19 @@ function Register() {
                 data.append('telefon', formData.telefon)
                 data.append('certificat_inregistrare', certificatInregistrare)
                 data.append('certificat_sanitar', certificatSanitar)
+                if (imagineCoperta) {
+                    data.append('imagine_coperta', imagineCoperta)
+                }
             }
 
-            await api.post('/auth/register', data, {
+           await api.post('/auth/register', data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
-
+            console.log('RASPUNS OK')
             navigate('/login')
 
         } catch (err) {
+            console.log('EROARE:', err)
             setEroare(err.response?.data?.mesaj || 'A aparut o eroare')
         } finally {
             setLoading(false)
@@ -152,23 +166,30 @@ function Register() {
                                     type="file"
                                     accept=".pdf,.jpg,.jpeg,.png"
                                     onChange={(e) => setCertificatInregistrare(e.target.files[0])}
-                                    required
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label>Certificat sanitar-veterinar</label>
+                                <label>Certificat sanitar</label>
                                 <input
                                     type="file"
                                     accept=".pdf,.jpg,.jpeg,.png"
                                     onChange={(e) => setCertificatSanitar(e.target.files[0])}
-                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Poză copertă cofetărie (opțional)</label>
+                                <input
+                                    type="file"
+                                    accept=".jpg,.jpeg,.png"
+                                    onChange={(e) => setImagineCoperta(e.target.files[0])}
                                 />
                             </div>
                         </>
                     )}
 
-                    <button type="submit" disabled={loading}>
+                    <button type="button" onClick={handleSubmit} disabled={loading}>
                         {loading ? 'Se creează contul...' : 'Creează cont'}
                     </button>
                 </form>

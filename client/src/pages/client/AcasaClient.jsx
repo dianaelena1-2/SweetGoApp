@@ -88,7 +88,11 @@ function AcasaClient(){
                             >
                                 {/* imaginea cofetariei - deocamdata emoji, ulterior imagine reala */}
                                 <div className="cofetarie-card-imagine">
-                                    🍰
+                                    {cofetarie.imagine_coperta ? (
+                                        <img src={`http://localhost:7000/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
+                                    ) : (
+                                        <span>🍰</span>
+                                    )}
                                 </div>
 
                                 {/* informatiile cofetariei */}

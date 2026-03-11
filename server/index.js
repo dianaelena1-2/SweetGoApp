@@ -15,6 +15,8 @@ const app = express()
 app.use(cors({ origin: 'http://localhost:5173' }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+const path = require('path')
+app.use('/partner_documents', express.static(path.join(__dirname, 'partner_documents')))
 
 const PORT = process.env.PORT || 7000
 
