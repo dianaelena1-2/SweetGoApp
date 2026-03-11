@@ -35,6 +35,7 @@ db.exec(`
         descriere TEXT,
         pret REAL NOT NULL,
         categorie TEXT,
+        stoc INTEGER DEFAULT 0,
         disponibil INTEGER DEFAULT 1,
         imagine TEXT,
         FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id)
