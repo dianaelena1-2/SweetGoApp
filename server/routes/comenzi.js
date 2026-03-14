@@ -5,9 +5,9 @@ const { verifyToken, verifyRol } = require('../middleware/auth')
 
 //plasare comanda
 router.post('/', verifyToken, verifyRol('client'), (req,res) => {
-    const { cofetarie_id, adresa_livrare, produse } = req.body
+    const { cofetarie_id, adresa_livrare, telefon, observatii, produse } = req.body
 
-    if (!cofetarie_id || !adresa_livrare || !produse || produse.length === 0) {
+    if (!cofetarie_id || !adresa_livrare || !telefon || !produse || produse.length === 0) {
         return res.status(400).json({ mesaj: 'Toate campurile sunt obligatorii' })
     }
 
@@ -17,22 +17,27 @@ router.post('/', verifyToken, verifyRol('client'), (req,res) => {
         if (!produsDb) {
             return res.status(404).json({ mesaj: `Produsul cu id ${produs.id} nu exista` })
         }
+        if (produsDb.stoc < produs.cantitate) {
+            return res.status(400).json({ mesaj: `Stoc insuficient pentru ${produsDb.numeProdus}` })
+        }
         total += produsDb.pret * produs.cantitate
     }
 
     const comanda = db.prepare(`
-        INSERT INTO comenzi (client_id, cofetarie_id, adresa_livrare, total)
-        VALUES (?, ?, ?, ?)
-    `).run(req.utilizator.id, cofetarie_id, adresa_livrare, total)
+        INSERT INTO comenzi (client_id, cofetarie_id, adresa_livrare, telefon, observatii, total)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `).run(req.utilizator.id, cofetarie_id, adresa_livrare, telefon, observatii || '', total)
 
     const comandaId = comanda.lastInsertRowid
 
     for (const produs of produse) {
         const produsDb = db.prepare('SELECT * FROM produse WHERE id = ?').get(produs.id)
         db.prepare(`
-            INSERT INTO detalii_comanda (comanda_id, produs_id, cantitate, pret_unitar)
-            VALUES (?, ?, ?, ?)
-        `).run(comandaId, produs.id, produs.cantitate, produsDb.pret)
+            INSERT INTO detalii_comanda (comanda_id, produs_id, cantitate, pret_unitar, optiune_decor, observatii)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `).run(comandaId, produs.id, produs.cantitate, produsDb.pret, produs.optiune_decor || null, produs.observatii || null)
+        // scade stocul
+        db.prepare('UPDATE produse SET stoc = stoc - ? WHERE id = ?').run(produs.cantitate, produs.id)
     }
 
     res.status(201).json({ mesaj: 'Comanda plasata cu succes', id: comandaId })

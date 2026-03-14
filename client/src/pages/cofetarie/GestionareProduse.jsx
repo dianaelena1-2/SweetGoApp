@@ -30,6 +30,9 @@ function GestionareProduse() {
     const [formEditare, setFormEditare] = useState(produsGol)
     const [imagineEditare, setImagineEditare] = useState(null)
 
+    const [optiuniDecor, setOptiuniDecor] = useState({})
+    const [optiuneNoua, setOptiuneNoua] = useState({})
+
     useEffect(() => {
         fetchProduse()
     }, [])
@@ -42,6 +45,15 @@ function GestionareProduse() {
             setEroare('Eroare la încărcarea produselor')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const fetchOptiuni = async (produsId) => {
+        try {
+            const raspuns = await api.get(`/optiuni-decor/produs/${produsId}`)
+            setOptiuniDecor(prev => ({ ...prev, [produsId]: raspuns.data }))
+        } catch (err) {
+            console.error('Eroare la incarcarea optiunilor', err)
         }
     }
 
@@ -61,7 +73,6 @@ function GestionareProduse() {
             setEroare('Numele și prețul sunt obligatorii')
             return
         }
-
         try {
             const data = new FormData()
             data.append('numeProdus', formNou.numeProdus)
@@ -71,11 +82,7 @@ function GestionareProduse() {
             data.append('stoc', formNou.stoc || 0)
             data.append('disponibil', formNou.disponibil)
             if (imagineNoua) data.append('imagine', imagineNoua)
-
-            await api.post('/produse', data, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            })
-
+            await api.post('/produse', data, { headers: { 'Content-Type': 'multipart/form-data' } })
             setFormNou(produsGol)
             setImagineNoua(null)
             afiseazaSucces('Produs adăugat cu succes!')
@@ -96,6 +103,9 @@ function GestionareProduse() {
             disponibil: produs.disponibil
         })
         setImagineEditare(null)
+        if (produs.categorie === 'Torturi') {
+            fetchOptiuni(produs.id)
+        }
     }
 
     const handleSalveazaEditare = async (id) => {
@@ -104,7 +114,6 @@ function GestionareProduse() {
             setEroare('Numele și prețul sunt obligatorii')
             return
         }
-
         try {
             const data = new FormData()
             data.append('numeProdus', formEditare.numeProdus)
@@ -114,11 +123,7 @@ function GestionareProduse() {
             data.append('disponibil', formEditare.disponibil)
             data.append('stoc', formEditare.stoc || 0)
             if (imagineEditare) data.append('imagine', imagineEditare)
-
-            await api.put(`/produse/${id}`, data, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            })
-
+            await api.put(`/produse/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
             setEditareId(-1)
             afiseazaSucces('Produs actualizat cu succes!')
             fetchProduse()
@@ -138,9 +143,75 @@ function GestionareProduse() {
         }
     }
 
+    const handleAdaugaOptiune = async (produsId) => {
+        const denumire = optiuneNoua[produsId]?.trim()
+        if (!denumire) return
+        try {
+            await api.post('/optiuni-decor', { produs_id: produsId, denumire })
+            setOptiuneNoua(prev => ({ ...prev, [produsId]: '' }))
+            fetchOptiuni(produsId)
+        } catch (err) {
+            setEroare(err.response?.data?.mesaj || 'Eroare la adaugarea optiunii')
+        }
+    }
+
+    const handleStergeOptiune = async (optiuneId, produsId) => {
+        try {
+            await api.delete(`/optiuni-decor/${optiuneId}`)
+            fetchOptiuni(produsId)
+        } catch (err) {
+            setEroare('Eroare la stergerea optiunii')
+        }
+    }
+
+    const renderOptiuniDecor = (produs) => (
+        <div className="gp-optiuni-decor">
+            <h5>🎨 Opțiuni decor</h5>
+            {!optiuniDecor[produs.id] ? (
+                <button
+                    className="btn-secundar"
+                    style={{ fontSize: '0.8rem', padding: '0.3rem 0.7rem' }}
+                    onClick={() => fetchOptiuni(produs.id)}
+                >
+                    Vezi opțiuni
+                </button>
+            ) : (
+                <>
+                    {optiuniDecor[produs.id].length === 0 ? (
+                        <p style={{ fontSize: '0.8rem', color: '#9a7a5a' }}>Nicio opțiune adăugată</p>
+                    ) : (
+                        <ul className="gp-optiuni-lista">
+                            {optiuniDecor[produs.id].map(opt => (
+                                <li key={opt.id}>
+                                    <span>{opt.denumire}</span>
+                                    <button onClick={() => handleStergeOptiune(opt.id, produs.id)}>✕</button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                    <div className="gp-optiune-adauga">
+                        <input
+                            type="text"
+                            placeholder="ex: Trandafiri roz"
+                            value={optiuneNoua[produs.id] || ''}
+                            onChange={(e) => setOptiuneNoua(prev => ({ ...prev, [produs.id]: e.target.value }))}
+                            onKeyDown={(e) => e.key === 'Enter' && handleAdaugaOptiune(produs.id)}
+                        />
+                        <button
+                            className="btn-primar"
+                            style={{ padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}
+                            onClick={() => handleAdaugaOptiune(produs.id)}
+                        >
+                            + Adaugă
+                        </button>
+                    </div>
+                </>
+            )}
+        </div>
+    )
+
     return (
         <div className="acasa-container">
-            {/* NAVBAR */}
             <nav className="navbar">
                 <h1 className="navbar-logo" onClick={() => navigate('/cofetarie/dashboard')} style={{ cursor: 'pointer' }}>
                     SweetGo 🍰
@@ -319,6 +390,9 @@ function GestionareProduse() {
                                                     onChange={(e) => setImagineEditare(e.target.files[0])}
                                                 />
                                             </div>
+
+                                            {formEditare.categorie === 'Torturi' && renderOptiuniDecor(produs)}
+
                                             <div className="gp-butoane-editare">
                                                 <button className="btn-primar" onClick={() => handleSalveazaEditare(produs.id)}>
                                                     Salvează
@@ -331,7 +405,7 @@ function GestionareProduse() {
                                     </div>
                                 ) : (
                                     /* MOD VIZUALIZARE */
-                                    <div className="gp-produs-vizualizare">
+                                    <div className="gp-produs-vizualizare" style={{ flexWrap: 'wrap' }}>
                                         <div className="gp-produs-imagine">
                                             {produs.imagine ? (
                                                 <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
@@ -357,6 +431,8 @@ function GestionareProduse() {
                                                 🗑️ Șterge
                                             </button>
                                         </div>
+
+                                        {produs.categorie === 'Torturi' && renderOptiuniDecor(produs)}
                                     </div>
                                 )}
                             </div>

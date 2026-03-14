@@ -50,6 +50,8 @@ db.exec(`
         status TEXT DEFAULT 'plasata',
         total REAL NOT NULL,
         adresa_livrare TEXT NOT NULL,
+        telefon TEXT,
+        observatii TEXT,
         creat_la DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (client_id) REFERENCES utilizatori(id),
         FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id)
@@ -63,6 +65,8 @@ db.exec(`
         produs_id INTEGER NOT NULL,
         cantitate INTEGER NOT NULL,
         pret_unitar REAL NOT NULL,
+        optiune_decor TEXT,
+        observatii TEXT,
         FOREIGN KEY (comanda_id) REFERENCES comenzi(id),
         FOREIGN KEY (produs_id) REFERENCES produse(id)
     )
@@ -78,6 +82,15 @@ db.exec(`
         creat_la DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (client_id) REFERENCES utilizatori(id),
         FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id)
+    )
+`)
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS optiuni_decor (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        produs_id INTEGER NOT NULL,
+        denumire TEXT NOT NULL,
+        FOREIGN KEY (produs_id) REFERENCES produse(id)
     )
 `)
 

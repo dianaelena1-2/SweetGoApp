@@ -12,11 +12,18 @@ function DetaliiCofetarie() {
     const [produse, setProduse] = useState([])
     const [loading, setLoading] = useState(true)
 
-    // initializam cosul din localStorage
     const [cos, setCos] = useState(() => {
         const cosSalvat = localStorage.getItem('cos')
         return cosSalvat ? JSON.parse(cosSalvat) : { cofetarie_id: null, produse: [] }
     })
+
+    const [modalDeschis, setModalDeschis] = useState(false)
+    const [produsMmodal, setProdusModal] = useState(null)
+    const [cantitateModal, setCantitateModal] = useState(1)
+    const [optiuniDecorModal, setOptiuniDecorModal] = useState([])
+    const [optiuneSelectata, setOptiuneSelectata] = useState('') // 'Trandafiri roz' sau 'Alta' sau ''
+    const [optiuneCustom, setOptiuneCustom] = useState('') // textul custom cand e selectat 'Alta'
+    const [observatiiModal, setObservatiiModal] = useState('')
 
     useEffect(() => {
         const fetchDetalii = async () => {
@@ -33,39 +40,82 @@ function DetaliiCofetarie() {
         fetchDetalii()
     }, [id])
 
-    // salveaza cosul in localStorage de fiecare data cand se schimba
     useEffect(() => {
         localStorage.setItem('cos', JSON.stringify(cos))
     }, [cos])
 
-    const adaugaInCos = (produs) => {
-        // daca cosul are produse din alta cofetarie, avertizam userul
+    const deschideModal = async (produs) => {
+        setProdusModal(produs)
+        setCantitateModal(1)
+        setOptiuneSelectata('')
+        setOptiuneCustom('')
+        setObservatiiModal('')
+        setOptiuniDecorModal([])
+
+        if (produs.categorie === 'Torturi') {
+            try {
+                const raspuns = await api.get(`/optiuni-decor/produs/${produs.id}`)
+                setOptiuniDecorModal(raspuns.data)
+            } catch (err) {
+                console.error('Eroare la incarcarea optiunilor', err)
+            }
+        }
+
+        setModalDeschis(true)
+    }
+
+    const inchideModal = () => {
+        setModalDeschis(false)
+        setProdusModal(null)
+        setOptiuneCustom('')
+    }
+
+    const confirmaAdaugareInCos = () => {
+        const produs = produsMmodal
+        // daca e 'Alta', folosim textul custom, altfel optiunea selectata
+        const optiuneFinala = optiuneSelectata === 'Alta'
+            ? (optiuneCustom.trim() || null)
+            : (optiuneSelectata || null)
+
         if (cos.cofetarie_id && cos.cofetarie_id !== id) {
             const confirmare = window.confirm(
                 'Ai produse din altă cofetărie în coș. Vrei să golești coșul și să adaugi din această cofetărie?'
             )
-            if (!confirmare) return
-            // golim cosul si adaugam produsul nou
+            if (!confirmare) {
+                inchideModal()
+                return
+            }
             setCos({
                 cofetarie_id: id,
-                produse: [{ ...produs, cantitate: 1 }]
+                produse: [{
+                    ...produs,
+                    cantitate: cantitateModal,
+                    optiune_decor: optiuneFinala,
+                    observatii: observatiiModal || null
+                }]
             })
+            inchideModal()
             return
         }
 
-        // verificam daca produsul e deja in cos
         const produseActualizate = [...cos.produse]
         const indexExistent = produseActualizate.findIndex(p => p.id === produs.id)
 
         if (indexExistent >= 0) {
-            // daca exista, crestem cantitatea
-            produseActualizate[indexExistent].cantitate += 1
+            produseActualizate[indexExistent].cantitate += cantitateModal
+            produseActualizate[indexExistent].optiune_decor = optiuneFinala
+            produseActualizate[indexExistent].observatii = observatiiModal || null
         } else {
-            // daca nu exista, il adaugam cu cantitatea 1
-            produseActualizate.push({ ...produs, cantitate: 1 })
+            produseActualizate.push({
+                ...produs,
+                cantitate: cantitateModal,
+                optiune_decor: optiuneFinala,
+                observatii: observatiiModal || null
+            })
         }
 
         setCos({ cofetarie_id: id, produse: produseActualizate })
+        inchideModal()
     }
 
     const scadeInCos = (produs) => {
@@ -74,22 +124,18 @@ function DetaliiCofetarie() {
 
         if (indexExistent >= 0) {
             if (produseActualizate[indexExistent].cantitate === 1) {
-                // daca cantitatea e 1, scoatem produsul din cos
                 produseActualizate.splice(indexExistent, 1)
             } else {
-                // altfel scadem cantitatea
                 produseActualizate[indexExistent].cantitate -= 1
             }
         }
 
-        // daca nu mai sunt produse, resetam si cofetaria din cos
         setCos({
             cofetarie_id: produseActualizate.length > 0 ? id : null,
             produse: produseActualizate
         })
     }
 
-    // returneaza cantitatea unui produs din cos
     const cantitateDinCos = (produsId) => {
         const produs = cos.produse.find(p => p.id === produsId)
         return produs ? produs.cantitate : 0
@@ -113,7 +159,6 @@ function DetaliiCofetarie() {
 
     return (
         <div className="acasa-container">
-            {/* NAVBAR */}
             <nav className="navbar">
                 <h1 className="navbar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
                     SweetGo 🍰
@@ -129,47 +174,42 @@ function DetaliiCofetarie() {
             </nav>
 
             <div className="acasa-continut">
-                {/* HEADER COFETARIE */}
                 <button className="btn-inapoi" onClick={() => navigate('/')}>← Înapoi</button>
 
                 <div className="cofetarie-detalii-header">
-                {/* poza de coperta a cofetariei */}
-                <div className="cofetarie-detalii-coperta">
-                    {cofetarie.imagine_coperta ? (
-                        <img src={`http://localhost:7000/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
-                    ) : (
-                        <span>🏪</span>
-                    )}
-                </div>
-                <div className="cofetarie-detalii-info">
-                    <h2>{cofetarie.numeCofetarie}</h2>
-                    <p>📍 {cofetarie.adresa}</p>
-                    <p>📞 {cofetarie.telefon}</p>
-                    <div className="rating">
-                        <span className="stele">{renderStele(cofetarie.rating_mediu)}</span>
-                        <span className="numar-recenzii">
-                            {cofetarie.numar_recenzii > 0
-                                ? `(${cofetarie.numar_recenzii} recenzii)`
-                                : '(fără recenzii)'}
-                        </span>
+                    <div className="cofetarie-detalii-coperta">
+                        {cofetarie.imagine_coperta ? (
+                            <img src={`http://localhost:7000/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
+                        ) : (
+                            <span>🏪</span>
+                        )}
+                    </div>
+                    <div className="cofetarie-detalii-info">
+                        <h2>{cofetarie.numeCofetarie}</h2>
+                        <p>📍 {cofetarie.adresa}</p>
+                        <p>📞 {cofetarie.telefon}</p>
+                        <div className="rating">
+                            <span className="stele">{renderStele(cofetarie.rating_mediu)}</span>
+                            <span className="numar-recenzii">
+                                {cofetarie.numar_recenzii > 0
+                                    ? `(${cofetarie.numar_recenzii} recenzii)`
+                                    : '(fără recenzii)'}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-                {/* PRODUSE */}
                 <h3 className="sectiune-titlu">Produse disponibile</h3>
                 {produse.length === 0 ? (
                     <p className="gol">Această cofetărie nu are produse disponibile momentan.</p>
                 ) : (
                     <div className="produse-grid">
                         {produse.map(produs => (
-                            <div key={produs.id} className="produs-card">
+                            <div key={produs.id} className={`produs-card ${!produs.disponibil || produs.stoc === 0 ? 'produs-indisponibil' : ''}`}>
                                 <div className="produs-card-imagine">
                                     {produs.imagine ? (
                                         <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
-                                    ) : (
-                                        <span>🎂</span>
-                                    )}
+                                    ) : <span>🎂</span>}
                                 </div>
                                 <div className="produs-card-info">
                                     <h4>{produs.numeProdus}</h4>
@@ -178,11 +218,12 @@ function DetaliiCofetarie() {
                                     <div className="produs-footer">
                                         <span className="produs-pret">{produs.pret} lei</span>
 
-                                        {/* butoane plus/minus */}
-                                        {cantitateDinCos(produs.id) === 0 ? (
+                                        {!produs.disponibil || produs.stoc === 0 ? (
+                                            <span className="badge-indisponibil">Indisponibil</span>
+                                        ) : cantitateDinCos(produs.id) === 0 ? (
                                             <button
                                                 className="btn-adauga-cos"
-                                                onClick={() => adaugaInCos(produs)}
+                                                onClick={() => deschideModal(produs)}
                                             >
                                                 + Adaugă
                                             </button>
@@ -190,7 +231,10 @@ function DetaliiCofetarie() {
                                             <div className="cantitate-control">
                                                 <button onClick={() => scadeInCos(produs)}>−</button>
                                                 <span>{cantitateDinCos(produs.id)}</span>
-                                                <button onClick={() => adaugaInCos(produs)}>+</button>
+                                                <button
+                                                    onClick={() => deschideModal(produs)}
+                                                    disabled={cantitateDinCos(produs.id) >= produs.stoc}
+                                                >+</button>
                                             </div>
                                         )}
                                     </div>
@@ -200,6 +244,96 @@ function DetaliiCofetarie() {
                     </div>
                 )}
             </div>
+
+            {/* MODAL PERSONALIZARE */}
+            {modalDeschis && produsMmodal && (
+                <div className="modal-overlay" onClick={inchideModal}>
+                    <div className="modal-continut" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-inchide" onClick={inchideModal}>✕</button>
+
+                        <div className="modal-produs-imagine">
+                            {produsMmodal.imagine ? (
+                                <img src={`http://localhost:7000/${produsMmodal.imagine}`} alt={produsMmodal.numeProdus} />
+                            ) : <span>🎂</span>}
+                        </div>
+
+                        <h3 className="modal-titlu">{produsMmodal.numeProdus}</h3>
+                        <p className="modal-descriere">{produsMmodal.descriere}</p>
+                        <p className="modal-pret">{produsMmodal.pret} lei / buc</p>
+
+                        {/* SELECTOR CANTITATE */}
+                        <div className="modal-sectiune">
+                            <label className="modal-label">Cantitate</label>
+                            <div className="cantitate-control">
+                                <button onClick={() => setCantitateModal(c => Math.max(1, c - 1))}>−</button>
+                                <span>{cantitateModal}</span>
+                                <button
+                                    onClick={() => setCantitateModal(c => Math.min(produsMmodal.stoc - cantitateDinCos(produsMmodal.id), c + 1))}
+                                    disabled={cantitateModal >= produsMmodal.stoc - cantitateDinCos(produsMmodal.id)}
+                                >+</button>
+                            </div>
+                            <p className="modal-stoc-info">Stoc disponibil: {produsMmodal.stoc - cantitateDinCos(produsMmodal.id)} buc</p>
+                        </div>
+
+                        {/* OPTIUNI DECOR - doar pentru torturi */}
+                        {produsMmodal.categorie === 'Torturi' && optiuniDecorModal.length > 0 && (
+                            <div className="modal-sectiune">
+                                <label className="modal-label">🎨 Opțiune decor</label>
+                                <div className="modal-optiuni-decor">
+                                    {optiuniDecorModal.map(opt => (
+                                        <button
+                                            key={opt.id}
+                                            className={`modal-optiune-btn ${optiuneSelectata === opt.denumire ? 'activa' : ''}`}
+                                            onClick={() => {
+                                                setOptiuneSelectata(optiuneSelectata === opt.denumire ? '' : opt.denumire)
+                                                setOptiuneCustom('')
+                                            }}
+                                        >
+                                            {opt.denumire}
+                                        </button>
+                                    ))}
+                                    <button
+                                        className={`modal-optiune-btn ${optiuneSelectata === 'Alta' ? 'activa' : ''}`}
+                                        onClick={() => setOptiuneSelectata(optiuneSelectata === 'Alta' ? '' : 'Alta')}
+                                    >
+                                        ✏️ Altă opțiune
+                                    </button>
+                                </div>
+                                {optiuneSelectata === 'Alta' && (
+                                    <input
+                                        type="text"
+                                        className="modal-input-alta"
+                                        placeholder="Descrie opțiunea dorită..."
+                                        value={optiuneCustom}
+                                        onChange={(e) => setOptiuneCustom(e.target.value)}
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {/* OBSERVATII */}
+                        <div className="modal-sectiune">
+                            <label className="modal-label">📝 Observații (opțional)</label>
+                            <textarea
+                                className="modal-textarea"
+                                placeholder="ex: Scrie pe tort 'La mulți ani Ana!', fără zahăr..."
+                                value={observatiiModal}
+                                onChange={(e) => setObservatiiModal(e.target.value)}
+                                rows={3}
+                            />
+                        </div>
+
+                        <div className="modal-total">
+                            <span>Total</span>
+                            <span className="modal-total-pret">{(produsMmodal.pret * cantitateModal).toFixed(2)} lei</span>
+                        </div>
+
+                        <button className="btn-primar modal-btn-adauga" onClick={confirmaAdaugareInCos}>
+                            🛒 Adaugă în coș
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

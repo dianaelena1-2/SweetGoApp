@@ -34,19 +34,24 @@ const cofetarieExistenta = db.prepare('SELECT * FROM utilizatori WHERE email = ?
 if (!cofetarieExistenta) {
     const parolaHash = bcrypt.hashSync('123456', 10)
 
-    // cream utilizatorul pentru cofetarie
     const utilizator = db.prepare(`
         INSERT INTO utilizatori (nume, email, parola, rol)
         VALUES (?, ?, ?, ?)
     `).run('Ion Popescu', 'ion.popescu@dulcegarii.com', parolaHash, 'cofetarie')
 
-    // cream cofetaria si o aprobam direct
-    db.prepare(`
+    const cofetarie = db.prepare(`
         INSERT INTO cofetarii (utilizator_id, numeCofetarie, adresa, telefon, status)
         VALUES (?, ?, ?, ?, ?)
     `).run(utilizator.lastInsertRowid, 'Dulcegarii', 'Strada Florilor nr. 10', '0742518654', 'aprobata')
 
+    // ===== PRODUS =====
+    db.prepare(`
+        INSERT INTO produse (cofetarie_id, numeProdus, descriere, pret, categorie, stoc, disponibil)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(cofetarie.lastInsertRowid, 'Tort Ciocolată', 'Tort cu cremă de ciocolată și fructe de pădure', 120, 'Torturi', 10, 1)
+
     console.log('✓ Cofetarie creata si aprobata - Email: ion.popescu@dulcegarii.com | Parola: 123456')
+    console.log('✓ Produs creat - Tort Ciocolată | Pret: 120 lei | Stoc: 10 buc')
 } else {
     console.log('! Cofetaria exista deja')
 }
