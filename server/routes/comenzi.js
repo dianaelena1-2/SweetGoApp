@@ -53,7 +53,17 @@ router.get('/istoricul-meu',verifyToken, verifyRol('client'), (req,res) => {
         ORDER BY c.creat_la DESC
     `).all(req.utilizator.id)
 
-    res.json(comenzi)
+    const comenziCuProduse = comenzi.map(comanda => {
+        const produse = db.prepare(`
+            SELECT dc.cantitate, dc.pret_unitar, dc.optiune_decor, dc.observatii, p.numeProdus, p.imagine
+            FROM detalii_comanda dc
+            JOIN produse p ON dc.produs_id = p.id
+            WHERE dc.comanda_id = ?
+        `).all(comanda.id)
+        return { ...comanda, produse }
+    })
+
+    res.json(comenziCuProduse)
 })
 
 //comenzile unei cofetarii
@@ -72,7 +82,17 @@ router.get('/cofetarie', verifyToken, verifyRol('cofetarie'), (req, res) => {
         ORDER BY c.creat_la DESC
     `).all(cofetarie.id)
 
-    res.json(comenzi)
+    const comenziCuProduse = comenzi.map(comanda => {
+        const produse = db.prepare(`
+            SELECT dc.cantitate, dc.pret_unitar, dc.optiune_decor, dc.observatii, p.numeProdus, p.imagine
+            FROM detalii_comanda dc
+            JOIN produse p ON dc.produs_id = p.id
+            WHERE dc.comanda_id = ?
+        `).all(comanda.id)
+        return { ...comanda, produse }
+    })
+
+    res.json(comenziCuProduse)
 })
 
 //actualizare status comanda

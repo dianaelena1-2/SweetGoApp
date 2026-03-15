@@ -62,7 +62,7 @@ function AcasaClient(){
                 <div className="navbar-actiuni">
                     <span>Bună, {utilizator?.nume}!</span>
                     <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
-                    <button onClick={() => navigate('/cos')}>🛒 Coș</button>
+                    <button onClick={() => navigate('/cos-cumparaturi')}>🛒 Coș</button>
                     <button onClick={handleLogout} className="btn-logout">Deconectare</button>
                 </div>
             </nav>

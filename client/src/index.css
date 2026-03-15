@@ -1172,3 +1172,272 @@ body {
     opacity: 0.6;
     filter: grayscale(40%);
 }
+
+/* ===== ISTORIC COMENZI ===== */
+.ic-filtre {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.ic-filtru-btn {
+    padding: 0.4rem 1rem;
+    border: 1.5px solid #f5d5a8;
+    border-radius: 20px;
+    background: white;
+    color: #7a5230;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ic-filtru-btn:hover {
+    background: #fdecd8;
+}
+
+.ic-filtru-btn.activ {
+    background: #c97c2e;
+    color: white;
+    border-color: #c97c2e;
+}
+
+.ic-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ic-comanda-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(180, 120, 40, 0.1);
+    overflow: hidden;
+}
+
+.ic-comanda-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ic-comanda-header:hover {
+    background: #fffaf5;
+}
+
+.ic-comanda-info h4 {
+    font-size: 1rem;
+    color: #3d2c1e;
+    margin-bottom: 0.3rem;
+}
+
+.ic-data, .ic-adresa {
+    font-size: 0.82rem;
+    color: #9a7a5a;
+    margin-bottom: 0.2rem;
+}
+
+.ic-comanda-dreapta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+}
+
+.ic-status {
+    padding: 0.25rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-plasata { background: #fff3cd; color: #856404; }
+.status-confirmata { background: #cce5ff; color: #004085; }
+.status-in-preparare { background: #fdecd8; color: #c97c2e; }
+.status-in-livrare { background: #d4edda; color: #155724; }
+.status-livrata { background: #d4edda; color: #155724; }
+.status-anulata { background: #f8d7da; color: #721c24; }
+
+.ic-total {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #c97c2e;
+}
+
+.ic-expand {
+    font-size: 0.8rem;
+    color: #9a7a5a;
+}
+
+.ic-produse {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f5d5a8;
+    background: #fffaf5;
+}
+
+.ic-produse h5 {
+    font-size: 0.9rem;
+    color: #7a5230;
+    margin-bottom: 0.8rem;
+}
+
+.ic-produs-rand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f5d5a8;
+    flex-wrap: wrap;
+}
+
+.ic-produs-rand:last-child {
+    border-bottom: none;
+}
+
+.ic-produs-imagine {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #fdecd8, #f5d5a8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.ic-produs-imagine img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ic-produs-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.ic-produs-nume {
+    font-size: 0.9rem;
+    color: #3d2c1e;
+    font-weight: 500;
+}
+
+.ic-produs-cantitate {
+    font-size: 0.85rem;
+    color: #9a7a5a;
+}
+
+.ic-produs-pret {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #c97c2e;
+    margin-left: auto;
+}
+
+.ic-produs-detalii {
+    width: 100%;
+    padding-left: 62px;
+}
+
+.ic-produs-detalii p {
+    font-size: 0.8rem;
+    color: #7a5230;
+    font-style: italic;
+    margin-bottom: 0.2rem;
+}
+
+/* ===== GESTIONARE COMENZI ===== */
+.gc-butoane-status {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f5d5a8;
+}
+
+.ic-observatii-generale {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    background: #fdecd8;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #7a5230;
+}
+
+/* ===== DASHBOARD COFETARIE ===== */
+.db-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.db-stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 4px 16px rgba(180, 120, 40, 0.1);
+}
+
+.db-stat-icon {
+    font-size: 2.5rem;
+}
+
+.db-stat-numar {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #3d2c1e;
+    margin-bottom: 0.2rem;
+}
+
+.db-stat-label {
+    font-size: 0.85rem;
+    color: #9a7a5a;
+}
+
+.db-stat-nou { border-left: 4px solid #c97c2e; }
+.db-stat-curs { border-left: 4px solid #3498db; }
+.db-stat-incasari { border-left: 4px solid #2ecc71; }
+.db-stat-produse { border-left: 4px solid #9b59b6; }
+
+.db-actiuni {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.db-actiune-btn {
+    padding: 0.7rem 1.3rem;
+    background: white;
+    border: 1.5px solid #f5d5a8;
+    border-radius: 12px;
+    color: #7a5230;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(180, 120, 40, 0.08);
+}
+
+.db-actiune-btn:hover {
+    background: #fdecd8;
+    border-color: #c97c2e;
+}
+
+.db-actiune-urgent {
+    background: #fdecd8;
+    border-color: #c97c2e;
+    color: #c97c2e;
+}
