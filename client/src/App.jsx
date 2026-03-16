@@ -11,7 +11,6 @@ import AcasaClient from './pages/client/AcasaClient'
 import DetaliiCofetarie from './pages/client/DetaliiCofetarie'
 import CosCumparaturi from './pages/client/CosCumparaturi'
 import IstoricComenzi from './pages/client/IstoricComenzi'
-import ProfilClient from './pages/client/ProfilClient'
 
 //cofetarie pages
 import DashboardCofetarie from './pages/cofetarie/DashboardCofetarie'
@@ -20,7 +19,6 @@ import GestionareComenzi from './pages/cofetarie/GestionareComenzi'
 
 //admin pages
 import DashboardAdmin from './pages/admin/DashboardAdmin'
-import GestionareUtilizatori from './pages/admin/GestionareUtilizatori'
 
 const ProtectedRoute = ({ children, rol }) => {
   const { utilizator, loading } = useContext(AuthContext)
@@ -44,7 +42,6 @@ function App(){
         <Route path="/cofetarie/:id" element={<ProtectedRoute rol="client"><DetaliiCofetarie /></ProtectedRoute>} />
         <Route path="/cos-cumparaturi" element={<ProtectedRoute rol="client"><CosCumparaturi /></ProtectedRoute>} />
         <Route path="/comenzile-mele" element={<ProtectedRoute rol="client"><IstoricComenzi /></ProtectedRoute>} />
-        <Route path="/profil" element={<ProtectedRoute rol="client"><ProfilClient /></ProtectedRoute>} />
 
         {/*cofetarie*/}
         <Route path="/cofetarie/dashboard" element={<ProtectedRoute rol="cofetarie"><DashboardCofetarie /></ProtectedRoute>} />
@@ -53,7 +50,6 @@ function App(){
 
         {/*admin*/}
         <Route path="/admin/dashboard" element={<ProtectedRoute rol="admin"><DashboardAdmin /></ProtectedRoute>} />
-        <Route path="/admin/utilizatori" element={<ProtectedRoute rol="admin"><GestionareUtilizatori/></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )

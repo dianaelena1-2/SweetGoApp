@@ -42,4 +42,20 @@ router.get('/cofetarie', verifyToken, verifyRol('cofetarie'), (req, res) => {
     res.json({ comenziNoi, comenziInCurs, totalIncasari, produseActive, ultimeleComenzi })
 })
 
+router.get('/admin', verifyToken, verifyRol('admin'), (req, res) => {
+    const totalUtilizatori = db.prepare('SELECT COUNT(*) as total FROM utilizatori WHERE rol != ?').get('admin').total
+    const totalCofetarii = db.prepare('SELECT COUNT(*) as total FROM cofetarii WHERE status = ?').get('aprobata').total
+    const totalComenzi = db.prepare('SELECT COUNT(*) as total FROM comenzi').get().total
+    const totalIncasari = db.prepare('SELECT COALESCE(SUM(total), 0) as total FROM comenzi WHERE status = ?').get('livrata').total
+    const cofetariiInAsteptare = db.prepare(`
+        SELECT c.*, u.nume, u.email
+        FROM cofetarii c
+        JOIN utilizatori u ON c.utilizator_id = u.id
+        WHERE c.status = 'in_asteptare'
+        ORDER BY c.id DESC
+    `).all()
+
+    res.json({ totalUtilizatori, totalCofetarii, totalComenzi, totalIncasari, cofetariiInAsteptare })
+})
+
 module.exports = router
