@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
+import { Cake, ShoppingCart, Store, Calendar, MapPin, Palette, StickyNote, Package } from 'lucide-react'
 import api from '../../services/api'
 
 const STATUSURI = ['toate', 'plasata', 'confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata']
@@ -95,7 +96,7 @@ function IstoricComenzi() {
                     <p className="loading">Se încarcă...</p>
                 ) : comenziFiltrate.length === 0 ? (
                     <div className="cos-gol">
-                        <p>📦 Nu ai comenzi {filtruStatus !== 'toate' ? `cu statusul "${statusLabel[filtruStatus]?.text}"` : 'încă'}.</p>
+                        <p><Package size={20} /> Nu ai comenzi {filtruStatus !== 'toate' ? `cu statusul "${statusLabel[filtruStatus]?.text}"` : 'încă'}.</p>
                         {filtruStatus === 'toate' && (
                             <button className="btn-primar" onClick={() => navigate('/')}>
                                 Explorează cofetăriile
@@ -109,9 +110,9 @@ function IstoricComenzi() {
                                 {/* HEADER COMANDA */}
                                 <div className="ic-comanda-header" onClick={() => toggleExpandare(comanda.id)}>
                                     <div className="ic-comanda-info">
-                                        <h4>🏪 {comanda.numeCofetarie}</h4>
-                                        <p className="ic-data">📅 {formatData(comanda.creat_la)}</p>
-                                        <p className="ic-adresa">📍 {comanda.adresa_livrare}</p>
+                                        <h4 className="icon-text-align"><Store size={18} color="#c97c2e" /> {comanda.numeCofetarie}</h4>
+                                        <p className="ic-data"><Calendar size={14} /> {formatData(comanda.creat_la)}</p>
+                                        <p className="ic-adresa icon-text-align"><MapPin size={14} /> {comanda.adresa_livrare}</p>
                                     </div>
                                     <div className="ic-comanda-dreapta">
                                         <span className={`ic-status ${statusLabel[comanda.status]?.cls}`}>
@@ -133,7 +134,7 @@ function IstoricComenzi() {
                                                 <div className="ic-produs-imagine">
                                                     {produs.imagine ? (
                                                         <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
-                                                    ) : <span>🎂</span>}
+                                                    ) : <Cake size={32} color="#c97c2e" strokeWidth={1.5} />}
                                                 </div>
                                                 <div className="ic-produs-info">
                                                     <span className="ic-produs-nume">{produs.numeProdus}</span>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
+import { Cake, Bell, Hourglass, Coins, Package, User, Calendar, MapPin } from 'lucide-react'
 import api from '../../services/api'
 
 const statusLabel = {
@@ -72,28 +73,28 @@ function DashboardCofetarie() {
                         {/* CARDURI STATISTICI */}
                         <div className="db-stats-grid">
                             <div className="db-stat-card db-stat-nou">
-                                <div className="db-stat-icon">🔔</div>
+                                <div className="db-stat-icon"><Bell size={32} /></div>
                                 <div className="db-stat-info">
                                     <p className="db-stat-numar">{date.comenziNoi}</p>
                                     <p className="db-stat-label">Comenzi noi</p>
                                 </div>
                             </div>
                             <div className="db-stat-card db-stat-curs">
-                                <div className="db-stat-icon">⏳</div>
+                                <div className="db-stat-icon"><Hourglass size={32} /></div>
                                 <div className="db-stat-info">
                                     <p className="db-stat-numar">{date.comenziInCurs}</p>
                                     <p className="db-stat-label">Comenzi în curs</p>
                                 </div>
                             </div>
                             <div className="db-stat-card db-stat-incasari">
-                                <div className="db-stat-icon">💰</div>
+                                <div className="db-stat-icon"><Coins size={32} /></div>
                                 <div className="db-stat-info">
                                     <p className="db-stat-numar">{date.totalIncasari.toFixed(2)} lei</p>
                                     <p className="db-stat-label">Total încasări</p>
                                 </div>
                             </div>
                             <div className="db-stat-card db-stat-produse">
-                                <div className="db-stat-icon">🍰</div>
+                                <div className="db-stat-icon"><Cake size={32} /></div>
                                 <div className="db-stat-info">
                                     <p className="db-stat-numar">{date.produseActive}</p>
                                     <p className="db-stat-label">Produse active</p>
@@ -111,7 +112,7 @@ function DashboardCofetarie() {
                             </button>
                             {date.comenziNoi > 0 && (
                                 <button className="db-actiune-btn db-actiune-urgent" onClick={() => navigate('/cofetarie/comenzi')}>
-                                    🔔 {date.comenziNoi} comenzi noi de confirmat!
+                                    <Bell size={18} /> {date.comenziNoi} comenzi noi de confirmat!
                                 </button>
                             )}
                         </div>
@@ -131,9 +132,9 @@ function DashboardCofetarie() {
                                     >
                                         <div className="ic-comanda-header">
                                             <div className="ic-comanda-info">
-                                                <h4>👤 {comanda.numeClient}</h4>
-                                                <p className="ic-data">📅 {formatData(comanda.creat_la)}</p>
-                                                <p className="ic-adresa">📍 {comanda.adresa_livrare}</p>
+                                                <h4><User size={16} /> {comanda.numeClient}</h4>
+                                                <p className="ic-data"><Calendar size={14} /> {formatData(comanda.creat_la)}</p>
+                                                <p className="ic-adresa"><MapPin size={14} /> {comanda.adresa_livrare}</p>
                                             </div>
                                             <div className="ic-comanda-dreapta">
                                                 <span className={`ic-status ${statusLabel[comanda.status]?.cls}`}>

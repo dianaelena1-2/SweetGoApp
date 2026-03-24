@@ -67,6 +67,7 @@ router.post('/login', (req,res) => {
         return res.status(401).json({ mesaj: 'Email sau parola incorecte' })
     }
 
+    //generare token
     const token = jwt.sign(
         { id: utilizator.id, rol: utilizator.rol },
         process.env.JWT_SECRET,

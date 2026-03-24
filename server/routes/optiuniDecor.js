@@ -3,14 +3,14 @@ const router = express.Router()
 const db = require('../db')
 const { verifyToken, verifyRol } = require('../middleware/auth')
 
-// get optiuni decor pentru un produs (public)
+//optiuni decor pentru un produs
 router.get('/produs/:id', (req, res) => {
     const { id } = req.params
     const optiuni = db.prepare('SELECT * FROM optiuni_decor WHERE produs_id = ?').all(id)
     res.json(optiuni)
 })
 
-// adauga optiune decor (cofetarie)
+//adauga optiune decor
 router.post('/', verifyToken, verifyRol('cofetarie'), (req, res) => {
     const { produs_id, denumire } = req.body
 
@@ -30,7 +30,7 @@ router.post('/', verifyToken, verifyRol('cofetarie'), (req, res) => {
     res.status(201).json({ mesaj: 'Optiune adaugata', id: rezultat.lastInsertRowid })
 })
 
-// sterge optiune decor (cofetarie)
+//sterge optiune decor
 router.delete('/:id', verifyToken, verifyRol('cofetarie'), (req, res) => {
     const { id } = req.params
     db.prepare('DELETE FROM optiuni_decor WHERE id = ?').run(id)

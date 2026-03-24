@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from 'react'
 
 export const AuthContext = createContext()
 
+//aici se verifica daca utilizatorul este conectat sau nu
 export const AuthProvider = ({ children }) => {
     const [utilizator, setUtilizator] = useState(null)
     const [token, setToken] = useState(null)
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }) => {
         setUtilizator(null)
     }
 
+    //punem la dispozitia aplicatiei-copil toate functiile si datele de mai sus
     return (
         <AuthContext.Provider value = {{ utilizator, token, login, logout, loading }} >
             {children}

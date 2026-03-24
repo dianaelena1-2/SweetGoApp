@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
+import { Cake, ShoppingCart, Store, MapPin, Phone, Palette, Pencil, StickyNote, Star, Tag } from 'lucide-react'
 import api from '../../services/api'
 
 function DetaliiCofetarie() {
@@ -181,13 +182,13 @@ function DetaliiCofetarie() {
                         {cofetarie.imagine_coperta ? (
                             <img src={`http://localhost:7000/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
                         ) : (
-                            <span>🏪</span>
+                            <Store size={64} color="#c97c2e" strokeWidth={1.5} />
                         )}
                     </div>
                     <div className="cofetarie-detalii-info">
                         <h2>{cofetarie.numeCofetarie}</h2>
-                        <p>📍 {cofetarie.adresa}</p>
-                        <p>📞 {cofetarie.telefon}</p>
+                        <p><MapPin size={16} /> {cofetarie.adresa}</p>
+                        <p><Phone size={16} /> {cofetarie.telefon}</p>
                         <div className="rating">
                             <span className="stele">{renderStele(cofetarie.rating_mediu)}</span>
                             <span className="numar-recenzii">
@@ -209,12 +210,12 @@ function DetaliiCofetarie() {
                                 <div className="produs-card-imagine">
                                     {produs.imagine ? (
                                         <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
-                                    ) : <span>🎂</span>}
+                                    ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                 </div>
                                 <div className="produs-card-info">
                                     <h4>{produs.numeProdus}</h4>
                                     <p className="produs-descriere">{produs.descriere}</p>
-                                    <p className="produs-categorie">📌 {produs.categorie}</p>
+                                    <p className="produs-categorie"><Tag size={14} /> {produs.categorie}</p>
                                     <div className="produs-footer">
                                         <span className="produs-pret">{produs.pret} lei</span>
 
@@ -245,7 +246,7 @@ function DetaliiCofetarie() {
                 )}
             </div>
 
-            {/* MODAL PERSONALIZARE */}
+            {/* PERSONALIZARE */}
             {modalDeschis && produsMmodal && (
                 <div className="modal-overlay" onClick={inchideModal}>
                     <div className="modal-continut" onClick={(e) => e.stopPropagation()}>
@@ -254,7 +255,7 @@ function DetaliiCofetarie() {
                         <div className="modal-produs-imagine">
                             {produsMmodal.imagine ? (
                                 <img src={`http://localhost:7000/${produsMmodal.imagine}`} alt={produsMmodal.numeProdus} />
-                            ) : <span>🎂</span>}
+                            ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                         </div>
 
                         <h3 className="modal-titlu">{produsMmodal.numeProdus}</h3>
@@ -296,7 +297,7 @@ function DetaliiCofetarie() {
                                         className={`modal-optiune-btn ${optiuneSelectata === 'Alta' ? 'activa' : ''}`}
                                         onClick={() => setOptiuneSelectata(optiuneSelectata === 'Alta' ? '' : 'Alta')}
                                     >
-                                        ✏️ Altă opțiune
+                                        <Pencil size={14} /> Altă opțiune
                                     </button>
                                 </div>
                                 {optiuneSelectata === 'Alta' && (
@@ -329,7 +330,7 @@ function DetaliiCofetarie() {
                         </div>
 
                         <button className="btn-primar modal-btn-adauga" onClick={confirmaAdaugareInCos}>
-                            🛒 Adaugă în coș
+                            <ShoppingCart size={18} /> Adaugă în coș
                         </button>
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
+import { Cake, User, Calendar, MapPin, Phone, Palette, StickyNote, Check, ChefHat, Bike, CheckCircle, X } from 'lucide-react'
 import api from '../../services/api'
 
 const STATUSURI = ['toate', 'plasata', 'confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata']
@@ -144,10 +145,10 @@ function GestionareComenzi() {
                                 {/* HEADER COMANDA */}
                                 <div className="ic-comanda-header" onClick={() => toggleExpandare(comanda.id)}>
                                     <div className="ic-comanda-info">
-                                        <h4>👤 {comanda.numeClient}</h4>
-                                        <p className="ic-data">📅 {formatData(comanda.creat_la)}</p>
-                                        <p className="ic-adresa">📍 {comanda.adresa_livrare}</p>
-                                        <p className="ic-adresa">📞 {comanda.telefon}</p>
+                                        <h4><User size={18} color="#c97c2e" /> {comanda.numeClient}</h4>
+                                        <p className="ic-data"><Calendar size={14} /> {formatData(comanda.creat_la)}</p>
+                                        <p className="ic-adresa"><MapPin size={14} /> {comanda.adresa_livrare}</p>
+                                        <p className="ic-adresa"><Phone size={14} /> {comanda.telefon}</p>
                                     </div>
                                     <div className="ic-comanda-dreapta">
                                         <span className={`ic-status ${statusLabel[comanda.status]?.cls}`}>
@@ -170,7 +171,7 @@ function GestionareComenzi() {
                                                 <div className="ic-produs-imagine">
                                                     {produs.imagine ? (
                                                         <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
-                                                    ) : <span>🎂</span>}
+                                                    ) : <Cake size={32} color="#c97c2e" strokeWidth={1.5} />}
                                                 </div>
                                                 <div className="ic-produs-info">
                                                     <span className="ic-produs-nume">{produs.numeProdus}</span>

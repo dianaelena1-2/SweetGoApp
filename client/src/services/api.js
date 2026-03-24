@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+//frontedn-ul comunica cu backend-ul in acest fisier
 const api = axios.create({
     baseURL: 'http://localhost:7000/api'
 })

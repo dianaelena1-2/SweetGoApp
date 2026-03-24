@@ -9,6 +9,7 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
+        //verifica validitatea tokenului
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
         req.utilizator = decoded
         next()

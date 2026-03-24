@@ -10,7 +10,7 @@ body {
     color: #3d2c1e;
 }
 
-/* ===== AUTENTIFICARE / INREGISTRARE ===== */
+/* AUTENTIFICARE / INREGISTRARE */
 .auth-container {
     min-height: 100vh;
     display: flex;
@@ -44,7 +44,7 @@ body {
     text-align: center;
 }
 
-/* Grup de camp din formular (label + input) */
+/* Grup de camp din formular */
 .form-group {
     margin-bottom: 1.2rem;
 }
@@ -126,7 +126,7 @@ body {
     border: 1px solid #f5c87a;
 }
 
-/* ===== NAVBAR ===== */
+/* NAVBAR */
 .navbar {
     display: flex;
     align-items: center;
@@ -199,7 +199,7 @@ body {
     background: #a8621e !important;
 }
 
-/* ===== PAGINA ACASA CLIENT ===== */
+/* PAGINA ACASA CLIENT */
 .acasa-container {
     min-height: 100vh;
     background: #fffaf5;
@@ -300,7 +300,7 @@ body {
     margin-top: 3rem;
 }
 
-/* ===== PAGINA DETALII COFETARIE ===== */
+/* PAGINA DETALII COFETARIE */
 
 /* Butonul de inapoi - rotunjit, in cromatica aplicatiei */
 .btn-inapoi {
@@ -377,7 +377,7 @@ body {
     margin-bottom: 1.2rem;
 }
 
-/* ===== GRID PRODUSE ===== */
+/* GRID PRODUSE */
 .produse-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -468,7 +468,7 @@ body {
     background: #a8621e;
 }
 
-/* ===== CONTROL CANTITATE PRODUS (plus/minus) ===== */
+/* CONTROL CANTITATE PRODUS (plus/minus) */
 .cantitate-control {
     display: flex;
     align-items: center;
@@ -507,7 +507,7 @@ body {
     color: #3d2c1e;
 }
 
-/* ===== GESTIONARE PRODUSE ===== */
+/* GESTIONARE PRODUSE */
 .succes {
     background: #f0fdf0;
     color: #2d7a2d;
@@ -710,7 +710,7 @@ body {
     margin-top: 0.5rem;
 }
 
-/* ===== COS CUMPARATURI ===== */
+/* COS CUMPARATURI */
 .cos-gol {
     text-align: center;
     padding: 4rem 2rem;
@@ -923,7 +923,7 @@ body {
     cursor: not-allowed;
 }
 
-/* ===== OPTIUNI DECOR ===== */
+/* OPTIUNI DECOR */
 .gp-optiuni-decor {
     margin-top: 1rem;
     padding-top: 1rem;
@@ -986,7 +986,7 @@ body {
     border-color: #c97c2e;
 }
 
-/* ===== MODAL PERSONALIZARE ===== */
+/* MODAL PERSONALIZARE */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -1173,7 +1173,7 @@ body {
     filter: grayscale(40%);
 }
 
-/* ===== ISTORIC COMENZI ===== */
+/* ISTORIC COMENZI */
 .ic-filtre {
     display: flex;
     gap: 0.5rem;
@@ -1354,7 +1354,7 @@ body {
     margin-bottom: 0.2rem;
 }
 
-/* ===== GESTIONARE COMENZI ===== */
+/* GESTIONARE COMENZI */
 .gc-butoane-status {
     display: flex;
     gap: 1rem;
@@ -1372,7 +1372,7 @@ body {
     color: #7a5230;
 }
 
-/* ===== DASHBOARD COFETARIE ===== */
+/* DASHBOARD COFETARIE */
 .db-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1442,7 +1442,7 @@ body {
     color: #c97c2e;
 }
 
-/* ===== DASHBOARD ADMIN ===== */
+/* DASHBOARD ADMIN */
 .admin-tabs {
     display: flex;
     gap: 0.5rem;
@@ -1589,3 +1589,4 @@ body {
 .badge-client { background: #cce5ff; color: #004085; }
 .badge-cofetarie { background: #fdecd8; color: #c97c2e; }
 .badge-admin { background: #f8d7da; color: #721c24; }
+

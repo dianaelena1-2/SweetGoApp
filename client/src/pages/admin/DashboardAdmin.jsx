@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
+import { Cake, Users, Store, Package, Coins, Hourglass, User, MapPin, Phone, FileText, Check, X } from 'lucide-react'
 import api from '../../services/api'
 
 function DashboardAdmin() {
@@ -96,28 +97,28 @@ function DashboardAdmin() {
                 {/* STATISTICI */}
                 <div className="db-stats-grid">
                     <div className="db-stat-card db-stat-nou">
-                        <div className="db-stat-icon">👥</div>
+                        <div className="db-stat-icon"><Users size={32} /></div>
                         <div className="db-stat-info">
                             <p className="db-stat-numar">{date.totalUtilizatori}</p>
                             <p className="db-stat-label">Utilizatori</p>
                         </div>
                     </div>
                     <div className="db-stat-card db-stat-curs">
-                        <div className="db-stat-icon">🏪</div>
+                        <div className="db-stat-icon"><Store size={32} /></div>
                         <div className="db-stat-info">
                             <p className="db-stat-numar">{date.totalCofetarii}</p>
                             <p className="db-stat-label">Cofetării aprobate</p>
                         </div>
                     </div>
                     <div className="db-stat-card db-stat-produse">
-                        <div className="db-stat-icon">📦</div>
+                        <div className="db-stat-icon"><Package size={32} /></div>
                         <div className="db-stat-info">
                             <p className="db-stat-numar">{date.totalComenzi}</p>
                             <p className="db-stat-label">Total comenzi</p>
                         </div>
                     </div>
                     <div className="db-stat-card db-stat-incasari">
-                        <div className="db-stat-icon">💰</div>
+                        <div className="db-stat-icon"><Coins size={32} /></div>
                         <div className="db-stat-info">
                             <p className="db-stat-numar">{date.totalIncasari.toFixed(2)} lei</p>
                             <p className="db-stat-label">Total încasări platformă</p>
@@ -154,10 +155,10 @@ function DashboardAdmin() {
                                 {date.cofetariiInAsteptare.map(cofetarie => (
                                     <div key={cofetarie.id} className="admin-card">
                                         <div className="admin-card-info">
-                                            <h4>🏪 {cofetarie.numeCofetarie}</h4>
-                                            <p>👤 {cofetarie.nume} — {cofetarie.email}</p>
-                                            <p>📍 {cofetarie.adresa}</p>
-                                            <p>📞 {cofetarie.telefon}</p>
+                                            <h4><Store size={18} color="#c97c2e" /> {cofetarie.numeCofetarie}</h4>
+                                            <p><User size={14} /> {cofetarie.nume} — {cofetarie.email}</p>
+                                            <p><MapPin size={14} /> {cofetarie.adresa}</p>
+                                            <p><Phone size={14} /> {cofetarie.telefon}</p>
                                             <div className="admin-documente">
                                                 {cofetarie.certificat_inregistrare && (
                                                     <a
@@ -186,13 +187,13 @@ function DashboardAdmin() {
                                                 className="btn-primar"
                                                 onClick={() => handleAproba(cofetarie.id)}
                                             >
-                                                ✓ Aprobă
+                                                <Check size={16} /> Aprobă
                                             </button>
                                             <button
                                                 className="btn-stergere"
                                                 onClick={() => handleRespinge(cofetarie.id)}
                                             >
-                                                ✕ Respinge
+                                                <X size={16} /> Respinge
                                             </button>
                                         </div>
                                     </div>

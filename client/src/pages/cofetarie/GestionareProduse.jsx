@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
+import { Cake, PlusCircle, Tag, Check, X, Package, Pencil, Trash2, Palette } from 'lucide-react'
 import api from '../../services/api'
 
 const CATEGORII = ['Torturi', 'Prăjituri', 'Macarons', 'Cupcakes', 'Croissante']
@@ -324,7 +325,7 @@ function GestionareProduse() {
                                         <div className="gp-produs-imagine">
                                             {produs.imagine ? (
                                                 <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
-                                            ) : <span>🎂</span>}
+                                            ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                         </div>
                                         <div className="gp-form gp-form-editare">
                                             <div className="form-group">
@@ -409,26 +410,26 @@ function GestionareProduse() {
                                         <div className="gp-produs-imagine">
                                             {produs.imagine ? (
                                                 <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
-                                            ) : <span>🎂</span>}
+                                            ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                         </div>
                                         <div className="gp-produs-info">
                                             <h4>{produs.numeProdus}</h4>
                                             <p className="produs-descriere">{produs.descriere}</p>
                                             <div className="gp-produs-meta">
                                                 <span className="produs-pret">{produs.pret} lei</span>
-                                                <span className="produs-categorie">📌 {produs.categorie}</span>
+                                                <span className="produs-categorie"><Tag size={14} /> {produs.categorie}</span>
                                                 <span className={produs.disponibil ? 'badge-disponibil' : 'badge-indisponibil'}>
-                                                    {produs.disponibil ? '✓ Disponibil' : '✗ Indisponibil'}
+                                                    {produs.disponibil ? <><Check size={14} /> Disponibil</> : <><X size={14} /> Indisponibil</>}
                                                 </span>
-                                                <span>📦 {produs.stoc} buc</span>
+                                                <span><Package size={14} /> {produs.stoc} buc</span>
                                             </div>
                                         </div>
                                         <div className="gp-produs-actiuni">
                                             <button className="btn-editare" onClick={() => handleIncepeEditare(produs)}>
-                                                ✏️ Editează
+                                                <Pencil size={16} /> Editează
                                             </button>
                                             <button className="btn-stergere" onClick={() => handleSterge(produs.id)}>
-                                                🗑️ Șterge
+                                                <Trash2 size={16} /> Șterge
                                             </button>
                                         </div>
 

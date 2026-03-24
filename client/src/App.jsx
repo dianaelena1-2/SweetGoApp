@@ -27,6 +27,7 @@ const ProtectedRoute = ({ children, rol }) => {
 
   if(!utilizator) return <Navigate to="/login" />
   if(rol && utilizator.rol !== rol) return <Navigate to="/login" />
+  
   return children
 }
 

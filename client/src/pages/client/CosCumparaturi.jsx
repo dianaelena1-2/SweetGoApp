@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
+import { Cake, ShoppingCart, Trash2, Palette, StickyNote, AlertTriangle } from 'lucide-react'
 import api from '../../services/api'
 
 function CosCumparaturi() {
@@ -169,14 +170,16 @@ function CosCumparaturi() {
 
             <div className="acasa-continut">
                 <button className="btn-inapoi" onClick={() => navigate(-1)}>← Înapoi</button>
-                <h2>Coșul meu 🛒</h2>
+                <h2>
+                    Coșul meu <ShoppingCart size={28} />
+                </h2>
 
                 {eroare && <div className="eroare">{eroare}</div>}
                 {succes && <div className="succes">{succes}</div>}
 
                 {cos.produse.length === 0 ? (
                     <div className="cos-gol">
-                        <p>🛒 Coșul tău este gol.</p>
+                        <p><ShoppingCart size={28} /> Coșul tău este gol.</p>
                         <button className="btn-primar" onClick={() => navigate('/')}>
                             Explorează cofetăriile
                         </button>
@@ -188,7 +191,7 @@ function CosCumparaturi() {
                             <div className="cos-header">
                                 <h3>Produse de la {cofetarie?.numeCofetarie}</h3>
                                 <button className="btn-goleste-cos" onClick={golestesCos}>
-                                    🗑️ Golește coșul
+                                    <Trash2 size={16} /> Golește coșul
                                 </button>
                             </div>
 
@@ -202,7 +205,7 @@ function CosCumparaturi() {
                                         <div className="cos-produs-imagine">
                                             {produsDB?.imagine ? (
                                                 <img src={`http://localhost:7000/${produsDB.imagine}`} alt={produs.numeProdus} />
-                                            ) : <span>🎂</span>}
+                                            ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                         </div>
                                         <div className="cos-produs-info">
                                             <h4>{produs.numeProdus}</h4>
@@ -216,7 +219,7 @@ function CosCumparaturi() {
                                             )}
                                             {depasesteStoc && (
                                                 <p className="cos-avertisment">
-                                                    ⚠️ Stoc disponibil: doar {stocRamas} buc
+                                                    <AlertTriangle size={14} /> Stoc disponibil: doar {stocRamas} buc
                                                 </p>
                                             )}
                                         </div>
@@ -286,7 +289,7 @@ function CosCumparaturi() {
 
                             {areProbleme && (
                                 <p className="cos-avertisment" style={{ marginTop: '0.5rem' }}>
-                                    ⚠️ Verifica stocul produselor selectate
+                                    <AlertTriangle size={14} /> Verifica stocul produselor selectate
                                 </p>
                             )}
                         </div>

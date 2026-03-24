@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
+import { MapPin, Cake, Star } from 'lucide-react';
 import api from '../../services/api'
 
 function AcasaClient(){
@@ -86,19 +87,21 @@ function AcasaClient(){
                                 // la click navigam la pagina de detalii a cofetariei
                                 onClick={() => navigate(`/cofetarie/${cofetarie.id}`)}
                             >
-                                {/* imaginea cofetariei - deocamdata emoji, ulterior imagine reala */}
+                                {/* imaginea cofetariei*/}
                                 <div className="cofetarie-card-imagine">
                                     {cofetarie.imagine_coperta ? (
                                         <img src={`http://localhost:7000/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
                                     ) : (
-                                        <span>🍰</span>
+                                        <Cake size={48} color="#c97c2e" strokeWidth={1.5} />
                                     )}
                                 </div>
 
                                 {/* informatiile cofetariei */}
                                 <div className="cofetarie-card-info">
                                     <h3>{cofetarie.numeCofetarie}</h3>
-                                    <p className="adresa">📍 {cofetarie.adresa}</p>
+                                    <p className="adresa">
+                                        <MapPin size={16} /> {cofetarie.adresa}
+                                    </p>
 
                                     {/* rating-ul calculat din recenziile clientilor */}
                                     <div className="rating">
