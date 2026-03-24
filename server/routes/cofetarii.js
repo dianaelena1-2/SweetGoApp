@@ -15,7 +15,23 @@ router.get('/', (req, res) => {
         GROUP BY c.id
     `).all()
     res.json(cofetarii)
-})
+});
+
+router.get('/:id/toate-recenziile', (req, res) => {
+    const { id } = req.params;
+    try {
+        const recenzii = db.prepare(`
+            SELECT r.*, u.nume as numeClient 
+            FROM recenzii r
+            JOIN utilizatori u ON r.client_id = u.id
+            WHERE r.cofetarie_id = ?
+            ORDER BY r.creat_la DESC
+        `).all(id);
+        res.json(recenzii);
+    } catch (err) {
+        res.status(500).json({ mesaj: 'Eroare la server' });
+    }
+});
 
 //detalii cofetarie
 router.get('/:id', (req, res) => {
