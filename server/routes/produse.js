@@ -18,7 +18,7 @@ router.get('/cofetarie/:id', verifyToken, verifyRol('cofetarie'), (req, res) => 
 
 //adauga produs
 router.post('/',verifyToken,verifyRol('cofetarie'), uploadImaginiProduse.single('imagine'),(req,res) => {
-    const { numeProdus, descriere, pret, categorie, stoc } = req.body
+    const { numeProdus, descriere, pret, categorie, stoc, transport_recomandat } = req.body
     const imagine = req.file ? req.file.path : null
 
     const cofetarie = db.prepare(`
@@ -34,9 +34,9 @@ router.post('/',verifyToken,verifyRol('cofetarie'), uploadImaginiProduse.single(
     }
 
     const rezultat = db.prepare(`
-        INSERT INTO produse (cofetarie_id, numeProdus, descriere, pret, categorie,stoc, imagine)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(cofetarie.id, numeProdus, descriere, pret, categorie, stoc || 0, imagine)
+        INSERT INTO produse (cofetarie_id, numeProdus, descriere, pret, categorie, stoc, imagine, transport_recomandat)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(cofetarie.id, numeProdus, descriere, pret, categorie, stoc || 0, imagine, transport_recomandat || 'masina')
 
     res.status(201).json({ mesaj: 'Produs adaugat', id: rezultat.lastInsertRowid })
 })
@@ -44,7 +44,7 @@ router.post('/',verifyToken,verifyRol('cofetarie'), uploadImaginiProduse.single(
 //editeaza produs
 router.put('/:id', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.single('imagine'), (req,res) => {
     const { id } = req.params
-    const { numeProdus, descriere, pret, categorie, disponibil, stoc } = req.body
+    const { numeProdus, descriere, pret, categorie, disponibil, stoc, transport_recomandat } = req.body
     const imagine = req.file 
     ? req.file.path 
     : db.prepare('SELECT imagine FROM produse WHERE id = ?').get(id)?.imagine
@@ -62,9 +62,9 @@ router.put('/:id', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.sin
     }
 
     db.prepare(`
-        UPDATE produse SET numeProdus = ?, descriere = ?, pret = ?, categorie = ?, disponibil = ?, stoc = ?, imagine = ?
+        UPDATE produse SET numeProdus = ?, descriere = ?, pret = ?, categorie = ?, disponibil = ?, stoc = ?, imagine = ?, transport_recomandat = ?
         WHERE id = ?
-    `).run(numeProdus, descriere, pret, categorie, disponibil, stoc, imagine, id)
+    `).run(numeProdus, descriere, pret, categorie, disponibil, stoc, imagine, transport_recomandat, id)
 
     res.json({ mesaj: 'Produs actualizat' })
 })

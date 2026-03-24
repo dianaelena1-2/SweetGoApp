@@ -57,32 +57,29 @@ router.get('/:id', (req, res) => {
 
 //adaugare recenzie
 router.post('/:id/recenzii', verifyToken, verifyRol('client'), (req, res) => {
-    const { id } = req.params
-    const { rating, comentariu } = req.body
+    const cofetarie_id = req.params.id;
+    const { rating, comentariu, comanda_id } = req.body;
+    
+    // Acum req.utilizator va fi populat de middleware
+    const client_id = req.utilizator.id; 
 
-    const comenziClient = db.prepare(`
-        SELECT * FROM comenzi 
-        WHERE client_id = ? AND cofetarie_id = ? AND status = 'livrata'
-    `).get(req.utilizator.id, id)
+    try {
+        // Verificăm dacă utilizatorul a lăsat deja recenzie pentru această comandă
+        const exista = db.prepare('SELECT id FROM recenzii WHERE comanda_id = ?').get(comanda_id);
+        if (exista) {
+            return res.status(400).json({ mesaj: 'Ai lăsat deja o recenzie pentru această comandă.' });
+        }
 
-    if (!comenziClient) {
-        return res.status(403).json({ mesaj: 'Poti da recenzii doar la cofetarii de la care ai comandat' })
+        db.prepare(`
+            INSERT INTO recenzii (client_id, cofetarie_id, comanda_id, rating, comentariu) 
+            VALUES (?, ?, ?, ?, ?)
+        `).run(client_id, cofetarie_id, comanda_id, rating, comentariu);
+
+        res.json({ mesaj: 'Recenzie adăugată cu succes!' });
+    } catch (err) {
+        console.error('Eroare la salvarea recenziei:', err);
+        res.status(500).json({ mesaj: 'Eroare internă de server' });
     }
-
-    const recenzieExistenta = db.prepare(`
-        SELECT * FROM recenzii WHERE client_id = ? AND cofetarie_id = ?
-    `).get(req.utilizator.id, id)
-
-    if (recenzieExistenta) {
-        return res.status(400).json({ mesaj: 'Ai dat deja recenzie la aceasta cofetarie' })
-    }
-
-    db.prepare(`
-        INSERT INTO recenzii (client_id, cofetarie_id, rating, comentariu)
-        VALUES (?, ?, ?, ?)
-    `).run(req.utilizator.id, id, rating, comentariu)
-
-    res.status(201).json({ mesaj: 'Recenzie adaugata cu succes' })
-})
+});
 
 module.exports = router

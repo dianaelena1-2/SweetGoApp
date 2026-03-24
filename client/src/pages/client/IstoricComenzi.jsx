@@ -2,19 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
-// Importurile complete pentru iconițe
-import { 
-    Cake, 
-    ShoppingCart, 
-    Store, 
-    Calendar, 
-    MapPin, 
-    Palette, 
-    StickyNote, 
-    Package, 
-    Star, 
-    MessageSquare 
-} from 'lucide-react'
+import { Cake, ShoppingCart, Store, Calendar, MapPin, Palette, StickyNote, Package, Star, MessageSquare,Check, X, Trash2} from 'lucide-react'
 
 const STATUSURI = ['toate', 'plasata', 'confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata']
 
@@ -34,11 +22,10 @@ function IstoricComenzi() {
     const [comenzi, setComenzi] = useState([])
     const [loading, setLoading] = useState(true)
     const [eroare, setEroare] = useState('')
-    const [succes, setSucces] = useState('')
+    const [succes, setSucces] = useState('') 
     const [filtruStatus, setFiltruStatus] = useState('toate')
     const [comenziExpandate, setComenziExpandate] = useState({})
 
-    // State pentru modalul de recenzie
     const [modalRecenzie, setModalRecenzie] = useState(null)
     const [ratingSelectat, setRatingSelectat] = useState(0)
     const [comentariuRecenzie, setComentariuRecenzie] = useState('')
@@ -78,11 +65,13 @@ function IstoricComenzi() {
         e.stopPropagation()
         setModalRecenzie({
             cofetarieId: comanda.cofetarie_id,
+            comandaId: comanda.id,
             numeCofetarie: comanda.numeCofetarie
         })
         setRatingSelectat(0)
         setComentariuRecenzie('')
         setEroare('')
+        setSucces('') // MODIFICARE 3: Curățăm mesajul de succes la deschidere
     }
 
     const handleTrimiteRecenzie = async () => {
@@ -92,10 +81,21 @@ function IstoricComenzi() {
         }
         setLoadingRecenzie(true)
         try {
+            // ATENȚIE: Backend-ul trebuie să aibă coloana comanda_id în tabela recenzii!
             await api.post(`/cofetarii/${modalRecenzie.cofetarieId}/recenzii`, {
                 rating: ratingSelectat,
-                comentariu: comentariuRecenzie
+                comentariu: comentariuRecenzie,
+                comanda_id: modalRecenzie.comandaId
             })
+
+            setComenzi(prevComenzi =>
+                 prevComenzi.map(c =>
+                     c.id === modalRecenzie.comandaId
+                     ? { ...c, are_recenzie: true } 
+                     : c
+                    )
+                )
+                
             setSucces('Recenzie trimisă cu succes!')
             setTimeout(() => {
                 setModalRecenzie(null)
@@ -108,6 +108,24 @@ function IstoricComenzi() {
         }
     }
 
+    const handleAnuleazaComanda = async (comandaId) => {
+    if (!window.confirm('Ești sigur că vrei să anulezi această comandă?')) return;
+
+    try {
+        await api.put(`/comenzi/${comandaId}/anulare-client`);
+
+        setComenzi(prevComenzi => 
+            prevComenzi.map(c => 
+                c.id === comandaId ? { ...c, status: 'anulata' } : c
+            )
+        );
+        
+        alert('Comanda a fost anulată cu succes.');
+    } catch (err) {
+        setEroare(err.response?.data?.mesaj || 'Eroare la anularea comenzii. Probabil a fost deja confirmată.');
+    }
+};
+
     const comenziFiltrate = filtruStatus === 'toate'
         ? comenzi
         : comenzi.filter(c => c.status === filtruStatus)
@@ -118,7 +136,7 @@ function IstoricComenzi() {
         <div className="acasa-container">
             <nav className="navbar">
                 <h1 className="navbar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    SweetGo <Cake size={28} />
+                    SweetGo 🍰
                 </h1>
                 <div className="navbar-actiuni">
                     <span>Bună, {utilizator?.nume}!</span>
@@ -176,19 +194,35 @@ function IstoricComenzi() {
                                                 <span className="ic-produs-cantitate">x{produs.cantitate}</span>
                                                 <span className="ic-produs-pret">{(produs.pret_unitar * produs.cantitate).toFixed(2)} lei</span>
                                             </div>
-                                            {(produs.optiune_decor || produs.observatii) && (
-                                                <div className="ic-produs-detalii">
-                                                    {produs.optiune_decor && <p><Palette size={14} /> Decor: {produs.optiune_decor}</p>}
-                                                    {produs.observatii && <p><StickyNote size={14} /> {produs.observatii}</p>}
-                                                </div>
-                                            )}
                                         </div>
                                     ))}
-                                    {comanda.status === 'livrata' && (
+                                    
+                                    {comanda.status === 'livrata' && !comanda.are_recenzie && (
                                         <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
                                             <button className="btn-secundar" onClick={(e) => deschideModalRecenzie(comanda, e)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                                 <Star size={16} /> Lasă o recenzie
                                             </button>
+                                        </div>
+                                    )}
+
+                                    {comanda.status === 'plasata' && (
+                                        <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                                            <button 
+                                                className="btn-stergere" 
+                                                onClick={(e) => { e.stopPropagation(); handleAnuleazaComanda(comanda.id); }}
+                                                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                                            >
+                                                <X size={16} /> Anulează comanda
+                                            </button>
+                                        </div>
+                                        
+                                    )}
+
+                                    {comanda.are_recenzie && (
+                                        <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', color: '#9a7a5a', fontSize: '0.9rem', fontStyle: 'italic' }}>
+                                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <Check size={14} /> Recenzie trimisă
+                                            </span>
                                         </div>
                                     )}
                                 </div>
@@ -198,7 +232,6 @@ function IstoricComenzi() {
                 </div>
             </div>
 
-            {/* MODAL RECENZIE */}
             {modalRecenzie && (
                 <div className="modal-overlay" onClick={() => setModalRecenzie(null)}>
                     <div className="modal-continut" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
@@ -228,7 +261,7 @@ function IstoricComenzi() {
                             onChange={(e) => setComentariuRecenzie(e.target.value)}
                             style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd' }}
                         />
-                        <button className="btn-primar" onClick={handleTrimiteRecenzie} disabled={loadingRecenzie} style={{ width: '100%', marginTop: '15px' }}>
+                        <button className="btn-primar" onClick={handleTrimiteRecenzie} disabled={loadingRecenzie || succes} style={{ width: '100%', marginTop: '15px' }}>
                             {loadingRecenzie ? 'Se trimite...' : 'Trimite recenzia'}
                         </button>
                     </div>

@@ -46,9 +46,9 @@ if (!cofetarieExistenta) {
 
     // ===== PRODUS =====
     db.prepare(`
-        INSERT INTO produse (cofetarie_id, numeProdus, descriere, pret, categorie, stoc, disponibil)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(cofetarie.lastInsertRowid, 'Tort Ciocolată', 'Tort cu cremă de ciocolată și fructe de pădure', 120, 'Torturi', 10, 1)
+        INSERT INTO produse (cofetarie_id, numeProdus, descriere, pret, categorie, stoc, disponibil, transport_recomandat)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(cofetarie.lastInsertRowid, 'Tort Ciocolată', 'Tort cu cremă de ciocolată și fructe de pădure', 120, 'Torturi', 10, 1, 'Mașină frigorifică')
 
     console.log('✓ Cofetarie creata si aprobata - Email: ion.popescu@dulcegarii.com | Parola: 123456')
     console.log('✓ Produs creat - Tort Ciocolată | Pret: 120 lei | Stoc: 10 buc')

@@ -1,18 +1,20 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, PlusCircle, Tag, Check, X, Package, Pencil, Trash2, Palette } from 'lucide-react'
+import { Cake, PlusCircle, Tag, Check, X, Package, Pencil, Trash2, Palette, Bike, Car, Snowflake } from 'lucide-react'
 import api from '../../services/api'
 
 const CATEGORII = ['Torturi', 'Prăjituri', 'Macarons', 'Cupcakes', 'Croissante']
 
+// Adăugat transport_recomandat în obiectul inițial
 const produsGol = {
     numeProdus: '',
     descriere: '',
     pret: '',
     stoc: '',
     categorie: 'Torturi',
-    disponibil: 1
+    disponibil: 1,
+    transport_recomandat: 'masina' 
 }
 
 function GestionareProduse() {
@@ -82,6 +84,9 @@ function GestionareProduse() {
             data.append('categorie', formNou.categorie)
             data.append('stoc', formNou.stoc || 0)
             data.append('disponibil', formNou.disponibil)
+            // Trimitere transport_recomandat
+            data.append('transport_recomandat', formNou.transport_recomandat)
+            
             if (imagineNoua) data.append('imagine', imagineNoua)
             await api.post('/produse', data, { headers: { 'Content-Type': 'multipart/form-data' } })
             setFormNou(produsGol)
@@ -101,7 +106,8 @@ function GestionareProduse() {
             pret: produs.pret,
             categorie: produs.categorie,
             stoc: produs.stoc || 0,
-            disponibil: produs.disponibil
+            disponibil: produs.disponibil,
+            transport_recomandat: produs.transport_recomandat || 'masina'
         })
         setImagineEditare(null)
         if (produs.categorie === 'Torturi') {
@@ -123,6 +129,9 @@ function GestionareProduse() {
             data.append('categorie', formEditare.categorie)
             data.append('disponibil', formEditare.disponibil)
             data.append('stoc', formEditare.stoc || 0)
+            // Trimitere transport_recomandat la editare
+            data.append('transport_recomandat', formEditare.transport_recomandat)
+
             if (imagineEditare) data.append('imagine', imagineEditare)
             await api.put(`/produse/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
             setEditareId(-1)
@@ -293,6 +302,18 @@ function GestionareProduse() {
                                     <option value={0}>Nu</option>
                                 </select>
                             </div>
+                            {/* Selector Transport pentru Produs Nou */}
+                            <div className="form-group">
+                                <label>Transport recomandat</label>
+                                <select
+                                    value={formNou.transport_recomandat}
+                                    onChange={(e) => setFormNou({ ...formNou, transport_recomandat: e.target.value })}
+                                >
+                                    <option value="bicicleta">🚲 Bicicletă / Trotinetă</option>
+                                    <option value="masina">🚗 Mașină Standard</option>
+                                    <option value="frigorific">❄️ Mașină Frigorifică</option>
+                                </select>
+                            </div>
                         </div>
                         <div className="form-group">
                             <label>Imagine produs (opțional)</label>
@@ -382,6 +403,18 @@ function GestionareProduse() {
                                                         <option value={0}>Nu</option>
                                                     </select>
                                                 </div>
+                                                {/* Selector Transport pentru Editare */}
+                                                <div className="form-group">
+                                                    <label>Transport recomandat</label>
+                                                    <select
+                                                        value={formEditare.transport_recomandat}
+                                                        onChange={(e) => setFormEditare({ ...formEditare, transport_recomandat: e.target.value })}
+                                                    >
+                                                        <option value="bicicleta">🚲 Bicicletă / Trotinetă</option>
+                                                        <option value="masina">🚗 Mașină Standard</option>
+                                                        <option value="frigorific">❄️ Mașină Frigorifică</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                             <div className="form-group">
                                                 <label>Imagine nouă (opțional)</label>
@@ -422,6 +455,13 @@ function GestionareProduse() {
                                                     {produs.disponibil ? <><Check size={14} /> Disponibil</> : <><X size={14} /> Indisponibil</>}
                                                 </span>
                                                 <span><Package size={14} /> {produs.stoc} buc</span>
+                                                
+                                                {/* Afișare Transport Recomandat în mod vizualizare */}
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    {produs.transport_recomandat === 'bicicleta' && <><Bike size={14} /> Bicicletă</>}
+                                                    {produs.transport_recomandat === 'masina' && <><Car size={14} /> Mașină</>}
+                                                    {produs.transport_recomandat === 'frigorific' && <><Snowflake size={14} /> Frigorific</>}
+                                                </span>
                                             </div>
                                         </div>
                                         <div className="gp-produs-actiuni">

@@ -38,6 +38,7 @@ db.exec(`
         stoc INTEGER DEFAULT 0,
         disponibil INTEGER DEFAULT 1,
         imagine TEXT,
+        transport_recomandat TEXT DEFAULT 'masina',
         FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id)
     )
 `)
@@ -75,6 +76,7 @@ db.exec(`
 db.exec(`
     CREATE TABLE IF NOT EXISTS recenzii (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        comanda_id INTEGER NOT NULL,
         client_id INTEGER NOT NULL,
         cofetarie_id INTEGER NOT NULL,
         rating INTEGER CHECK(rating BETWEEN 1 AND 5) NOT NULL,

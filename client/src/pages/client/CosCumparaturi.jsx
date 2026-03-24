@@ -1,8 +1,16 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, ShoppingCart, Trash2, Palette, StickyNote, AlertTriangle } from 'lucide-react'
+// Adăugăm iconițele pentru transport
+import { Cake, ShoppingCart, Trash2, Palette, StickyNote, AlertTriangle, Bike, Car, Snowflake, Check } from 'lucide-react'
 import api from '../../services/api'
+
+// Definim opțiunile de transport
+const MIJLOACE_TRANSPORT = [
+    { id: 'bicicleta', nume: '🚲Bicicletă / Trotinetă', desc: 'Produse mici și rezistente' },
+    { id: 'masina', nume: '🚗Mașină Standard', desc: 'Prăjituri și pachete medii'},
+    { id: 'frigorific', nume: '❄️Mașină Frigorifică', desc: 'Torturi și produse sensibile' }
+];
 
 function CosCumparaturi() {
     const { utilizator, logout } = useContext(AuthContext)
@@ -19,6 +27,9 @@ function CosCumparaturi() {
     const [adresaLivrare, setAdresaLivrare] = useState('')
     const [telefon, setTelefon] = useState('')
     const [observatii, setObservatii] = useState('')
+    
+    // State nou pentru tipul de transport selectat
+    const [tipTransport, setTipTransport] = useState('masina');
 
     useEffect(() => {
         const cosSalvat = localStorage.getItem('cos')
@@ -46,6 +57,31 @@ function CosCumparaturi() {
             setLoading(false)
         }
     }
+
+    // Funcție pentru a determina ce metodă este recomandată de cofetărie pentru produsele din coș
+    const obtineMetodaRecomandata = () => {
+        if (cos.produse.length === 0 || produseProduse.length === 0) return 'masina';
+
+        // Găsim detaliile din DB pentru toate produsele aflate în coș
+        const detaliiProduseCos = cos.produse.map(itemCos => 
+            produseProduse.find(p => p.id === itemCos.id)
+        ).filter(Boolean);
+
+        // Prioritate: Frigorific > Masina > Bicicleta
+        if (detaliiProduseCos.some(p => p.transport_recomandat === 'frigorific')) return 'frigorific';
+        if (detaliiProduseCos.some(p => p.transport_recomandat === 'masina')) return 'masina';
+        
+        return 'bicicleta';
+    };
+
+    const recomandat = obtineMetodaRecomandata();
+
+    // Actualizăm selecția automată atunci când se încarcă produsele
+    useEffect(() => {
+        if (produseProduse.length > 0) {
+            setTipTransport(obtineMetodaRecomandata());
+        }
+    }, [produseProduse, cos.produse]);
 
     const salveazaCos = (cosNou) => {
         setCos(cosNou)
@@ -128,6 +164,7 @@ function CosCumparaturi() {
                 adresa_livrare: adresaLivrare,
                 telefon,
                 observatii,
+                tip_transport: tipTransport, // Trimitem tipul de transport selectat
                 produse: cos.produse.map(p => ({
                     id: p.id,
                     cantitate: p.cantitate,
@@ -138,7 +175,7 @@ function CosCumparaturi() {
 
             golestesCos()
             setSucces('Comandă plasată cu succes!')
-            setTimeout(() => navigate('/comenzile-mele'), 2000)
+            setTimeout(() => navigate('/cos-cumparaturi'), 2000)
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la plasarea comenzii')
         } finally {
@@ -155,7 +192,6 @@ function CosCumparaturi() {
 
     return (
         <div className="acasa-container">
-            {/* NAVBAR */}
             <nav className="navbar">
                 <h1 className="navbar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
                     SweetGo 🍰
@@ -171,7 +207,7 @@ function CosCumparaturi() {
             <div className="acasa-continut">
                 <button className="btn-inapoi" onClick={() => navigate(-1)}>← Înapoi</button>
                 <h2>
-                    Coșul meu <ShoppingCart size={28} />
+                    Coșul meu 🛒
                 </h2>
 
                 {eroare && <div className="eroare">{eroare}</div>}
@@ -186,7 +222,6 @@ function CosCumparaturi() {
                     </div>
                 ) : (
                     <div className="cos-layout">
-                        {/* LISTA PRODUSE DIN COS */}
                         <div className="cos-produse">
                             <div className="cos-header">
                                 <h3>Produse de la {cofetarie?.numeCofetarie}</h3>
@@ -210,7 +245,6 @@ function CosCumparaturi() {
                                         <div className="cos-produs-info">
                                             <h4>{produs.numeProdus}</h4>
                                             <p className="cos-produs-pret">{produsDB?.pret || produs.pret} lei / buc</p>
-                                            {/* afisam optiunea de decor si observatiile per produs */}
                                             {produs.optiune_decor && (
                                                 <p className="cos-produs-detaliu">🎨 Decor: {produs.optiune_decor}</p>
                                             )}
@@ -242,7 +276,6 @@ function CosCumparaturi() {
                             })}
                         </div>
 
-                        {/* FORMULAR DE COMANDA */}
                         <div className="cos-comanda-form">
                             <h3>Detalii comandă</h3>
 
@@ -264,6 +297,30 @@ function CosCumparaturi() {
                                     placeholder="07xxxxxxxx"
                                 />
                             </div>
+                            
+                            {/* SECTIUNE SELECTIE TRANSPORT */}
+                            <div className="form-group">
+                                <label>Mijloc de transport livrare *</label>
+                                <div className="transport-selectie-grid">
+                                    {MIJLOACE_TRANSPORT.map(t => (
+                                        <div 
+                                            key={t.id} 
+                                            className={`transport-option ${tipTransport === t.id ? 'active' : ''} ${recomandat === t.id ? 'recommended' : ''}`}
+                                            onClick={() => setTipTransport(t.id)}
+                                        >
+                                            <div className="transport-header">
+                                                {t.icon}
+                                                {tipTransport === t.id && <Check size={16} className="check-icon" />}
+                                            </div>
+                                            <div className="transport-body">
+                                                <span className="transport-nume">{t.nume}</span>
+                                                {recomandat === t.id && <span className="badge-recomandat">Recomandat de cofetărie</span>}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
                             <div className="form-group">
                                 <label>Observații generale</label>
                                 <textarea

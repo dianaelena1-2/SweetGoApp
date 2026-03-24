@@ -1641,3 +1641,56 @@ body {
 .modal-textarea:focus {
     border-color: #c97c2e;
 }
+
+/* GRID SELECTARE MIJLOC TRANSPORT */
+.transport-selectie-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.transport-option {
+    border: 2px solid #eee;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.transport-option.active {
+    border-color: #c97c2e;
+    background-color: #fff9f2;
+}
+
+.transport-option.recommended {
+    border-style: dashed;
+    border-color: #c97c2e;
+}
+
+.transport-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.transport-nume {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.badge-recomandat {
+    display: block;
+    font-size: 0.75rem;
+    color: #c97c2e;
+    font-weight: bold;
+    margin-top: 2px;
+}
+
+.check-icon {
+    color: #c97c2e;
+}

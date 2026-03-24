@@ -65,7 +65,7 @@ function AcasaClient(){
         <div className="acasa-container">
             <nav className="navbar">
                 <h1 className="navbar-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    SweetGo <Cake size={28} />
+                    SweetGo 🍰
                 </h1>
                 <div className="navbar-search">
                     <input
@@ -79,7 +79,7 @@ function AcasaClient(){
                     <span>Bună, {utilizator?.nume}!</span>
                     <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
                     <button onClick={() => navigate('/cos-cumparaturi')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <ShoppingCart size={18} /> Coș
+                        🛒 Coș
                     </button>
                     <button onClick={handleLogout} className="btn-logout">Deconectare</button>
                 </div>

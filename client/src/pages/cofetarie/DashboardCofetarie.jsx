@@ -112,7 +112,7 @@ function DashboardCofetarie() {
                             </button>
                             {date.comenziNoi > 0 && (
                                 <button className="db-actiune-btn db-actiune-urgent" onClick={() => navigate('/cofetarie/comenzi')}>
-                                    <Bell size={18} /> {date.comenziNoi} comenzi noi de confirmat!
+                                    🔔 {date.comenziNoi} comenzi noi de confirmat!
                                 </button>
                             )}
                         </div>

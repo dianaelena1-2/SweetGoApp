@@ -46,12 +46,13 @@ router.post('/', verifyToken, verifyRol('client'), (req,res) => {
 //istoric comenzi client
 router.get('/istoricul-meu',verifyToken, verifyRol('client'), (req,res) => {
     const comenzi = db.prepare(`
-        SELECT c.*, co.numeCofetarie 
+        SELECT c.*, co.numeCofetarie, 
+        (SELECT 1 FROM recenzii WHERE comanda_id = c.id LIMIT 1) as are_recenzie 
         FROM comenzi c
         JOIN cofetarii co ON c.cofetarie_id = co.id
         WHERE c.client_id = ?
         ORDER BY c.creat_la DESC
-    `).all(req.utilizator.id)
+    `).all(req.utilizator.id);
 
     const comenziCuProduse = comenzi.map(comanda => {
         const produse = db.prepare(`
@@ -107,6 +108,35 @@ router.put('/:id/status', verifyToken, verifyRol('cofetarie'), (req, res) => {
 
     db.prepare('UPDATE comenzi SET status = ? WHERE id = ?').run(status, id)
     res.json({ mesaj: 'Status actualizat' })
+})
+
+router.put('/:id/anulare-client', verifyToken, verifyRol('client'), (req, res) => {
+    const comandaId = req.params.id;
+    const clientId = req.utilizator.id;
+
+    try {
+        const comanda = db.prepare('SELECT status FROM comenzi WHERE id = ? AND client_id = ?').get(comandaId, clientId);
+
+        if (!comanda) {
+            return res.status(404).json({ mesaj: 'Comanda nu a fost găsită.' });
+        }
+
+        if (comanda.status !== 'plasata') {
+            return res.status(400).json({ mesaj: 'Comanda nu mai poate fi anulată deoarece a fost deja preluată de cofetărie.' });
+        }
+
+        const produseComanda = db.prepare('SELECT produs_id, cantitate FROM detalii_comanda WHERE comanda_id = ?').all(comandaId);
+        for (const p of produseComanda) {
+            db.prepare('UPDATE produse SET stoc = stoc + ? WHERE id = ?').run(p.cantitate, p.produs_id);
+        }
+        
+        db.prepare("UPDATE comenzi SET status = 'anulata' WHERE id = ?").run(comandaId);
+
+        res.json({ mesaj: 'Comanda a fost anulată.' });
+    } catch (err) {
+        console.error("Eroare la anulare client:", err);
+        res.status(500).json({ mesaj: 'Eroare la server la anularea comenzii.' });
+    }
 })
 
 module.exports = router
