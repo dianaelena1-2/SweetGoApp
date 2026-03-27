@@ -13,12 +13,22 @@ router.get('/cofetarie/:id', verifyToken, verifyRol('cofetarie'), (req, res) => 
     }
 
     const produse = db.prepare('SELECT * FROM produse WHERE cofetarie_id = ?').all(cofetarie.id)
-    res.json(produse)
+
+    const produseCuIngrediente = produse.map(p => {
+        const ingrediente = db.prepare(`
+            SELECT i.id, i.nume
+            FROM ingrediente i
+            JOIN compozitieProdus cp ON i.id = cp.ingredient_id
+            WHERE cp.produs_id = ?
+            `).all(p.id);
+        return {...p, ingrediente};
+    })
+    res.json(produseCuIngrediente);
 })
 
 //adauga produs
 router.post('/',verifyToken,verifyRol('cofetarie'), uploadImaginiProduse.single('imagine'),(req,res) => {
-    const { numeProdus, descriere, pret, categorie, stoc, transport_recomandat } = req.body
+    const { numeProdus, descriere, pret, categorie, stoc, transport_recomandat, ingredienteAlese, ingredientNou } = req.body
     const imagine = req.file ? req.file.path : null
 
     const cofetarie = db.prepare(`
@@ -33,18 +43,28 @@ router.post('/',verifyToken,verifyRol('cofetarie'), uploadImaginiProduse.single(
         return res.status(403).json({ mesaj: 'Contul tau nu a fost aprobat inca de administrator' })
     }
 
-    const rezultat = db.prepare(`
-        INSERT INTO produse (cofetarie_id, numeProdus, descriere, pret, categorie, stoc, imagine, transport_recomandat)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(cofetarie.id, numeProdus, descriere, pret, categorie, stoc || 0, imagine, transport_recomandat || 'masina')
+    try{
+        const insertProdus = db.prepare(`
+            INSERT INTO produse (cofetarie_id, numeProdus, descriere, pret, categorie, stoc, imagine, transport_recomandat)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `);
 
-    res.status(201).json({ mesaj: 'Produs adaugat', id: rezultat.lastInsertRowid })
+        const rezultat = insertProdus.run(cofetarie.id, numeProdus, descriere, pret, categorie, stoc || 0, imagine, transport_recomandat || 'masina');
+        const produsId = rezultat.lastInsertRowid;
+
+        gestioneazaIngrediente(produsId, ingredienteAlese, ingredientNou);
+        res.status(201).json({mesaj: 'Produs adaugat', id: produsId})
+    } catch(err){
+        console.error(err);
+        res.status(500).json({mesaj: 'Eroare la adaugarea produsului'});
+    }
 })
+
 
 //editeaza produs
 router.put('/:id', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.single('imagine'), (req,res) => {
     const { id } = req.params
-    const { numeProdus, descriere, pret, categorie, disponibil, stoc, transport_recomandat } = req.body
+    const { numeProdus, descriere, pret, categorie, disponibil, stoc, transport_recomandat, ingredienteAlese, ingredientNou } = req.body
     const imagine = req.file 
     ? req.file.path 
     : db.prepare('SELECT imagine FROM produse WHERE id = ?').get(id)?.imagine
@@ -61,12 +81,19 @@ router.put('/:id', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.sin
         return res.status(403).json({ mesaj: 'Contul tau nu a fost aprobat inca de administrator' })
     }
 
-    db.prepare(`
-        UPDATE produse SET numeProdus = ?, descriere = ?, pret = ?, categorie = ?, disponibil = ?, stoc = ?, imagine = ?, transport_recomandat = ?
-        WHERE id = ?
-    `).run(numeProdus, descriere, pret, categorie, disponibil, stoc, imagine, transport_recomandat, id)
+    try{
+        db.prepare(`
+            UPDATE produse SET numeProdus = ?, descriere = ?, pret = ?, categorie = ?, disponibil = ?, stoc = ?, imagine = ?, transport_recomandat = ?
+            WHERE id = ?
+        `).run(numeProdus, descriere, pret, categorie, disponibil, stoc, imagine, transport_recomandat, id)
 
-    res.json({ mesaj: 'Produs actualizat' })
+        db.prepare('DELETE FROM compozitieProdus WHERE produs_id = ?').run(id);
+        gestioneazaIngrediente(id, ingredienteAlese, ingredientNou);
+        res.json({mesaj: 'Produs actualizat'})
+    } catch(err) {
+        console.error(err);
+        res.status(500).json({ mesaj: 'Eroare la actualizarea produsului' });
+    }
 })
 
 //sterge produs
@@ -85,8 +112,43 @@ router.delete('/:id', verifyToken, verifyRol('cofetarie'), (req, res) => {
         return res.status(403).json({ mesaj: 'Contul tau nu a fost aprobat inca de administrator' })
     }
 
+    db.prepare('DELETE FROM compozitieProdus WHERE produs_id = ?').run(id)
     db.prepare('DELETE FROM produse WHERE id = ?').run(id)
+
     res.json({ mesaj: 'Produs sters' })
 })
+
+function gestioneazaIngrediente(produsId, ingredienteAlese, ingredientNou) {
+    let idsDeInserat = [];
+
+    //procesare id-uri
+    if (ingredienteAlese) {
+        try{
+            const alese = typeof ingredienteAlese === 'string' ? JSON.parse(ingredienteAlese) : ingredienteAlese;
+            if(Array.isArray(alese))
+                idsDeInserat = [...alese];
+        } catch(err){
+            if (ingredienteAlese) 
+                idsDeInserat.push(ingredienteAlese);
+        }
+        
+    }
+
+    //ingredient nou
+    if (ingredientNou && ingredientNou.trim() !== '') {
+        const numeCurat = ingredientNou.trim().toLowerCase();
+        
+        db.prepare('INSERT OR IGNORE INTO ingrediente (nume) VALUES (?)').run(numeCurat);
+        
+        const record = db.prepare('SELECT id FROM ingrediente WHERE nume = ?').get(numeCurat);
+        if (record) idsDeInserat.push(record.id);
+    }
+
+    const idsUnice = [...new Set(idsDeInserat)];
+    const stmt = db.prepare('INSERT INTO compozitieProdus (produs_id, ingredient_id) VALUES (?, ?)');
+    idsUnice.forEach(ingId => {
+        stmt.run(produsId, ingId);
+    });
+}
 
 module.exports = router

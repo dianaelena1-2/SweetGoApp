@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, ShoppingCart, Store, MapPin, Phone, Palette, Pencil, StickyNote, Star, Tag } from 'lucide-react'
+import { Cake, ShoppingCart, Store, MapPin, Phone, Palette, Pencil, StickyNote, Star, Tag, ChevronDown, ChevronUp  } from 'lucide-react'
 import api from '../../services/api'
 
 function DetaliiCofetarie() {
@@ -12,6 +12,8 @@ function DetaliiCofetarie() {
     const [cofetarie, setCofetarie] = useState(null)
     const [produse, setProduse] = useState([])
     const [loading, setLoading] = useState(true)
+
+    const [ingredienteExtinse, setIngredienteExtinse] = useState(false)
 
     const [cos, setCos] = useState(() => {
         const cosSalvat = localStorage.getItem('cos')
@@ -52,6 +54,7 @@ function DetaliiCofetarie() {
         setOptiuneCustom('')
         setObservatiiModal('')
         setOptiuniDecorModal([])
+        setIngredienteExtinse(false)
 
         if (produs.categorie === 'Torturi') {
             try {
@@ -73,7 +76,7 @@ function DetaliiCofetarie() {
 
     const confirmaAdaugareInCos = () => {
         const produs = produsMmodal
-        // daca e 'Alta', folosim textul custom, altfel optiunea selectata
+
         const optiuneFinala = optiuneSelectata === 'Alta'
             ? (optiuneCustom.trim() || null)
             : (optiuneSelectata || null)
@@ -216,6 +219,13 @@ function DetaliiCofetarie() {
                                     <h4>{produs.numeProdus}</h4>
                                     <p className="produs-descriere">{produs.descriere}</p>
                                     <p className="produs-categorie"><Tag size={14} /> {produs.categorie}</p>
+                                    {produs.ingrediente && produs.ingrediente.length > 0 && (
+                                        <div className="produs-ingrediente-preview" style={{ fontSize: '0.75rem', color: '#8d6e63', marginTop: '4px' }}>
+                                            <span style={{ fontWeight: '600' }}>Ingrediente: </span>
+                                            {produs.ingrediente.slice(0, 3).map(i => i.nume).join(', ')}
+                                            {produs.ingrediente.length > 3 && '...'}
+                                        </div>
+                                    )}
                                     <div className="produs-footer">
                                         <span className="produs-pret">{produs.pret} lei</span>
 
@@ -260,6 +270,47 @@ function DetaliiCofetarie() {
 
                         <h3 className="modal-titlu">{produsMmodal.numeProdus}</h3>
                         <p className="modal-descriere">{produsMmodal.descriere}</p>
+
+                        {produsMmodal.ingrediente && produsMmodal.ingrediente.length > 0 && (
+                            <div className="modal-sectiune-ingrediente" style={{ 
+                                backgroundColor: '#fff9f2', 
+                                padding: '10px', 
+                                borderRadius: '8px', 
+                                marginBottom: '15px',
+                                borderLeft: '3px solid #f5d5a8'
+                            }}>
+                                <p style={{ fontSize: '0.85rem', color: '#7a5230', fontWeight: 'bold', marginBottom: '4px' }}>
+                                    🥣 Ingrediente:
+                                </p>
+                                <p style={{ fontSize: '0.85rem', color: '#5d4037', lineHeight: '1.4' }}>
+                                    {ingredienteExtinse 
+                                        ? produsMmodal.ingrediente.map(i => i.nume).join(', ')
+                                        : produsMmodal.ingrediente.slice(0, 5).map(i => i.nume).join(', ') + (produsMmodal.ingrediente.length > 5 ? '...' : '')
+                                    }
+                                    
+                                    {produsMmodal.ingrediente.length > 5 && (
+                                        <button 
+                                            onClick={() => setIngredienteExtinse(!ingredienteExtinse)}
+                                            style={{ 
+                                                background: 'none', 
+                                                border: 'none', 
+                                                color: '#c97c2e', 
+                                                fontSize: '0.8rem', 
+                                                fontWeight: 'bold', 
+                                                cursor: 'pointer',
+                                                padding: '0 5px',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '2px'
+                                            }}
+                                        >
+                                            {ingredienteExtinse ? <><ChevronUp size={14}/> vezi mai puțin</> : <><ChevronDown size={14}/> vezi tot</>}
+                                        </button>
+                                    )}
+                                </p>
+                            </div>
+                        )}
+
                         <p className="modal-pret">{produsMmodal.pret} lei / buc</p>
 
                         {/* SELECTOR CANTITATE */}

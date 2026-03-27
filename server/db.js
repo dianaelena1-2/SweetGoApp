@@ -44,6 +44,23 @@ db.exec(`
 `)
 
 db.exec(`
+    CREATE TABLE IF NOT EXISTS ingrediente (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nume TEXT UNIQUE NOT NULL
+    )
+`)
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS compozitieProdus(
+        produs_id INTEGER,
+        ingredient_id INTEGER,
+        PRIMARY KEY (produs_id, ingredient_id),
+        FOREIGN KEY (produs_id) REFERENCES produse(id) ON DELETE CASCADE,
+        FOREIGN KEY (ingredient_id) REFERENCES ingrediente(id) ON DELETE CASCADE
+    )
+`)
+
+db.exec(`
     CREATE TABLE IF NOT EXISTS comenzi (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         client_id INTEGER NOT NULL,

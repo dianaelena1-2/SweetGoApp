@@ -1694,3 +1694,89 @@ body {
 .check-icon {
     color: #c97c2e;
 }
+
+/* SECTIUNE INGREDIENTE */
+.ingrediente-selector-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+    max-height: 120px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #fdfaf6;
+    border: 1px solid #f5d5a8;
+    border-radius: 8px;
+}
+
+.ing-tag {
+    padding: 5px 12px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.ing-tag:hover {
+    border-color: #c97c2e;
+    background: #fffcf9;
+}
+
+.ing-tag.activ {
+    background: #c97c2e;
+    color: white;
+    border-color: #c97c2e;
+    font-weight: 600;
+}
+
+/*Adaugare ingredient buton*/
+.btn-ingredient-nou {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Spațiu între iconiță și text */
+    padding: 10px 24px;
+    background-color: #c97c2e; /* Culoarea maro-auriu a brandului tău */
+    color: white;
+    border: none;
+    border-radius: 50px; /* Îl face rotund la capete (pill-shape) */
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(201, 124, 46, 0.2);
+}
+
+.btn-ingredient-nou:hover {
+    background-color: #ae6a25;
+    transform: translateY(-1px); /* Efect discret de ridicare */
+    box-shadow: 0 4px 8px rgba(201, 124, 46, 0.3);
+}
+
+.btn-ingredient-nou:active {
+    transform: translateY(0);
+}
+
+/* Stil pentru iconița din interior */
+.btn-ingredient-nou svg {
+    stroke-width: 3px; /* Face plusul puțin mai gros și vizibil */
+}
+
+.produs-ingrediente-preview {
+    font-style: italic;
+    /* Limităm la un singur rând în cardul mic */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.modal-sectiune-ingrediente {
+    background: #fff9f2; /* Un fundal foarte pal ca să iasă în evidență */
+    padding: 8px 12px;
+    border-radius: 8px;
+    border-left: 3px solid #f5d5a8;
+}

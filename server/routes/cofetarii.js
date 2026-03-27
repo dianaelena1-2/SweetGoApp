@@ -34,26 +34,44 @@ router.get('/:id/toate-recenziile', (req, res) => {
 });
 
 //detalii cofetarie
+// În server/routes/cofetarii.js
+
 router.get('/:id', (req, res) => {
-    const { id } = req.params
-    const cofetarie = db.prepare(`
-        SELECT c.*, AVG(r.rating) as rating_mediu, COUNT(r.id) as numar_recenzii
-        FROM cofetarii c
-        LEFT JOIN recenzii r ON c.id = r.cofetarie_id
-        WHERE c.id = ? AND c.status = 'aprobata'
-        GROUP BY c.id
-    `).get(id)
+    const { id } = req.params;
 
-    if (!cofetarie) {
-        return res.status(404).json({ mesaj: 'Cofetaria nu a fost gasita' })
+    try {
+        const cofetarie = db.prepare(`
+            SELECT *, 
+            (SELECT AVG(rating) FROM recenzii WHERE cofetarie_id = ?) as rating_mediu,
+            (SELECT COUNT(*) FROM recenzii WHERE cofetarie_id = ?) as numar_recenzii
+            FROM cofetarii WHERE id = ?
+        `).get(id, id, id);
+
+        if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetaria nu a fost gasita' });
+
+        const produseRaw = db.prepare('SELECT * FROM produse WHERE cofetarie_id = ?').all(id);
+
+        const produseCuIngrediente = produseRaw.map(p => {
+            const ingrediente = db.prepare(`
+                SELECT i.id, i.nume 
+                FROM ingrediente i
+                JOIN compozitieProdus cp ON i.id = cp.ingredient_id
+                WHERE cp.produs_id = ?
+            `).all(p.id);
+            
+            return { ...p, ingrediente }; 
+        });
+
+        res.json({
+            cofetarie,
+            produse: produseCuIngrediente 
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ mesaj: 'Eroare la server' });
     }
-
-    const produse = db.prepare(`
-        SELECT * FROM produse WHERE cofetarie_id = ? AND disponibil = 1
-    `).all(id)
-
-    res.json({ cofetarie, produse })
-})
+});
 
 //adaugare recenzie
 router.post('/:id/recenzii', verifyToken, verifyRol('client'), (req, res) => {

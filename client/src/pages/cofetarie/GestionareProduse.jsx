@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, PlusCircle, Tag, Check, X, Package, Pencil, Trash2, Palette, Bike, Car, Snowflake } from 'lucide-react'
+import { Cake, PlusCircle, Tag, Check, X, Package, Pencil, Trash2, Palette, Bike, Car, Snowflake, ListChecks } from 'lucide-react'
 import api from '../../services/api'
 
 const CATEGORII = ['Torturi', 'Prăjituri', 'Macarons', 'Cupcakes', 'Croissante']
@@ -36,8 +36,13 @@ function GestionareProduse() {
     const [optiuniDecor, setOptiuniDecor] = useState({})
     const [optiuneNoua, setOptiuneNoua] = useState({})
 
+    const [listaGlobalaIngrediente, setListaGlobalaIngrediente] = useState([])
+    const [ingredienteAlese, setIngredienteAlese] = useState([])
+    const [numeIngredientNou, setNumeIngredientNou] = useState('')
+
     useEffect(() => {
         fetchProduse()
+        fetchIngrediente()
     }, [])
 
     const fetchProduse = async () => {
@@ -48,6 +53,15 @@ function GestionareProduse() {
             setEroare('Eroare la încărcarea produselor')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const fetchIngrediente = async () => {
+        try{
+            const raspuns = await api.get('/ingrediente')
+            setListaGlobalaIngrediente(raspuns.data)
+        } catch(err){
+            console.error('Eroare la incarcarea listei de ingrediente', err)
         }
     }
 
@@ -84,17 +98,41 @@ function GestionareProduse() {
             data.append('categorie', formNou.categorie)
             data.append('stoc', formNou.stoc || 0)
             data.append('disponibil', formNou.disponibil)
-            // Trimitere transport_recomandat
             data.append('transport_recomandat', formNou.transport_recomandat)
+            data.append('ingredienteAlese', JSON.stringify(ingredienteAlese))
+            data.append('ingredientNou', numeIngredientNou)
             
             if (imagineNoua) data.append('imagine', imagineNoua)
             await api.post('/produse', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+
             setFormNou(produsGol)
             setImagineNoua(null)
+            setIngredienteAlese([])
+            setNumeIngredientNou('')
+
             afiseazaSucces('Produs adăugat cu succes!')
             fetchProduse()
+            fetchIngrediente()
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la adăugarea produsului')
+        }
+    }
+
+    const handleAdaugaIngredient = async () => {
+        const nume = numeIngredientNou.trim().toLowerCase();
+        if (!nume) return;
+
+        try{
+            const res = await api.post('/ingrediente', { nume });
+            await fetchIngrediente();
+            const ingredientAdaugat = res.data.id; 
+            if (!ingredienteAlese.includes(ingredientAdaugat)) {
+                setIngredienteAlese([...ingredienteAlese, ingredientAdaugat]);
+            }
+            setNumeIngredientNou('');
+            afiseazaSucces(`Ingredientul "${nume}" a fost adăugat!`);
+        } catch(err){
+            setEroare(err.response?.data?.mesaj || "Eroare la adăugarea ingredientului");
         }
     }
 
@@ -110,6 +148,9 @@ function GestionareProduse() {
             transport_recomandat: produs.transport_recomandat || 'masina'
         })
         setImagineEditare(null)
+        setIngredienteAlese(produs.ingrediente ? produs.ingrediente.map(i => i.id) : [])
+        setNumeIngredientNou('')
+
         if (produs.categorie === 'Torturi') {
             fetchOptiuni(produs.id)
         }
@@ -129,14 +170,20 @@ function GestionareProduse() {
             data.append('categorie', formEditare.categorie)
             data.append('disponibil', formEditare.disponibil)
             data.append('stoc', formEditare.stoc || 0)
-            // Trimitere transport_recomandat la editare
             data.append('transport_recomandat', formEditare.transport_recomandat)
+            data.append('ingredienteAlese', JSON.stringify(ingredienteAlese))
+            data.append('ingredientNou', numeIngredientNou)
 
             if (imagineEditare) data.append('imagine', imagineEditare)
             await api.put(`/produse/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+            
             setEditareId(-1)
+            setIngredienteAlese([])
+            setNumeIngredientNou('')
+
             afiseazaSucces('Produs actualizat cu succes!')
             fetchProduse()
+            fetchIngrediente()
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la actualizarea produsului')
         }
@@ -217,6 +264,60 @@ function GestionareProduse() {
                     </div>
                 </>
             )}
+        </div>
+    )
+
+    const renderSectiuneIngrediente = () => (
+        <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: '10px'}}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#7a5230' }}>
+                <ListChecks size={18} /> Ingrediente produs
+            </label>
+
+            {/* lista de ingrediente */}
+            <div className="ingrediente-selector-container">
+                {listaGlobalaIngrediente.map(ing => (
+                    <div 
+                        key={ing.id} 
+                        className={`ing-tag ${ingredienteAlese.includes(ing.id) ? 'activ' : ''}`}
+                        onClick={() => {
+                            if (ingredienteAlese.includes(ing.id)) {
+                                setIngredienteAlese(ingredienteAlese.filter(id => id !== ing.id))
+                            } else {
+                                setIngredienteAlese([...ingredienteAlese, ing.id])
+                            }
+                        }}
+                    >
+                        {ing.nume}
+                    </div>
+                ))}
+            </div>
+
+            {/* Camp adaugare ingredient nou */}
+            <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+                <input 
+                    type="text" 
+                    placeholder="Ingredient nou? (ex: Sirop de agave)" 
+                    value={numeIngredientNou}
+                    onChange={(e) => setNumeIngredientNou(e.target.value)}
+                    // Permitem adăugarea prin tasta Enter
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault(); // Evităm trimiterea întregului formular
+                            handleAdaugaIngredient();
+                        }
+                    }}
+                    style={{ flex: 1 }}
+                />
+                <div className="container-buton-centrat">
+                    <button 
+                        type="button" 
+                        className="btn-ingredient-nou" 
+                        onClick={handleAdaugaIngredient}
+                    >
+                        ➕ Adaugă în listă
+                    </button>
+                </div>
+            </div>
         </div>
     )
 
@@ -315,6 +416,9 @@ function GestionareProduse() {
                                 </select>
                             </div>
                         </div>
+
+                        {renderSectiuneIngrediente()}
+
                         <div className="form-group">
                             <label>Imagine produs (opțional)</label>
                             <input
@@ -416,6 +520,9 @@ function GestionareProduse() {
                                                     </select>
                                                 </div>
                                             </div>
+
+                                            {renderSectiuneIngrediente()}
+
                                             <div className="form-group">
                                                 <label>Imagine nouă (opțional)</label>
                                                 <input
@@ -448,6 +555,11 @@ function GestionareProduse() {
                                         <div className="gp-produs-info">
                                             <h4>{produs.numeProdus}</h4>
                                             <p className="produs-descriere">{produs.descriere}</p>
+                                            {produs.ingrediente && produs.ingrediente.length > 0 && (
+                                                <div style={{ margin: '8px 0', fontSize: '0.85rem', color: '#7a5230' }}>
+                                                    <strong>Ingrediente:</strong> {produs.ingrediente.map(i => i.nume).join(', ')}
+                                                </div>
+                                            )}
                                             <div className="gp-produs-meta">
                                                 <span className="produs-pret">{produs.pret} lei</span>
                                                 <span className="produs-categorie"><Tag size={14} /> {produs.categorie}</span>
