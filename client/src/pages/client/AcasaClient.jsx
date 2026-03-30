@@ -29,6 +29,10 @@ function AcasaClient(){
         fetchCofetarii()
     }, [])
 
+    const cofetariiFiltrate = cofetarii.filter(c => 
+        c.numeCofetarie.toLowerCase().includes(cautare.toLowerCase())
+    );
+
     const deschideRecenzii = async (e, cofetarie) => {
         e.stopPropagation(); // Previne navigarea catre pagina cofetariei
         setLoadingRecenzii(true);
@@ -88,38 +92,45 @@ function AcasaClient(){
             <div className="acasa-continut">
                 <h2>Cofetării disponibile</h2>
 
-                <div className="cofetarii-grid">
-                    {cofetarii.filter(c => c.numeCofetarie.toLowerCase().includes(cautare.toLowerCase())).map(cofetarie => (
-                        <div key={cofetarie.id} className="cofetarie-card" onClick={() => navigate(`/cofetarie/${cofetarie.id}`)}>
-                            <div className="cofetarie-card-imagine">
-                                {cofetarie.imagine_coperta ? (
-                                    <img src={`http://localhost:7000/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
-                                ) : (
-                                    <Cake size={48} color="#c97c2e" strokeWidth={1.5} />
-                                )}
-                            </div>
-                            <div className="cofetarie-card-info">
-                                <h3>{cofetarie.numeCofetarie}</h3>
-                                <p className="adresa" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <MapPin size={16} /> {cofetarie.adresa}
-                                </p>
-                                <div className="rating">
-                                    <span className="stele" style={{ display: 'flex', gap: '2px' }}>
-                                        {renderStele(cofetarie.rating_mediu)}
-                                    </span>
-                                    {/* Click aici deschide modalul */}
-                                    <span 
-                                        className="numar-recenzii" 
-                                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                        onClick={(e) => deschideRecenzii(e, cofetarie)}
-                                    >
-                                        {cofetarie.numar_recenzii > 0 ? `(${cofetarie.numar_recenzii} recenzii)` : '(fără recenzii)'}
-                                    </span>
+                {loading ? (
+                    <p className="loading">Se încarcă...</p>
+                ) : cofetariiFiltrate.length > 0 ? (
+                    <div className="cofetarii-grid">
+                        {cofetariiFiltrate.map(cofetarie => (
+                            <div key={cofetarie.id} className="cofetarie-card" onClick={() => navigate(`/cofetarie/${cofetarie.id}`)}>
+                                <div className="cofetarie-card-imagine">
+                                    {cofetarie.imagine_coperta ? (
+                                        <img src={`http://localhost:7000/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
+                                    ) : (
+                                        <Cake size={48} color="#c97c2e" strokeWidth={1.5} />
+                                    )}
+                                </div>
+                                <div className="cofetarie-card-info">
+                                    <h3>{cofetarie.numeCofetarie}</h3>
+                                    <p className="adresa" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <MapPin size={16} /> {cofetarie.adresa}
+                                    </p>
+                                    <div className="rating">
+                                        <span className="stele" style={{ display: 'flex', gap: '2px' }}>
+                                            {renderStele(cofetarie.rating_mediu)}
+                                        </span>
+                                        <span 
+                                            className="numar-recenzii" 
+                                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                            onClick={(e) => deschideRecenzii(e, cofetarie)}
+                                        >
+                                            {cofetarie.numar_recenzii > 0 ? `(${cofetarie.numar_recenzii} recenzii)` : '(fără recenzii)'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center', marginTop: '3rem', color: '#7a5230' }}>
+                        <p>Nu am găsit nicio cofetărie cu numele "<strong>{cautare}</strong>".</p>
+                    </div>
+                )}
             </div>
 
             {/* MODAL VIZUALIZARE RECENZII */}

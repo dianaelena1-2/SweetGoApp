@@ -1780,3 +1780,220 @@ body {
     border-radius: 8px;
     border-left: 3px solid #f5d5a8;
 }
+
+/* --- LAYOUT DETALII COFETARIE (Sidebar + Produse) --- */
+
+/* Containerul principal care împarte pagina în două coloane */
+.detalii-layout-container {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+    align-items: flex-start;
+}
+
+/* Coloana din stânga - Sidebar-ul */
+.sidebar-categorii {
+    min-width: 200px;
+    position: sticky;
+    top: 20px; /* Rămâne fixat la scroll */
+    padding: 10px;
+    background-color: #fffcf9; /* Un fundal foarte discret */
+    border-radius: 15px;
+}
+
+.sidebar-categorii h4 {
+    color: #7a5230;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    padding-left: 5px;
+    border-left: 4px solid #c97c2e; /* O linie mică de accent */
+    line-height: 1;
+}
+
+/* Stilul butoanelor din Sidebar */
+.btn-sidebar {
+    display: block;
+    width: 100%;
+    padding: 12px 18px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    border: 1px solid #f5d5a8;
+    background-color: white;
+    color: #7a5230;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efect de hover pe butoane */
+.btn-sidebar:hover {
+    background-color: #fff4e6;
+    border-color: #c97c2e;
+    color: #c97c2e;
+    transform: translateX(5px); /* Se mișcă ușor spre dreapta */
+}
+
+/* Stilul pentru butonul selectat (Activ) */
+.btn-sidebar.activ {
+    background-color: #c97c2e;
+    color: white;
+    border-color: #c97c2e;
+    box-shadow: 0 4px 10px rgba(201, 124, 46, 0.2);
+}
+
+/* Coloana din dreapta - Zona de produse */
+.continut-produse {
+    flex: 1; /* Ocupă tot spațiul rămas */
+}
+
+/* Grid-ul de produse (ajustat pentru layout-ul cu sidebar) */
+.produse-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+/* --- RESPONSIVITATE (Pentru Tablete și Telefoane) --- */
+
+@media (max-width: 900px) {
+    .detalii-layout-container {
+        flex-direction: column; /* Pune sidebar-ul deasupra produselor */
+        gap: 20px;
+    }
+
+    .sidebar-categorii {
+        width: 100%;
+        position: static; /* Nu mai stă fixat la scroll pe mobil */
+    }
+
+    /* Pe mobil, transformăm lista verticală într-un rând orizontal cu scroll */
+    .sidebar-categorii-lista {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 10px;
+        scrollbar-width: none; /* Ascunde scrollbar pe Firefox */
+    }
+
+    .sidebar-categorii-lista::-webkit-scrollbar {
+        display: none; /* Ascunde scrollbar pe Chrome/Safari */
+    }
+
+    .btn-sidebar {
+        width: auto;
+        white-space: nowrap; /* Nu lasă textul să treacă pe rândul următor */
+        padding: 8px 20px;
+    }
+    
+    .btn-sidebar:hover {
+        transform: none; /* Scoatem animația de translație pe mobil */
+    }
+}
+
+/* Layout Principal */
+.detalii-pagina-layout {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Stil Sidebar */
+.sidebar-filtrare {
+    width: 250px;
+    position: sticky;
+    top: 20px; /* Rămâne fix când dai scroll */
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #f5eadd;
+}
+
+.sidebar-titlu-filtru {
+    color: #7a5230;
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f5d5a8;
+}
+
+.filtru-grup h4 {
+    color: #9a7a5a;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+/* Stil Butoane Filtru Item */
+.filtru-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border: 1px solid transparent;
+    background: #fdfaf6;
+    color: #7a5230;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.filtru-item:hover {
+    background: #f5eadd;
+    transform: translateX(5px);
+}
+
+.filtru-item.activ {
+    background: #c97c2e;
+    color: white;
+    box-shadow: 0 4px 10px rgba(201, 124, 46, 0.3);
+}
+
+/* Header Produse (Dreapta) */
+.produse-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.numar-rezultate {
+    font-size: 0.85rem;
+    color: #9a7a5a;
+    background: #fdfaf6;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+/* Grid ajustat pentru sidebar */
+.produse-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+/* Responsivitate pentru ecrane mici */
+@media (max-width: 850px) {
+    .detalii-pagina-layout {
+        flex-direction: column;
+    }
+    .sidebar-filtrare {
+        width: 100%;
+        position: static;
+    }
+    .categorii-lista-verticala {
+        display: flex;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 10px;
+    }
+    .filtru-item {
+        width: auto;
+        white-space: nowrap;
+    }
+}

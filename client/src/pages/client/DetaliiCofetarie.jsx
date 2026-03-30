@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, ShoppingCart, Store, MapPin, Phone, Palette, Pencil, StickyNote, Star, Tag, ChevronDown, ChevronUp  } from 'lucide-react'
+import { Cake, ShoppingCart, Store, MapPin, Phone, Palette, Pencil, StickyNote, Star, Tag, ChevronDown, ChevronUp, Check, Filter  } from 'lucide-react'
 import api from '../../services/api'
 
 function DetaliiCofetarie() {
@@ -10,10 +10,14 @@ function DetaliiCofetarie() {
     const { utilizator, logout } = useContext(AuthContext)
 
     const [cofetarie, setCofetarie] = useState(null)
+    const [cautare, setCautare] = useState('')
     const [produse, setProduse] = useState([])
     const [loading, setLoading] = useState(true)
+    const [categorieActiva, setCategorieActiva] = useState('Toate')
 
     const [ingredienteExtinse, setIngredienteExtinse] = useState(false)
+
+    const categoriiUnice = ['Toate', ...new Set(produse.map(p => p.categorie))];
 
     const [cos, setCos] = useState(() => {
         const cosSalvat = localStorage.getItem('cos')
@@ -46,6 +50,18 @@ function DetaliiCofetarie() {
     useEffect(() => {
         localStorage.setItem('cos', JSON.stringify(cos))
     }, [cos])
+
+    const produseFiltrate = produse.filter(produs => {
+        const term = cautare.toLowerCase().trim();
+
+        const numeMatch = produs.numeProdus.toLowerCase().includes(term);
+        const descriereMatch = produs.descriere?.toLowerCase().includes(term);
+        const meciuriCautare = numeMatch || descriereMatch;
+
+        const meciuriCategorie = categorieActiva === 'Toate' || produs.categorie === categorieActiva;
+
+        return meciuriCautare && meciuriCategorie;
+    });
 
     const deschideModal = async (produs) => {
         setProdusModal(produs)
@@ -167,6 +183,14 @@ function DetaliiCofetarie() {
                 <h1 className="navbar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
                     SweetGo 🍰
                 </h1>
+                <div className="navbar-search">
+                    <input
+                        type="text"
+                        placeholder="Caută în meniu..."
+                        value={cautare}
+                        onChange={(e) => setCautare(e.target.value)}
+                    />
+                </div>
                 <div className="navbar-actiuni">
                     <span>Bună, {utilizator?.nume}!</span>
                     <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
@@ -203,57 +227,101 @@ function DetaliiCofetarie() {
                     </div>
                 </div>
 
-                <h3 className="sectiune-titlu">Produse disponibile</h3>
-                {produse.length === 0 ? (
-                    <p className="gol">Această cofetărie nu are produse disponibile momentan.</p>
-                ) : (
-                    <div className="produse-grid">
-                        {produse.map(produs => (
-                            <div key={produs.id} className={`produs-card ${!produs.disponibil || produs.stoc === 0 ? 'produs-indisponibil' : ''}`}>
-                                <div className="produs-card-imagine">
-                                    {produs.imagine ? (
-                                        <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
-                                    ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
-                                </div>
-                                <div className="produs-card-info">
-                                    <h4>{produs.numeProdus}</h4>
-                                    <p className="produs-descriere">{produs.descriere}</p>
-                                    <p className="produs-categorie"><Tag size={14} /> {produs.categorie}</p>
-                                    {produs.ingrediente && produs.ingrediente.length > 0 && (
-                                        <div className="produs-ingrediente-preview" style={{ fontSize: '0.75rem', color: '#8d6e63', marginTop: '4px' }}>
-                                            <span style={{ fontWeight: '600' }}>Ingrediente: </span>
-                                            {produs.ingrediente.slice(0, 3).map(i => i.nume).join(', ')}
-                                            {produs.ingrediente.length > 3 && '...'}
-                                        </div>
-                                    )}
-                                    <div className="produs-footer">
-                                        <span className="produs-pret">{produs.pret} lei</span>
-
-                                        {!produs.disponibil || produs.stoc === 0 ? (
-                                            <span className="badge-indisponibil">Indisponibil</span>
-                                        ) : cantitateDinCos(produs.id) === 0 ? (
-                                            <button
-                                                className="btn-adauga-cos"
-                                                onClick={() => deschideModal(produs)}
-                                            >
-                                                + Adaugă
-                                            </button>
-                                        ) : (
-                                            <div className="cantitate-control">
-                                                <button onClick={() => scadeInCos(produs)}>−</button>
-                                                <span>{cantitateDinCos(produs.id)}</span>
-                                                <button
-                                                    onClick={() => deschideModal(produs)}
-                                                    disabled={cantitateDinCos(produs.id) >= produs.stoc}
-                                                >+</button>
-                                            </div>
-                                        )}
-                                    </div>
+                <div className="detalii-layout-container">
+                    
+                    {/* Sidebar de Filtrare */}
+                    <aside className="sidebar-filtrare">
+                        <div className="sidebar-sectiune">
+                            <h3 className="sidebar-titlu-filtru" style={{ 
+                                display: 'flex',          
+                                alignItems: 'center',     
+                                gap: '10px',             
+                                color: '#7a5230', 
+                                fontSize: '1.2rem',
+                                margin: '0 0 20px 0',     
+                                lineHeight: '1'           
+                            }}>
+                                Filtrează <Filter size={20} color="#c97c2e" strokeWidth={2.5} />
+                            </h3>
+                            
+                            <div className="filtru-grup">
+                                <h4>Categorii</h4>
+                                <div className="categorii-lista-verticala">
+                                    {categoriiUnice.map(cat => (
+                                        <button
+                                            key={cat}
+                                            onClick={() => setCategorieActiva(cat)}
+                                            className={`filtru-item ${categorieActiva === cat ? 'activ' : ''}`}
+                                        >
+                                            <span className="filtru-text">{cat}</span>
+                                            {categorieActiva === cat && <Check size={14} />}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
+
+                            {/* <div className="filtru-grup" style={{ marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
+                                <h4 style={{ opacity: 0.6 }}>Alte opțiuni</h4>
+                                <p style={{ fontSize: '0.8rem', color: '#9a7a5a', fontStyle: 'italic' }}>În curând...</p>
+                            </div> */}
+                        </div>
+                    </aside>
+
+                    {/* Zona Principală de Produse */}
+                    <main className="zona-produse-main">
+                        <div className="produse-header-flex">
+                            <h3 className="sectiune-titlu" style={{ margin: 0 }}>
+                                {categorieActiva === 'Toate' ? 'Toate produsele' : categorieActiva}
+                            </h3>
+                            <span className="numar-rezultate">{produseFiltrate.length} produse</span>
+                        </div>
+                        
+                        {produse.length === 0 ? (
+                            <p className="gol">Această cofetărie nu are produse disponibile momentan.</p>
+                        ) : produseFiltrate.length === 0 ? (
+                            <div className="cautare-fara-rezultat">
+                                <p>Niciun rezultat pentru "<strong>{cautare}</strong>" în categoria "{categorieActiva}".</p>
+                            </div>
+                        ) : (
+                            <div className="produse-grid">
+                                {produseFiltrate.map(produs => (
+                                    <div key={produs.id} className={`produs-card ${!produs.disponibil || produs.stoc === 0 ? 'produs-indisponibil' : ''}`}>
+                                        <div className="produs-card-imagine">
+                                            {produs.imagine ? (
+                                                <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
+                                            ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                        </div>
+                                        <div className="produs-card-info">
+                                            <h4>{produs.numeProdus}</h4>
+                                            <p className="produs-descriere">{produs.descriere}</p>
+                                            <p className="produs-categorie"><Tag size={14} /> {produs.categorie}</p>
+                                            {produs.ingrediente && produs.ingrediente.length > 0 && (
+                                                <div className="produs-ingrediente-preview">
+                                                    <span style={{ fontWeight: '600' }}>Ingrediente: </span>
+                                                    {produs.ingrediente.slice(0, 3).map(i => i.nume).join(', ')}{produs.ingrediente.length > 3 && '...'}
+                                                </div>
+                                            )}
+                                            <div className="produs-footer">
+                                                <span className="produs-pret">{produs.pret} lei</span>
+                                                {!produs.disponibil || produs.stoc === 0 ? (
+                                                    <span className="badge-indisponibil">Indisponibil</span>
+                                                ) : cantitateDinCos(produs.id) === 0 ? (
+                                                    <button className="btn-adauga-cos" onClick={() => deschideModal(produs)}>+ Adaugă</button>
+                                                ) : (
+                                                    <div className="cantitate-control">
+                                                        <button onClick={() => scadeInCos(produs)}>−</button>
+                                                        <span>{cantitateDinCos(produs.id)}</span>
+                                                        <button onClick={() => deschideModal(produs)} disabled={cantitateDinCos(produs.id) >= produs.stoc}>+</button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </main>
+                </div>
             </div>
 
             {/* PERSONALIZARE */}
