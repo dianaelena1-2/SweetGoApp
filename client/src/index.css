@@ -2080,3 +2080,128 @@ body {
         white-space: nowrap;
     }
 }
+
+/* --- SECȚIUNE CADOU (Client) --- */
+.cadou-sectiune {
+    margin-top: 1.5rem;
+    padding: 15px;
+    background: #fff9f2;
+    border-radius: 12px;
+    border: 1px dashed #c97c2e;
+}
+.cadou-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    margin: 0;
+    color: #c97c2e;
+    font-size: 1rem;
+    font-weight: bold;
+}
+.cadou-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #c97c2e;
+    cursor: pointer;
+}
+.cadou-icon { font-size: 1.4rem; }
+.cadou-help-text {
+    font-size: 0.8rem;
+    color: #9a7a5a;
+    margin-left: 30px;
+    margin-top: 4px;
+}
+.cadou-mesaj-container { margin-top: 15px; }
+.cadou-mesaj-label { font-size: 0.9rem; color: #7a5230; font-weight: 500; }
+.cadou-mesaj-textarea {
+    width: 100%;
+    margin-top: 5px;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #f5d5a8;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    resize: vertical;
+    background: #fffaf5;
+    font-family: inherit;
+}
+.cadou-mesaj-textarea:focus { border-color: #c97c2e; }
+
+/* --- ALERTĂ CADOU (Cofetărie) --- */
+.alerta-cadou {
+    margin-bottom: 1rem;
+    padding: 12px 15px;
+    background: #fff4e6;
+    border-radius: 10px;
+    border-left: 4px solid #c97c2e;
+}
+.alerta-cadou-titlu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #c97c2e;
+    margin: 0 0 6px 0;
+    font-size: 1rem;
+}
+.alerta-cadou-icon { font-size: 1.3rem; }
+.alerta-cadou-text {
+    font-size: 0.85rem;
+    color: #7a5230;
+    font-weight: bold;
+}
+.alerta-cadou-mesaj-box {
+    margin-top: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    border: 1px dashed #f5d5a8;
+}
+.alerta-cadou-mesaj-label {
+    font-size: 0.8rem;
+    color: #9a7a5a;
+    margin-bottom: 4px;
+}
+.alerta-cadou-mesaj-text {
+    font-size: 0.95rem;
+    color: #5d4037;
+    font-style: italic;
+}
+
+/* --- RESPONSIVITATE --- */
+@media (max-width: 900px) {
+    .detalii-layout-container { flex-direction: column; }
+    .sidebar-filtrare { width: 100%; position: static; }
+    .categorii-lista-verticala { display: flex; overflow-x: auto; gap: 10px; }
+}
+
+/* --- BADGE-URI TRANSPORT (Gestionare Comenzi) --- */
+.badge-transport {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 8px;
+    width: fit-content;
+}
+
+.transport-bicicleta {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.transport-masina {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+.transport-frigorific {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+    border: 1px solid #e1bee7;
+}

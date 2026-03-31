@@ -5,7 +5,7 @@ const { verifyToken, verifyRol } = require('../middleware/auth')
 
 //plasare comanda
 router.post('/', verifyToken, verifyRol('client'), (req,res) => {
-    const { cofetarie_id, adresa_livrare, telefon, observatii, produse } = req.body
+    const { cofetarie_id, adresa_livrare, telefon, observatii, produse, este_cadou, mesaj_cadou, tip_transport } = req.body
 
     if (!cofetarie_id || !adresa_livrare || !telefon || !produse || produse.length === 0) {
         return res.status(400).json({ mesaj: 'Toate campurile sunt obligatorii' })
@@ -23,10 +23,13 @@ router.post('/', verifyToken, verifyRol('client'), (req,res) => {
         total += produsDb.pret * produs.cantitate
     }
 
+    const esteCadouFormatat = este_cadou ? 1 : 0;
+    const mesajCadouFormatat = mesaj_cadou ? mesaj_cadou : null;
+
     const comanda = db.prepare(`
-        INSERT INTO comenzi (client_id, cofetarie_id, adresa_livrare, telefon, observatii, total)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `).run(req.utilizator.id, cofetarie_id, adresa_livrare, telefon, observatii || '', total)
+        INSERT INTO comenzi (client_id, cofetarie_id, adresa_livrare, telefon, observatii, total, este_cadou, mesaj_cadou, tip_transport)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(req.utilizator.id, cofetarie_id, adresa_livrare, telefon, observatii || '', total, esteCadouFormatat, mesajCadouFormatat, tip_transport || 'masina')
 
     const comandaId = comanda.lastInsertRowid
 

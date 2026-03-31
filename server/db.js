@@ -70,6 +70,9 @@ db.exec(`
         adresa_livrare TEXT NOT NULL,
         telefon TEXT,
         observatii TEXT,
+        este_cadou BOOLEAN,
+        mesaj_cadou TEXT,
+        tip_transport TEXT DEFAULT 'masina',
         creat_la DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (client_id) REFERENCES utilizatori(id),
         FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id)

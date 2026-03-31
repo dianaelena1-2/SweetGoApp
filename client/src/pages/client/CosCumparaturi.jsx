@@ -27,6 +27,8 @@ function CosCumparaturi() {
     const [observatii, setObservatii] = useState('')
     
     const [tipTransport, setTipTransport] = useState('masina');
+    const [esteCadou, setEsteCadou] = useState(false)
+    const [mesajCadou, setMesajCadou] = useState('')
 
     useEffect(() => {
         const cosSalvat = localStorage.getItem('cos')
@@ -158,6 +160,8 @@ function CosCumparaturi() {
                 telefon,
                 observatii,
                 tip_transport: tipTransport,
+                este_cadou: esteCadou,
+                mesaj_cadou: esteCadou ? mesajCadou : null,
                 produse: cos.produse.map(p => ({
                     id: p.id,
                     cantitate: p.cantitate,
@@ -319,6 +323,34 @@ function CosCumparaturi() {
                                     placeholder="ex: Etaj 2, interfon 14..."
                                     rows={3}
                                 />
+                            </div>
+
+                            <div className="cadou-sectiune">
+                                <label className="cadou-label">
+                                    <input
+                                        type="checkbox"
+                                        checked={esteCadou}
+                                        onChange={(e) => setEsteCadou(e.target.checked)}
+                                        className="cadou-checkbox"
+                                    />
+                                    <span className="cadou-icon">🎁</span> Trimite un cadou dulce!
+                                </label>
+                                <p className="cadou-help-text">
+                                    Numele tău nu va apărea pe eticheta de livrare.
+                                </p>
+
+                                {esteCadou && (
+                                    <div className="cadou-mesaj-container">
+                                        <label className="cadou-mesaj-label">Mesaj pentru destinatar (va fi printat pe felicitare)</label>
+                                        <textarea
+                                            value={mesajCadou}
+                                            onChange={(e) => setMesajCadou(e.target.value)}
+                                            placeholder="ex: La mulți ani! Cu drag..."
+                                            rows={2}
+                                            className="cadou-mesaj-textarea"
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="cos-total">

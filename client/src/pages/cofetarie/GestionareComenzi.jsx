@@ -101,6 +101,10 @@ function GestionareComenzi() {
         ? comenzi
         : comenzi.filter(c => c.status === filtruStatus)
 
+    const esteComandaCadou = (comanda) => {
+        return comanda.este_cadou === true || comanda.este_cadou === 1 || comanda.este_cadou === '1' || comanda.este_cadou === 'true'
+    }
+
     return (
         <div className="acasa-container">
             <nav className="navbar">
@@ -149,6 +153,13 @@ function GestionareComenzi() {
                                         <p className="ic-data"><Calendar size={14} /> {formatData(comanda.creat_la)}</p>
                                         <p className="ic-adresa"><MapPin size={14} /> {comanda.adresa_livrare}</p>
                                         <p className="ic-adresa"><Phone size={14} /> {comanda.telefon}</p>
+                                        {comanda.tip_transport && (
+                                            <div className={`badge-transport transport-${comanda.tip_transport}`}>
+                                                {comanda.tip_transport === 'bicicleta' && <> 🚲 Bicicletă</>}
+                                                {comanda.tip_transport === 'masina' && <> 🚗 Mașină</>}
+                                                {comanda.tip_transport === 'frigorific' && <> ❄️ Frigorific</>}
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="ic-comanda-dreapta">
                                         <span className={`ic-status ${statusLabel[comanda.status]?.cls}`}>
@@ -165,6 +176,24 @@ function GestionareComenzi() {
                                 {comenziExpandate[comanda.id] && (
                                     <div className="ic-produse">
                                         {/* PRODUSE */}
+                                        {esteComandaCadou(comanda) ? (
+                                            <div className="alerta-cadou">
+                                                <h5 className="alerta-cadou-titlu">
+                                                    <span className="alerta-cadou-icon">🎁</span> COMANDĂ CADOU!
+                                                </h5>
+                                                <p className="alerta-cadou-text">
+                                                    Atenție: Nu treceți numele clientului expeditor pe eticheta de livrare.
+                                                </p>
+                                                {comanda.mesaj_cadou && (
+                                                    <div className="alerta-cadou-mesaj-box">
+                                                        <p className="alerta-cadou-mesaj-label">Mesaj pentru felicitare:</p>
+                                                        <p className="alerta-cadou-mesaj-text">
+                                                            "{comanda.mesaj_cadou}"
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : null}
                                         <h5>Produse comandate:</h5>
                                         {comanda.produse.map((produs, index) => (
                                             <div key={index} className="ic-produs-rand">
