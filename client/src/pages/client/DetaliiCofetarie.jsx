@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, ShoppingCart, Store, MapPin, Phone, Palette, Pencil, StickyNote, Star, Tag, ChevronDown, ChevronUp, Check, Filter  } from 'lucide-react'
+import { Cake, ShoppingCart, Store, MapPin, Phone, Pencil, Tag, ChevronDown, ChevronUp, Check, Filter  } from 'lucide-react'
 import api from '../../services/api'
 
 function DetaliiCofetarie() {
@@ -28,8 +28,8 @@ function DetaliiCofetarie() {
     const [produsMmodal, setProdusModal] = useState(null)
     const [cantitateModal, setCantitateModal] = useState(1)
     const [optiuniDecorModal, setOptiuniDecorModal] = useState([])
-    const [optiuneSelectata, setOptiuneSelectata] = useState('') // 'Trandafiri roz' sau 'Alta' sau ''
-    const [optiuneCustom, setOptiuneCustom] = useState('') // textul custom cand e selectat 'Alta'
+    const [optiuneSelectata, setOptiuneSelectata] = useState('')
+    const [optiuneCustom, setOptiuneCustom] = useState('')
     const [observatiiModal, setObservatiiModal] = useState('')
 
     useEffect(() => {
@@ -180,7 +180,7 @@ function DetaliiCofetarie() {
     return (
         <div className="acasa-container">
             <nav className="navbar">
-                <h1 className="navbar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                <h1 className="navbar-logo" onClick={() => navigate('/')}>
                     SweetGo 🍰
                 </h1>
                 <div className="navbar-search">
@@ -229,18 +229,9 @@ function DetaliiCofetarie() {
 
                 <div className="detalii-layout-container">
                     
-                    {/* Sidebar de Filtrare */}
                     <aside className="sidebar-filtrare">
                         <div className="sidebar-sectiune">
-                            <h3 className="sidebar-titlu-filtru" style={{ 
-                                display: 'flex',          
-                                alignItems: 'center',     
-                                gap: '10px',             
-                                color: '#7a5230', 
-                                fontSize: '1.2rem',
-                                margin: '0 0 20px 0',     
-                                lineHeight: '1'           
-                            }}>
+                            <h3 className="sidebar-titlu-filtru">
                                 Filtrează <Filter size={20} color="#c97c2e" strokeWidth={2.5} />
                             </h3>
                             
@@ -259,18 +250,12 @@ function DetaliiCofetarie() {
                                     ))}
                                 </div>
                             </div>
-
-                            {/* <div className="filtru-grup" style={{ marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
-                                <h4 style={{ opacity: 0.6 }}>Alte opțiuni</h4>
-                                <p style={{ fontSize: '0.8rem', color: '#9a7a5a', fontStyle: 'italic' }}>În curând...</p>
-                            </div> */}
                         </div>
                     </aside>
 
-                    {/* Zona Principală de Produse */}
                     <main className="zona-produse-main">
                         <div className="produse-header-flex">
-                            <h3 className="sectiune-titlu" style={{ margin: 0 }}>
+                            <h3 className="sectiune-titlu fara-margine">
                                 {categorieActiva === 'Toate' ? 'Toate produsele' : categorieActiva}
                             </h3>
                             <span className="numar-rezultate">{produseFiltrate.length} produse</span>
@@ -297,7 +282,7 @@ function DetaliiCofetarie() {
                                             <p className="produs-categorie"><Tag size={14} /> {produs.categorie}</p>
                                             {produs.ingrediente && produs.ingrediente.length > 0 && (
                                                 <div className="produs-ingrediente-preview">
-                                                    <span style={{ fontWeight: '600' }}>Ingrediente: </span>
+                                                    <span className="ingrediente-label">Ingrediente: </span>
                                                     {produs.ingrediente.slice(0, 3).map(i => i.nume).join(', ')}{produs.ingrediente.length > 3 && '...'}
                                                 </div>
                                             )}
@@ -340,17 +325,11 @@ function DetaliiCofetarie() {
                         <p className="modal-descriere">{produsMmodal.descriere}</p>
 
                         {produsMmodal.ingrediente && produsMmodal.ingrediente.length > 0 && (
-                            <div className="modal-sectiune-ingrediente" style={{ 
-                                backgroundColor: '#fff9f2', 
-                                padding: '10px', 
-                                borderRadius: '8px', 
-                                marginBottom: '15px',
-                                borderLeft: '3px solid #f5d5a8'
-                            }}>
-                                <p style={{ fontSize: '0.85rem', color: '#7a5230', fontWeight: 'bold', marginBottom: '4px' }}>
+                            <div className="modal-sectiune-ingrediente">
+                                <p className="modal-ingrediente-titlu">
                                     🥣 Ingrediente:
                                 </p>
-                                <p style={{ fontSize: '0.85rem', color: '#5d4037', lineHeight: '1.4' }}>
+                                <p className="modal-ingrediente-text">
                                     {ingredienteExtinse 
                                         ? produsMmodal.ingrediente.map(i => i.nume).join(', ')
                                         : produsMmodal.ingrediente.slice(0, 5).map(i => i.nume).join(', ') + (produsMmodal.ingrediente.length > 5 ? '...' : '')
@@ -359,18 +338,7 @@ function DetaliiCofetarie() {
                                     {produsMmodal.ingrediente.length > 5 && (
                                         <button 
                                             onClick={() => setIngredienteExtinse(!ingredienteExtinse)}
-                                            style={{ 
-                                                background: 'none', 
-                                                border: 'none', 
-                                                color: '#c97c2e', 
-                                                fontSize: '0.8rem', 
-                                                fontWeight: 'bold', 
-                                                cursor: 'pointer',
-                                                padding: '0 5px',
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '2px'
-                                            }}
+                                            className="btn-vezi-mai-mult"
                                         >
                                             {ingredienteExtinse ? <><ChevronUp size={14}/> vezi mai puțin</> : <><ChevronDown size={14}/> vezi tot</>}
                                         </button>
@@ -381,7 +349,6 @@ function DetaliiCofetarie() {
 
                         <p className="modal-pret">{produsMmodal.pret} lei / buc</p>
 
-                        {/* SELECTOR CANTITATE */}
                         <div className="modal-sectiune">
                             <label className="modal-label">Cantitate</label>
                             <div className="cantitate-control">
@@ -395,7 +362,6 @@ function DetaliiCofetarie() {
                             <p className="modal-stoc-info">Stoc disponibil: {produsMmodal.stoc - cantitateDinCos(produsMmodal.id)} buc</p>
                         </div>
 
-                        {/* OPTIUNI DECOR - doar pentru torturi */}
                         {produsMmodal.categorie === 'Torturi' && optiuniDecorModal.length > 0 && (
                             <div className="modal-sectiune">
                                 <label className="modal-label">🎨 Opțiune decor</label>
@@ -431,7 +397,6 @@ function DetaliiCofetarie() {
                             </div>
                         )}
 
-                        {/* OBSERVATII */}
                         <div className="modal-sectiune">
                             <label className="modal-label">📝 Observații (opțional)</label>
                             <textarea

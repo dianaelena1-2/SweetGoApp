@@ -1,11 +1,9 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-// Adăugăm iconițele pentru transport
-import { Cake, ShoppingCart, Trash2, Palette, StickyNote, AlertTriangle, Bike, Car, Snowflake, Check } from 'lucide-react'
+import { Cake, ShoppingCart, Trash2, AlertTriangle, Check } from 'lucide-react'
 import api from '../../services/api'
 
-// Definim opțiunile de transport
 const MIJLOACE_TRANSPORT = [
     { id: 'bicicleta', nume: '🚲Bicicletă / Trotinetă', desc: 'Produse mici și rezistente' },
     { id: 'masina', nume: '🚗Mașină Standard', desc: 'Prăjituri și pachete medii'},
@@ -28,7 +26,6 @@ function CosCumparaturi() {
     const [telefon, setTelefon] = useState('')
     const [observatii, setObservatii] = useState('')
     
-    // State nou pentru tipul de transport selectat
     const [tipTransport, setTipTransport] = useState('masina');
 
     useEffect(() => {
@@ -58,16 +55,13 @@ function CosCumparaturi() {
         }
     }
 
-    // Funcție pentru a determina ce metodă este recomandată de cofetărie pentru produsele din coș
     const obtineMetodaRecomandata = () => {
         if (cos.produse.length === 0 || produseProduse.length === 0) return 'masina';
 
-        // Găsim detaliile din DB pentru toate produsele aflate în coș
         const detaliiProduseCos = cos.produse.map(itemCos => 
             produseProduse.find(p => p.id === itemCos.id)
         ).filter(Boolean);
 
-        // Prioritate: Frigorific > Masina > Bicicleta
         if (detaliiProduseCos.some(p => p.transport_recomandat === 'frigorific')) return 'frigorific';
         if (detaliiProduseCos.some(p => p.transport_recomandat === 'masina')) return 'masina';
         
@@ -76,7 +70,6 @@ function CosCumparaturi() {
 
     const recomandat = obtineMetodaRecomandata();
 
-    // Actualizăm selecția automată atunci când se încarcă produsele
     useEffect(() => {
         if (produseProduse.length > 0) {
             setTipTransport(obtineMetodaRecomandata());
@@ -164,7 +157,7 @@ function CosCumparaturi() {
                 adresa_livrare: adresaLivrare,
                 telefon,
                 observatii,
-                tip_transport: tipTransport, // Trimitem tipul de transport selectat
+                tip_transport: tipTransport,
                 produse: cos.produse.map(p => ({
                     id: p.id,
                     cantitate: p.cantitate,
@@ -193,7 +186,7 @@ function CosCumparaturi() {
     return (
         <div className="acasa-container">
             <nav className="navbar">
-                <h1 className="navbar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                <h1 className="navbar-logo" onClick={() => navigate('/')}>
                     SweetGo 🍰
                 </h1>
                 <div className="navbar-actiuni">
@@ -206,9 +199,7 @@ function CosCumparaturi() {
 
             <div className="acasa-continut">
                 <button className="btn-inapoi" onClick={() => navigate(-1)}>← Înapoi</button>
-                <h2>
-                    Coșul meu 🛒
-                </h2>
+                <h2>Coșul meu 🛒</h2>
 
                 {eroare && <div className="eroare">{eroare}</div>}
                 {succes && <div className="succes">{succes}</div>}
@@ -298,7 +289,6 @@ function CosCumparaturi() {
                                 />
                             </div>
                             
-                            {/* SECTIUNE SELECTIE TRANSPORT */}
                             <div className="form-group">
                                 <label>Mijloc de transport livrare *</label>
                                 <div className="transport-selectie-grid">
@@ -345,7 +335,7 @@ function CosCumparaturi() {
                             </button>
 
                             {areProbleme && (
-                                <p className="cos-avertisment" style={{ marginTop: '0.5rem' }}>
+                                <p className="cos-avertisment pt-margin">
                                     <AlertTriangle size={14} /> Verifica stocul produselor selectate
                                 </p>
                             )}

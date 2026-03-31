@@ -10,6 +10,26 @@ body {
     color: #3d2c1e;
 }
 
+/* CLASE DE UTILITATE NOI ADAUGATE */
+.btn-nav-icon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.text-centrat {
+    text-align: center;
+}
+.text-gol {
+    text-align: center;
+    color: #9a7a5a;
+}
+.pt-margin {
+    margin-top: 10px;
+}
+.star-pointer {
+    cursor: pointer;
+}
+
 /* AUTENTIFICARE / INREGISTRARE */
 .auth-container {
     min-height: 100vh;
@@ -19,7 +39,6 @@ body {
     background: linear-gradient(135deg, #fff8f0, #fdecd8);
 }
 
-/* Cardul central de login/register */
 .auth-card {
     background: white;
     padding: 2.5rem;
@@ -44,7 +63,6 @@ body {
     text-align: center;
 }
 
-/* Grup de camp din formular */
 .form-group {
     margin-bottom: 1.2rem;
 }
@@ -74,7 +92,6 @@ body {
     border-color: #c97c2e;
 }
 
-/* Buton principal din auth card */
 .auth-card button {
     width: 100%;
     padding: 0.85rem;
@@ -115,7 +132,6 @@ body {
     text-decoration: underline;
 }
 
-/* Mesaj de eroare din formulare */
 .eroare {
     background: #fdecd8;
     color: #c97c2e;
@@ -139,14 +155,16 @@ body {
     z-index: 100;
 }
 
-/* Logo SweetGo din stanga navbar-ului */
 .navbar-logo {
     font-size: 1.5rem;
     color: #c97c2e;
     font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* Bara de cautare din centrul navbar-ului */
 .navbar-search input {
     padding: 0.6rem 1.2rem;
     border: 1.5px solid #f5d5a8;
@@ -162,7 +180,6 @@ body {
     border-color: #c97c2e;
 }
 
-/* Butoanele din dreapta navbar-ului */
 .navbar-actiuni {
     display: flex;
     align-items: center;
@@ -189,7 +206,6 @@ body {
     background: #f0c080;
 }
 
-/* Butonul de deconectare - stilizat diferit */
 .btn-logout {
     background: #c97c2e !important;
     color: white !important;
@@ -205,7 +221,6 @@ body {
     background: #fffaf5;
 }
 
-/* Zona de continut principal, centrata si cu padding */
 .acasa-continut {
     padding: 2rem;
     max-width: 1200px;
@@ -218,14 +233,12 @@ body {
     margin-bottom: 1.5rem;
 }
 
-/* Grid responsive de carduri cofetarii */
 .cofetarii-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.5rem;
 }
 
-/* Card individual cofetarie din lista */
 .cofetarie-card {
     background: white;
     border-radius: 16px;
@@ -240,7 +253,6 @@ body {
     box-shadow: 0 8px 24px rgba(180, 120, 40, 0.18);
 }
 
-/* Zona imaginii din cardul de cofetarie */
 .cofetarie-card-imagine {
     height: 160px;
     background: linear-gradient(135deg, #fdecd8, #f5d5a8);
@@ -251,14 +263,12 @@ body {
     overflow: hidden;
 }
 
-/* Imaginea din cardul de cofetarie - acopera tot spatiul */
 .cofetarie-card-imagine img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* Zona de text din cardul de cofetarie */
 .cofetarie-card-info {
     padding: 1rem;
 }
@@ -273,9 +283,11 @@ body {
     font-size: 0.85rem;
     color: #9a7a5a;
     margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-/* Rating cu stele */
 .rating {
     display: flex;
     align-items: center;
@@ -285,6 +297,8 @@ body {
 .stele {
     color: #c97c2e;
     font-size: 1rem;
+    display: flex;
+    gap: 2px;
 }
 
 .numar-recenzii {
@@ -292,7 +306,11 @@ body {
     color: #9a7a5a;
 }
 
-/* Mesaje de incarcare sau lista goala */
+.numar-recenzii-link {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .loading, .gol {
     text-align: center;
     color: #9a7a5a;
@@ -300,9 +318,49 @@ body {
     margin-top: 3rem;
 }
 
-/* PAGINA DETALII COFETARIE */
+/* RECENZII ELEMENTE LISTA */
+.recenzie-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
 
-/* Butonul de inapoi - rotunjit, in cromatica aplicatiei */
+.recenzie-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.recenzie-autor {
+    color: #3d2c1e;
+    font-weight: bold;
+}
+
+.recenzie-stele {
+    display: flex;
+}
+
+.recenzie-comentariu {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #7a5230;
+}
+
+.recenzie-data {
+    color: #9a7a5a;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 5px;
+    font-size: 0.8rem;
+}
+
+.cautare-fara-rezultat {
+    text-align: center;
+    margin-top: 3rem;
+    color: #7a5230;
+}
+
+/* PAGINA DETALII COFETARIE */
 .btn-inapoi {
     display: inline-flex;
     align-items: center;
@@ -323,7 +381,6 @@ body {
     background: #f5d5a8;
 }
 
-/* Cardul principal cu poza + informatii cofetarie */
 .cofetarie-detalii-header {
     display: flex;
     flex-direction: column;
@@ -334,7 +391,6 @@ body {
     overflow: hidden;
 }
 
-/* Zona pozei de coperta a cofetariei */
 .cofetarie-detalii-coperta {
     width: 100%;
     height: 280px;
@@ -346,7 +402,6 @@ body {
     overflow: hidden;
 }
 
-/* Imaginea de coperta - acopera tot spatiul disponibil */
 .cofetarie-detalii-coperta img {
     width: 100%;
     height: 100%;
@@ -354,7 +409,6 @@ body {
     object-position: center;
 }
 
-/* Zona cu numele, adresa, telefonul si ratingul cofetariei */
 .cofetarie-detalii-info {
     padding: 1.5rem;
 }
@@ -370,21 +424,23 @@ body {
     margin-bottom: 0.3rem;
 }
 
-/* Titlul sectiunii de produse */
 .sectiune-titlu {
     font-size: 1.3rem;
     color: #7a5230;
     margin-bottom: 1.2rem;
 }
 
+.sectiune-titlu.fara-margine {
+    margin: 0;
+}
+
 /* GRID PRODUSE */
 .produse-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
+    gap: 20px;
 }
 
-/* Card individual produs */
 .produs-card {
     background: white;
     border-radius: 16px;
@@ -397,7 +453,6 @@ body {
     transform: translateY(-4px);
 }
 
-/* Zona imaginii produsului */
 .produs-card-imagine {
     height: 140px;
     background: linear-gradient(135deg, #fdecd8, #f5d5a8);
@@ -408,14 +463,12 @@ body {
     overflow: hidden;
 }
 
-/* Imaginea produsului - acopera tot spatiul */
 .produs-card-imagine img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* Zona de text din cardul produsului */
 .produs-card-info {
     padding: 1rem;
 }
@@ -438,7 +491,6 @@ body {
     margin-bottom: 0.8rem;
 }
 
-/* Zona de jos a cardului - pret si butoane cos */
 .produs-footer {
     display: flex;
     align-items: center;
@@ -451,7 +503,6 @@ body {
     color: #c97c2e;
 }
 
-/* Butonul de adaugare initiala in cos */
 .btn-adauga-cos {
     padding: 0.5rem 0.8rem;
     background: #c97c2e;
@@ -468,7 +519,11 @@ body {
     background: #a8621e;
 }
 
-/* CONTROL CANTITATE PRODUS (plus/minus) */
+.btn-adauga-cos:disabled {
+    background: #e8c49a;
+    cursor: not-allowed;
+}
+
 .cantitate-control {
     display: flex;
     align-items: center;
@@ -478,7 +533,6 @@ body {
     padding: 0.2rem 0.4rem;
 }
 
-/* Butoanele de plus si minus */
 .cantitate-control button {
     width: 28px;
     height: 28px;
@@ -499,7 +553,6 @@ body {
     background: #a8621e;
 }
 
-/* Numarul de bucati selectate */
 .cantitate-control span {
     min-width: 24px;
     text-align: center;
@@ -853,7 +906,6 @@ body {
     font-style: italic;
 }
 
-/* Formularul de comanda din dreapta */
 .cos-comanda-form {
     background: white;
     border-radius: 16px;
@@ -914,11 +966,6 @@ body {
 }
 
 .cos-btn-comanda:disabled {
-    background: #e8c49a;
-    cursor: not-allowed;
-}
-
-.btn-adauga-cos:disabled {
     background: #e8c49a;
     cursor: not-allowed;
 }
@@ -986,7 +1033,7 @@ body {
     border-color: #c97c2e;
 }
 
-/* MODAL PERSONALIZARE */
+/* MODALE COMUNE */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -1009,6 +1056,20 @@ body {
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
+}
+
+.modal-continut.modal-recenzii {
+    max-width: 500px;
+}
+
+.modal-continut.modal-mic {
+    max-width: 400px;
+}
+
+.modal-scroll-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 1rem;
 }
 
 .modal-inchide {
@@ -1049,8 +1110,18 @@ body {
 
 .modal-titlu {
     font-size: 1.3rem;
-    color: #3d2c1e;
-    margin-bottom: 0.3rem;
+    color: #c97c2e;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.modal-subtitlu {
+    text-align: center;
+    color: #7a5230;
+    margin-bottom: 1rem;
 }
 
 .modal-descriere {
@@ -1070,12 +1141,14 @@ body {
     margin-bottom: 1.2rem;
 }
 
-.modal-label {
-    display: block;
-    font-size: 0.9rem;
+.modal-sectiune label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-weight: 600;
-    color: #7a5230;
     margin-bottom: 0.5rem;
+    color: #7a5230;
+    font-size: 0.9rem;
 }
 
 .modal-stoc-info {
@@ -1128,14 +1201,15 @@ body {
 
 .modal-textarea {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1.5px solid #f5d5a8;
-    border-radius: 10px;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #f5d5a8;
+    font-family: inherit;
     font-size: 0.9rem;
     outline: none;
     resize: vertical;
-    font-family: 'Segoe UI', sans-serif;
     background: #fffaf5;
+    transition: border-color 0.2s;
 }
 
 .modal-textarea:focus {
@@ -1168,9 +1242,38 @@ body {
     padding: 1rem;
 }
 
+.modal-btn-trimite {
+    width: 100%;
+    margin-top: 15px;
+}
+
 .produs-indisponibil {
     opacity: 0.6;
     filter: grayscale(40%);
+}
+
+/* Rating Selectie */
+.rating-selectie-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 1.5rem 0;
+}
+
+.star-rating-item {
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.star-rating-item:hover {
+    transform: scale(1.2);
+}
+
+.modal-rating-selectie {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
 }
 
 /* ISTORIC COMENZI */
@@ -1233,12 +1336,18 @@ body {
     font-size: 1rem;
     color: #3d2c1e;
     margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .ic-data, .ic-adresa {
     font-size: 0.82rem;
     color: #9a7a5a;
     margin-bottom: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .ic-comanda-dreapta {
@@ -1352,6 +1461,27 @@ body {
     color: #7a5230;
     font-style: italic;
     margin-bottom: 0.2rem;
+}
+
+.ic-actiuni-comanda {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ic-mesaj-recenzie {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    color: #9a7a5a;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.ic-mesaj-recenzie span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 /* GESTIONARE COMENZI */
@@ -1590,58 +1720,6 @@ body {
 .badge-cofetarie { background: #fdecd8; color: #c97c2e; }
 .badge-admin { background: #f8d7da; color: #721c24; }
 
-/* --- STILURI MODAL RECENZIE --- */
-.modal-titlu {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-    color: #c97c2e;
-    margin-bottom: 1rem;
-}
-
-.modal-sectiune label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #7a5230;
-}
-
-/* Stil pentru stelele de rating */
-.rating-selectie-container {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin: 1.5rem 0;
-}
-
-.star-rating-item {
-    cursor: pointer;
-    transition: transform 0.2s, color 0.2s;
-}
-
-.star-rating-item:hover {
-    transform: scale(1.2);
-}
-
-/* Ajustare pentru formularul din modal */
-.modal-textarea {
-    width: 100%;
-    padding: 0.8rem;
-    border-radius: 8px;
-    border: 1px solid #f5d5a8;
-    font-family: inherit;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-.modal-textarea:focus {
-    border-color: #c97c2e;
-}
-
 /* GRID SELECTARE MIJLOC TRANSPORT */
 .transport-selectie-grid {
     display: flex;
@@ -1732,17 +1810,16 @@ body {
     font-weight: 600;
 }
 
-/*Adaugare ingredient buton*/
 .btn-ingredient-nou {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* Spațiu între iconiță și text */
+    gap: 8px;
     padding: 10px 24px;
-    background-color: #c97c2e; /* Culoarea maro-auriu a brandului tău */
+    background-color: #c97c2e;
     color: white;
     border: none;
-    border-radius: 50px; /* Îl face rotund la capete (pill-shape) */
+    border-radius: 50px;
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
@@ -1752,7 +1829,7 @@ body {
 
 .btn-ingredient-nou:hover {
     background-color: #ae6a25;
-    transform: translateY(-1px); /* Efect discret de ridicare */
+    transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(201, 124, 46, 0.3);
 }
 
@@ -1760,30 +1837,57 @@ body {
     transform: translateY(0);
 }
 
-/* Stil pentru iconița din interior */
 .btn-ingredient-nou svg {
-    stroke-width: 3px; /* Face plusul puțin mai gros și vizibil */
+    stroke-width: 3px;
 }
 
 .produs-ingrediente-preview {
     font-style: italic;
-    /* Limităm la un singur rând în cardul mic */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
 }
 
+.ingrediente-label {
+    font-weight: 600;
+}
+
 .modal-sectiune-ingrediente {
-    background: #fff9f2; /* Un fundal foarte pal ca să iasă în evidență */
-    padding: 8px 12px;
+    background-color: #fff9f2;
+    padding: 10px;
     border-radius: 8px;
+    margin-bottom: 15px;
     border-left: 3px solid #f5d5a8;
 }
 
-/* --- LAYOUT DETALII COFETARIE (Sidebar + Produse) --- */
+.modal-ingrediente-titlu {
+    font-size: 0.85rem;
+    color: #7a5230;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
 
-/* Containerul principal care împarte pagina în două coloane */
+.modal-ingrediente-text {
+    font-size: 0.85rem;
+    color: #5d4037;
+    line-height: 1.4;
+}
+
+.btn-vezi-mai-mult {
+    background: none;
+    border: none;
+    color: #c97c2e;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* --- LAYOUT DETALII COFETARIE (Sidebar + Produse) --- */
 .detalii-layout-container {
     display: flex;
     gap: 40px;
@@ -1791,13 +1895,12 @@ body {
     align-items: flex-start;
 }
 
-/* Coloana din stânga - Sidebar-ul */
 .sidebar-categorii {
     min-width: 200px;
     position: sticky;
-    top: 20px; /* Rămâne fixat la scroll */
+    top: 20px;
     padding: 10px;
-    background-color: #fffcf9; /* Un fundal foarte discret */
+    background-color: #fffcf9;
     border-radius: 15px;
 }
 
@@ -1806,11 +1909,10 @@ body {
     margin-bottom: 20px;
     font-size: 1.1rem;
     padding-left: 5px;
-    border-left: 4px solid #c97c2e; /* O linie mică de accent */
+    border-left: 4px solid #c97c2e;
     line-height: 1;
 }
 
-/* Stilul butoanelor din Sidebar */
 .btn-sidebar {
     display: block;
     width: 100%;
@@ -1827,15 +1929,13 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
-/* Efect de hover pe butoane */
 .btn-sidebar:hover {
     background-color: #fff4e6;
     border-color: #c97c2e;
     color: #c97c2e;
-    transform: translateX(5px); /* Se mișcă ușor spre dreapta */
+    transform: translateX(5px);
 }
 
-/* Stilul pentru butonul selectat (Activ) */
 .btn-sidebar.activ {
     background-color: #c97c2e;
     color: white;
@@ -1843,68 +1943,21 @@ body {
     box-shadow: 0 4px 10px rgba(201, 124, 46, 0.2);
 }
 
-/* Coloana din dreapta - Zona de produse */
 .continut-produse {
-    flex: 1; /* Ocupă tot spațiul rămas */
+    flex: 1;
 }
 
-/* Grid-ul de produse (ajustat pentru layout-ul cu sidebar) */
-.produse-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 25px;
-}
-
-/* --- RESPONSIVITATE (Pentru Tablete și Telefoane) --- */
-
-@media (max-width: 900px) {
-    .detalii-layout-container {
-        flex-direction: column; /* Pune sidebar-ul deasupra produselor */
-        gap: 20px;
-    }
-
-    .sidebar-categorii {
-        width: 100%;
-        position: static; /* Nu mai stă fixat la scroll pe mobil */
-    }
-
-    /* Pe mobil, transformăm lista verticală într-un rând orizontal cu scroll */
-    .sidebar-categorii-lista {
-        display: flex !important;
-        flex-direction: row !important;
-        overflow-x: auto;
-        gap: 10px;
-        padding-bottom: 10px;
-        scrollbar-width: none; /* Ascunde scrollbar pe Firefox */
-    }
-
-    .sidebar-categorii-lista::-webkit-scrollbar {
-        display: none; /* Ascunde scrollbar pe Chrome/Safari */
-    }
-
-    .btn-sidebar {
-        width: auto;
-        white-space: nowrap; /* Nu lasă textul să treacă pe rândul următor */
-        padding: 8px 20px;
-    }
-    
-    .btn-sidebar:hover {
-        transform: none; /* Scoatem animația de translație pe mobil */
-    }
-}
-
-/* Layout Principal */
+/* Layout Principal Sidebar & Filtre */
 .detalii-pagina-layout {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* Stil Sidebar */
 .sidebar-filtrare {
     width: 250px;
     position: sticky;
-    top: 20px; /* Rămâne fix când dai scroll */
+    top: 20px;
     background: white;
     padding: 20px;
     border-radius: 15px;
@@ -1913,11 +1966,15 @@ body {
 }
 
 .sidebar-titlu-filtru {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     color: #7a5230;
     font-size: 1.2rem;
-    margin-bottom: 25px;
+    margin: 0 0 20px 0;
     padding-bottom: 10px;
     border-bottom: 2px solid #f5d5a8;
+    line-height: 1;
 }
 
 .filtru-grup h4 {
@@ -1926,7 +1983,6 @@ body {
     margin-bottom: 12px;
 }
 
-/* Stil Butoane Filtru Item */
 .filtru-item {
     display: flex;
     justify-content: space-between;
@@ -1954,7 +2010,6 @@ body {
     box-shadow: 0 4px 10px rgba(201, 124, 46, 0.3);
 }
 
-/* Header Produse (Dreapta) */
 .produse-header-flex {
     display: flex;
     justify-content: space-between;
@@ -1970,14 +2025,42 @@ body {
     border-radius: 20px;
 }
 
-/* Grid ajustat pentru sidebar */
-.produse-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
+/* --- RESPONSIVITATE --- */
+@media (max-width: 900px) {
+    .detalii-layout-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .sidebar-categorii {
+        width: 100%;
+        position: static;
+    }
+
+    .sidebar-categorii-lista {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto;
+        gap: 10px;
+        padding-bottom: 10px;
+        scrollbar-width: none;
+    }
+
+    .sidebar-categorii-lista::-webkit-scrollbar {
+        display: none;
+    }
+
+    .btn-sidebar {
+        width: auto;
+        white-space: nowrap;
+        padding: 8px 20px;
+    }
+    
+    .btn-sidebar:hover {
+        transform: none;
+    }
 }
 
-/* Responsivitate pentru ecrane mici */
 @media (max-width: 850px) {
     .detalii-pagina-layout {
         flex-direction: column;

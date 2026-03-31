@@ -11,8 +11,7 @@ function AcasaClient(){
     const { utilizator, logout } = useContext(AuthContext)
     const navigate = useNavigate()
 
-    // State pentru vizualizare recenzii
-    const [modalRecenzii, setModalRecenzii] = useState(null) // { id, nume, listaRecenzii }
+    const [modalRecenzii, setModalRecenzii] = useState(null)
     const [loadingRecenzii, setLoadingRecenzii] = useState(false)
 
     useEffect(() => {
@@ -34,7 +33,7 @@ function AcasaClient(){
     );
 
     const deschideRecenzii = async (e, cofetarie) => {
-        e.stopPropagation(); // Previne navigarea catre pagina cofetariei
+        e.stopPropagation();
         setLoadingRecenzii(true);
         setModalRecenzii({ id: cofetarie.id, nume: cofetarie.numeCofetarie, lista: [] });
         
@@ -68,7 +67,7 @@ function AcasaClient(){
     return (
         <div className="acasa-container">
             <nav className="navbar">
-                <h1 className="navbar-logo" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h1 className="navbar-logo">
                     SweetGo 🍰
                 </h1>
                 <div className="navbar-search">
@@ -82,7 +81,7 @@ function AcasaClient(){
                 <div className="navbar-actiuni">
                     <span>Bună, {utilizator?.nume}!</span>
                     <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
-                    <button onClick={() => navigate('/cos-cumparaturi')} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <button className="btn-nav-icon" onClick={() => navigate('/cos-cumparaturi')}>
                         🛒 Coș
                     </button>
                     <button onClick={handleLogout} className="btn-logout">Deconectare</button>
@@ -107,16 +106,15 @@ function AcasaClient(){
                                 </div>
                                 <div className="cofetarie-card-info">
                                     <h3>{cofetarie.numeCofetarie}</h3>
-                                    <p className="adresa" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <p className="adresa">
                                         <MapPin size={16} /> {cofetarie.adresa}
                                     </p>
                                     <div className="rating">
-                                        <span className="stele" style={{ display: 'flex', gap: '2px' }}>
+                                        <span className="stele">
                                             {renderStele(cofetarie.rating_mediu)}
                                         </span>
                                         <span 
-                                            className="numar-recenzii" 
-                                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                            className="numar-recenzii numar-recenzii-link" 
                                             onClick={(e) => deschideRecenzii(e, cofetarie)}
                                         >
                                             {cofetarie.numar_recenzii > 0 ? `(${cofetarie.numar_recenzii} recenzii)` : '(fără recenzii)'}
@@ -127,7 +125,7 @@ function AcasaClient(){
                         ))}
                     </div>
                 ) : (
-                    <div style={{ textAlign: 'center', marginTop: '3rem', color: '#7a5230' }}>
+                    <div className="cautare-fara-rezultat">
                         <p>Nu am găsit nicio cofetărie cu numele "<strong>{cautare}</strong>".</p>
                     </div>
                 )}
@@ -136,26 +134,26 @@ function AcasaClient(){
             {/* MODAL VIZUALIZARE RECENZII */}
             {modalRecenzii && (
                 <div className="modal-overlay" onClick={() => setModalRecenzii(null)}>
-                    <div className="modal-continut" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+                    <div className="modal-continut modal-recenzii" onClick={(e) => e.stopPropagation()}>
                         <button className="modal-inchide" onClick={() => setModalRecenzii(null)}><X size={20} /></button>
-                        <h3 className="modal-titlu" style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center' }}>
+                        <h3 className="modal-titlu">
                             <MessageSquare size={24} color="#c97c2e" /> Recenzii {modalRecenzii.nume}
                         </h3>
 
-                        <div style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '1rem' }}>
+                        <div className="modal-scroll-container">
                             {loadingRecenzii ? (
-                                <p style={{ textAlign: 'center' }}>Se încarcă recenziile...</p>
+                                <p className="text-centrat">Se încarcă recenziile...</p>
                             ) : modalRecenzii.lista.length === 0 ? (
-                                <p style={{ textAlign: 'center', color: '#9a7a5a' }}>Nu există încă recenzii scrise.</p>
+                                <p className="text-gol">Nu există încă recenzii scrise.</p>
                             ) : (
                                 modalRecenzii.lista.map(r => (
-                                    <div key={r.id} style={{ padding: '15px', borderBottom: '1px solid #eee' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                                            <strong style={{ color: '#3d2c1e' }}>{r.numeClient}</strong>
-                                            <div style={{ display: 'flex' }}>{renderStele(r.rating, 12)}</div>
+                                    <div key={r.id} className="recenzie-item">
+                                        <div className="recenzie-header">
+                                            <strong className="recenzie-autor">{r.numeClient}</strong>
+                                            <div className="recenzie-stele">{renderStele(r.rating, 12)}</div>
                                         </div>
-                                        <p style={{ fontSize: '0.9rem', fontStyle: 'italic', color: '#7a5230' }}>"{r.comentariu || 'Fără comentariu'}"</p>
-                                        <small style={{ color: '#9a7a5a', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '5px' }}>
+                                        <p className="recenzie-comentariu">"{r.comentariu || 'Fără comentariu'}"</p>
+                                        <small className="recenzie-data">
                                             <Calendar size={12} /> {new Date(r.creat_la + 'Z').toLocaleDateString('ro-RO')}
                                         </small>
                                     </div>
