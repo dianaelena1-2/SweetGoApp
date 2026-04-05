@@ -2205,3 +2205,22 @@ body {
     color: #7b1fa2;
     border: 1px solid #e1bee7;
 }
+
+/* --- METODA DE PLATĂ --- */
+.plata-selectie-grid { display: flex; gap: 15px; margin-top: 5px; }
+.plata-option { flex: 1; border: 2px solid #eee; padding: 15px; border-radius: 10px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; }
+.plata-option:hover { border-color: #f5d5a8; }
+.plata-option.active { border-color: #c97c2e; background-color: #fff9f2; }
+.plata-nume { font-weight: bold; color: #7a5230; }
+.plata-desc { font-size: 0.8rem; color: #9a7a5a; }
+
+/* --- MODAL SIMULARE PLATĂ --- */
+.modal-plata-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal-plata-content { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.spinner-plata { border: 4px solid #f3f3f3; border-top: 4px solid #c97c2e; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* --- STATUS PLATĂ (Pentru Cofetărie) --- */
+.badge-plata { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-top: 8px; margin-left: 10px; width: fit-content; }
+.plata-numerar { background-color: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
+.plata-card { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }

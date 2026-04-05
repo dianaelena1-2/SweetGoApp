@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, ShoppingCart, Trash2, AlertTriangle, Check } from 'lucide-react'
+import { Cake, ShoppingCart, Trash2, AlertTriangle, Check, CreditCard, Banknote } from 'lucide-react'
 import api from '../../services/api'
 
 const MIJLOACE_TRANSPORT = [
@@ -29,6 +29,9 @@ function CosCumparaturi() {
     const [tipTransport, setTipTransport] = useState('masina');
     const [esteCadou, setEsteCadou] = useState(false)
     const [mesajCadou, setMesajCadou] = useState('')
+
+    const [metodaPlata, setMetodaPlata] = useState('numerar')
+    const [simularePlata, setSimularePlata] = useState({ activa: false, status: 'procesare' }) 
 
     useEffect(() => {
         const cosSalvat = localStorage.getItem('cos')
@@ -137,22 +140,7 @@ function CosCumparaturi() {
 
     const areProbleme = cos.produse.some(p => stocInsuficient(p))
 
-    const handlePlaseazaComanda = async () => {
-        setEroare('')
-        if (!adresaLivrare.trim()) {
-            setEroare('Adresa de livrare este obligatorie')
-            return
-        }
-        if (!telefon.trim()) {
-            setEroare('Telefonul este obligatoriu')
-            return
-        }
-        if (areProbleme) {
-            setEroare('Unele produse din coș depășesc stocul disponibil')
-            return
-        }
-
-        setLoadingComanda(true)
+    const plaseazaComandaFinala = async (statusPlata) => {
         try {
             await api.post('/comenzi', {
                 cofetarie_id: cos.cofetarie_id,
@@ -162,6 +150,8 @@ function CosCumparaturi() {
                 tip_transport: tipTransport,
                 este_cadou: esteCadou,
                 mesaj_cadou: esteCadou ? mesajCadou : null,
+                metoda_plata: metodaPlata,
+                status_plata: statusPlata,
                 produse: cos.produse.map(p => ({
                     id: p.id,
                     cantitate: p.cantitate,
@@ -175,8 +165,34 @@ function CosCumparaturi() {
             setTimeout(() => navigate('/cos-cumparaturi'), 2000)
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la plasarea comenzii')
-        } finally {
             setLoadingComanda(false)
+            setSimularePlata({ activa: false, status: 'procesare' })
+        }
+    }
+
+    const handlePlaseazaComanda = async () => {
+        setEroare('')
+        if (!adresaLivrare.trim()) { setEroare('Adresa de livrare este obligatorie'); return; }
+        if (!telefon.trim()) { setEroare('Telefonul este obligatoriu'); return; }
+        if (areProbleme) { setEroare('Unele produse din coș depășesc stocul disponibil'); return; }
+
+        setLoadingComanda(true)
+
+        // LOGICĂ DE PLATĂ
+        if (metodaPlata === 'card') {
+            setSimularePlata({ activa: true, status: 'procesare' })
+            
+            // Așteptăm 2.5 secunde pentru a simula procesarea bancară
+            setTimeout(() => {
+                setSimularePlata({ activa: true, status: 'succes' })
+                
+                setTimeout(() => {
+                    setSimularePlata({ activa: false, status: 'procesare' })
+                    plaseazaComandaFinala('platita')
+                }, 1000)
+            }, 2500)
+        } else {
+            plaseazaComandaFinala('in_asteptare')
         }
     }
 
@@ -292,6 +308,22 @@ function CosCumparaturi() {
                                     placeholder="07xxxxxxxx"
                                 />
                             </div>
+
+                            <div className="form-group">
+                                <label>Metodă de plată *</label>
+                                <div className="plata-selectie-grid">
+                                    <div className={`plata-option ${metodaPlata === 'numerar' ? 'active' : ''}`} onClick={() => setMetodaPlata('numerar')}>
+                                        <Banknote size={28} color={metodaPlata === 'numerar' ? '#c97c2e' : '#9a7a5a'} />
+                                        <span className="plata-nume">Numerar la livrare</span>
+                                        <span className="plata-desc">Plătești curierului</span>
+                                    </div>
+                                    <div className={`plata-option ${metodaPlata === 'card' ? 'active' : ''}`} onClick={() => setMetodaPlata('card')}>
+                                        <CreditCard size={28} color={metodaPlata === 'card' ? '#c97c2e' : '#9a7a5a'} />
+                                        <span className="plata-nume">Plată cu cardul</span>
+                                        <span className="plata-desc">Procesare securizată</span>
+                                    </div>
+                                </div>
+                            </div>
                             
                             <div className="form-group">
                                 <label>Mijloc de transport livrare *</label>
@@ -375,6 +407,26 @@ function CosCumparaturi() {
                     </div>
                 )}
             </div>
+            {/*MODAL PLATA*/}
+            {simularePlata.activa && (
+                <div className="modal-plata-overlay">
+                    <div className="modal-plata-content">
+                        {simularePlata.status === 'procesare' ? (
+                            <>
+                                <div className="spinner-plata"></div>
+                                <h3 style={{color: '#7a5230', marginBottom: '10px'}}>Se procesează plata...</h3>
+                                <p style={{color: '#9a7a5a', fontSize: '0.9rem'}}>Te rugăm să nu închizi această pagină. Comunicăm cu banca ta.</p>
+                            </>
+                        ) : (
+                            <>
+                                <div style={{color: '#4CAF50', marginBottom: '20px'}}><Check size={60} strokeWidth={3} style={{margin: '0 auto'}}/></div>
+                                <h3 style={{color: '#4CAF50', marginBottom: '10px'}}>Plată acceptată!</h3>
+                                <p style={{color: '#9a7a5a', fontSize: '0.9rem'}}>Se plasează comanda...</p>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

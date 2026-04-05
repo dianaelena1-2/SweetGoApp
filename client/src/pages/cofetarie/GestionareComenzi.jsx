@@ -160,6 +160,15 @@ function GestionareComenzi() {
                                                 {comanda.tip_transport === 'frigorific' && <> ❄️ Frigorific</>}
                                             </div>
                                         )}
+                                        {comanda.metoda_plata && (
+                                            <div className={`badge-plata plata-${comanda.metoda_plata}`}>
+                                                {comanda.metoda_plata === 'numerar' ? (
+                                                    <>💵 Numerar (Ramburs)</>
+                                                ) : (
+                                                    <>💳 Plătit cu Cardul</>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="ic-comanda-dreapta">
                                         <span className={`ic-status ${statusLabel[comanda.status]?.cls}`}>

@@ -73,6 +73,8 @@ db.exec(`
         este_cadou BOOLEAN,
         mesaj_cadou TEXT,
         tip_transport TEXT DEFAULT 'masina',
+        metoda_plata TEXT DEFAULT 'numerar',
+        status_plata TEXT DEFAULT 'in_asteptare',
         creat_la DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (client_id) REFERENCES utilizatori(id),
         FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id)
