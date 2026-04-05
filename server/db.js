@@ -38,6 +38,8 @@ db.exec(`
         stoc INTEGER DEFAULT 0,
         disponibil INTEGER DEFAULT 1,
         imagine TEXT,
+        data_expirare DATE,
+        este_la_oferta BOOLEAN DEFAULT 0,
         transport_recomandat TEXT DEFAULT 'masina',
         FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id)
     )

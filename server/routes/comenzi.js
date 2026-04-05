@@ -20,7 +20,8 @@ router.post('/', verifyToken, verifyRol('client'), (req,res) => {
         if (produsDb.stoc < produs.cantitate) {
             return res.status(400).json({ mesaj: `Stoc insuficient pentru ${produsDb.numeProdus}` })
         }
-        total += produsDb.pret * produs.cantitate
+        const pretFinal = produsDb.este_la_oferta ? (produsDb.pret * 0.6) : produsDb.pret;
+        total += pretFinal * produs.cantitate
     }
 
     const esteCadouFormatat = este_cadou ? 1 : 0;

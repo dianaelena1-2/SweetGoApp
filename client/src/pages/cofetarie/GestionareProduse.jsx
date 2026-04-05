@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, PlusCircle, Tag, Check, X, Package, Pencil, Trash2, Palette, Bike, Car, Snowflake, ListChecks } from 'lucide-react'
+import { Cake, PlusCircle, Tag, Check, X, Package, Pencil, Trash2, Palette, Bike, Car, Snowflake, ListChecks, AlertTriangle, Calendar } from 'lucide-react'
 import api from '../../services/api'
 
 const CATEGORII = ['Torturi', 'Prăjituri', 'Macarons', 'Cupcakes', 'Croissante']
@@ -14,7 +14,8 @@ const produsGol = {
     stoc: '',
     categorie: 'Torturi',
     disponibil: 1,
-    transport_recomandat: 'masina' 
+    transport_recomandat: 'masina',
+    data_expirare: ''
 }
 
 function GestionareProduse() {
@@ -40,9 +41,23 @@ function GestionareProduse() {
     const [ingredienteAlese, setIngredienteAlese] = useState([])
     const [numeIngredientNou, setNumeIngredientNou] = useState('')
 
+    const [alerteExpirare, setAlerteExpirare] = useState([]);
+    const [esteDupaOra20, setEsteDupaOra20] = useState(false)
+
     useEffect(() => {
         fetchProduse()
         fetchIngrediente()
+        fetchAlerte()
+    }, [])
+
+    useEffect(() => {
+        const checkOra = () => {
+            const now = new Date()
+            setEsteDupaOra20(now.getHours() >= 20)
+        }
+        checkOra()
+        const interval = setInterval(checkOra, 60000)
+        return () => clearInterval(interval)
     }, [])
 
     const fetchProduse = async () => {
@@ -74,6 +89,13 @@ function GestionareProduse() {
         }
     }
 
+    const fetchAlerte = async () => {
+        try {
+            const raspuns = await api.get('/produse/alerte-expirare');
+            setAlerteExpirare(raspuns.data);
+        } catch (err) { console.error(err); }
+    }
+
     const handleLogout = () => {
         logout()
         navigate('/login')
@@ -99,6 +121,9 @@ function GestionareProduse() {
             data.append('stoc', formNou.stoc || 0)
             data.append('disponibil', formNou.disponibil)
             data.append('transport_recomandat', formNou.transport_recomandat)
+            if (formNou.data_expirare) {
+                data.append('data_expirare', formNou.data_expirare)
+            }
             data.append('ingredienteAlese', JSON.stringify(ingredienteAlese))
             data.append('ingredientNou', numeIngredientNou)
             
@@ -145,7 +170,8 @@ function GestionareProduse() {
             categorie: produs.categorie,
             stoc: produs.stoc || 0,
             disponibil: produs.disponibil,
-            transport_recomandat: produs.transport_recomandat || 'masina'
+            transport_recomandat: produs.transport_recomandat || 'masina',
+            data_expirare: produs.data_expirare || ''
         })
         setImagineEditare(null)
         setIngredienteAlese(produs.ingrediente ? produs.ingrediente.map(i => i.id) : [])
@@ -171,6 +197,9 @@ function GestionareProduse() {
             data.append('disponibil', formEditare.disponibil)
             data.append('stoc', formEditare.stoc || 0)
             data.append('transport_recomandat', formEditare.transport_recomandat)
+            if (formEditare.data_expirare) {
+                data.append('data_expirare', formEditare.data_expirare)
+            }
             data.append('ingredienteAlese', JSON.stringify(ingredienteAlese))
             data.append('ingredientNou', numeIngredientNou)
 
@@ -302,7 +331,7 @@ function GestionareProduse() {
                     // Permitem adăugarea prin tasta Enter
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                            e.preventDefault(); // Evităm trimiterea întregului formular
+                            e.preventDefault(); 
                             handleAdaugaIngredient();
                         }
                     }}
@@ -385,6 +414,14 @@ function GestionareProduse() {
                                 />
                             </div>
                             <div className="form-group">
+                                <label>Dată expirare</label>
+                                <input
+                                    type="date"
+                                    value={formNou.data_expirare}
+                                    onChange={(e) => setFormNou({ ...formNou, data_expirare: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-group">
                                 <label>Categorie</label>
                                 <select
                                     value={formNou.categorie}
@@ -432,6 +469,59 @@ function GestionareProduse() {
                         </button>
                     </div>
                 </div>
+
+                {alerteExpirare.length > 0 && (
+                    <div className="alerta-expirare-container">
+                        <h3 className="alerta-expirare-header">
+                            <AlertTriangle size={24} /> Atenție! Produse care expiră mâine
+                        </h3>
+                        <p className="alerta-expirare-text">
+                            Aceste produse vor expira mâine. Dorești să le aplici o reducere de 40% pentru a preveni risipa?
+                        </p>
+                        {!esteDupaOra20 && (
+                            <p style={{ color: '#d32f2f', fontSize: '0.85rem' }}>
+                                ⏳ Ofertele pot fi aplicate doar după ora 20:00.
+                            </p>
+                        )}
+                        
+                        <div className="alerta-expirare-lista">
+                            {alerteExpirare.map(produs => (
+                                <div key={produs.id} className="alerta-expirare-item">
+                                    <div className="alerta-expirare-detalii">
+                                        <strong>{produs.numeProdus}</strong> (Stoc: {produs.stoc} buc)
+                                        <span className="alerta-expirare-preturi">
+                                            Preț normal: {produs.pret} lei → Preț redus: {(produs.pret * 0.6).toFixed(2)} lei
+                                        </span>
+                                    </div>
+                                    <button 
+                                        className="btn-aplica-oferta" 
+                                        style={{ 
+                                            backgroundColor: esteDupaOra20 ? '#4CAF50' : '#e0e0e0', 
+                                            cursor: esteDupaOra20 ? 'pointer' : 'not-allowed',
+                                            color: esteDupaOra20 ? 'white' : '#9e9e9e'
+                                        }}
+                                        disabled={!esteDupaOra20}
+                                        onClick={async () => {
+                                            if (!esteDupaOra20) return;
+                                            try {
+                                                await api.put(`/produse/${produs.id}/aplica-oferta`);
+                                                fetchAlerte(); 
+                                                fetchProduse(); 
+                                                setSucces('Oferta de 40% a fost aplicată cu succes!');
+                                                setTimeout(() => setSucces(''), 3000);
+                                            } catch (err) {
+                                                setEroare(err.response?.data?.mesaj || 'Eroare la aplicarea ofertei');
+                                                setTimeout(() => setEroare(''), 3000);
+                                            }
+                                        }}
+                                    >
+                                        {esteDupaOra20 ? 'Aplică ofertă -40%' : '⏳ Așteaptă ora 20:00'}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* LISTA PRODUSE */}
                 <h3 className="sectiune-titlu">Produsele tale ({produse.length})</h3>
@@ -486,6 +576,14 @@ function GestionareProduse() {
                                                         value={formEditare.stoc}
                                                         onChange={(e) => setFormEditare({ ...formEditare, stoc: e.target.value })}
                                                         min="0"
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>Dată expirare</label>
+                                                    <input
+                                                        type="date"
+                                                        value={formEditare.data_expirare}
+                                                        onChange={(e) => setFormEditare({ ...formEditare, data_expirare: e.target.value })}
                                                     />
                                                 </div>
                                                 <div className="form-group">
@@ -574,6 +672,14 @@ function GestionareProduse() {
                                                     {produs.transport_recomandat === 'masina' && <><Car size={14} /> Mașină</>}
                                                     {produs.transport_recomandat === 'frigorific' && <><Snowflake size={14} /> Frigorific</>}
                                                 </span>
+                                                {produs.data_expirare && (
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#d32f2f' }}>
+                                                        <Calendar size={14} /> Expiră: {produs.data_expirare}
+                                                    </span>
+                                                )}
+                                                {produs.este_la_oferta === 1 && (
+                                                    <span className="badge-oferta" style={{margin: '0'}}>La Ofertă (-40%)</span>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="gp-produs-actiuni">

@@ -141,7 +141,7 @@ function IstoricComenzi() {
                     <span>Bună, {utilizator?.nume}!</span>
                     <button onClick={() => navigate('/')}>Acasă</button>
                     <button className="btn-nav-icon" onClick={() => navigate('/cos-cumparaturi')}>
-                        <ShoppingCart size={18} /> Coș
+                        🛒 Coș
                     </button>
                     <button onClick={handleLogout} className="btn-logout">Deconectare</button>
                 </div>

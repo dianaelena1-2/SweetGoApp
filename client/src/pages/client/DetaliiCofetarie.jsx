@@ -97,6 +97,8 @@ function DetaliiCofetarie() {
             ? (optiuneCustom.trim() || null)
             : (optiuneSelectata || null)
 
+        const pretFinal = produs.este_la_oferta === 1 ? produs.pret * 0.6 : produs.pret;
+
         if (cos.cofetarie_id && cos.cofetarie_id !== id) {
             const confirmare = window.confirm(
                 'Ai produse din altă cofetărie în coș. Vrei să golești coșul și să adaugi din această cofetărie?'
@@ -109,6 +111,7 @@ function DetaliiCofetarie() {
                 cofetarie_id: id,
                 produse: [{
                     ...produs,
+                    pret: pretFinal,
                     cantitate: cantitateModal,
                     optiune_decor: optiuneFinala,
                     observatii: observatiiModal || null
@@ -128,6 +131,7 @@ function DetaliiCofetarie() {
         } else {
             produseActualizate.push({
                 ...produs,
+                pret: pretFinal,
                 cantitate: cantitateModal,
                 optiune_decor: optiuneFinala,
                 observatii: observatiiModal || null
@@ -286,8 +290,21 @@ function DetaliiCofetarie() {
                                                     {produs.ingrediente.slice(0, 3).map(i => i.nume).join(', ')}{produs.ingrediente.length > 3 && '...'}
                                                 </div>
                                             )}
+                                            {produs.este_la_oferta === 1 && (
+                                                <div style={{marginTop: '8px', marginBottom: '8px'}}>
+                                                    <span className="badge-oferta">🔥 SALVEAZĂ-MĂ! -40%</span>
+                                                </div>
+                                            )}
                                             <div className="produs-footer">
-                                                <span className="produs-pret">{produs.pret} lei</span>
+                                                {produs.este_la_oferta === 1 ? (
+                                                    <div className="pret-container-oferta">
+                                                        <span className="pret-vechi">{produs.pret} lei</span>
+                                                        <span className="pret-nou">{(produs.pret * 0.6).toFixed(2)} lei</span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="produs-pret">{produs.pret} lei</span>
+                                                )}
+
                                                 {!produs.disponibil || produs.stoc === 0 ? (
                                                     <span className="badge-indisponibil">Indisponibil</span>
                                                 ) : cantitateDinCos(produs.id) === 0 ? (
@@ -347,7 +364,17 @@ function DetaliiCofetarie() {
                             </div>
                         )}
 
-                        <p className="modal-pret">{produsMmodal.pret} lei / buc</p>
+                        {produsMmodal.este_la_oferta === 1 ? (
+                            <div style={{ marginBottom: '15px' }}>
+                                <span className="badge-oferta" style={{marginBottom: '5px'}}>🔥 SALVEAZĂ-MĂ! -40%</span>
+                                <div className="pret-container-oferta">
+                                    <span className="pret-vechi">{produsMmodal.pret} lei</span>
+                                    <span className="pret-nou">{(produsMmodal.pret * 0.6).toFixed(2)} lei / buc</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="modal-pret">{produsMmodal.pret} lei / buc</p>
+                        )}
 
                         <div className="modal-sectiune">
                             <label className="modal-label">Cantitate</label>
@@ -410,7 +437,11 @@ function DetaliiCofetarie() {
 
                         <div className="modal-total">
                             <span>Total</span>
-                            <span className="modal-total-pret">{(produsMmodal.pret * cantitateModal).toFixed(2)} lei</span>
+                            <span className="modal-total-pret">
+                                {(
+                                    (produsMmodal.este_la_oferta === 1 ? produsMmodal.pret * 0.6 : produsMmodal.pret) * cantitateModal
+                                ).toFixed(2)} lei
+                            </span>
                         </div>
 
                         <button className="btn-primar modal-btn-adauga" onClick={confirmaAdaugareInCos}>

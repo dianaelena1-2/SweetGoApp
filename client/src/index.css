@@ -437,8 +437,20 @@ body {
 /* GRID PRODUSE */
 .produse-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(2, 1fr); 
     gap: 20px;
+}
+
+@media (min-width: 1100px) {
+    .produse-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .produse-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .produs-card {
@@ -558,6 +570,11 @@ body {
     text-align: center;
     font-weight: 700;
     color: #3d2c1e;
+}
+
+.zona-produse-main {
+    flex: 1; 
+    min-width: 0; 
 }
 
 /* GESTIONARE PRODUSE */
@@ -762,6 +779,7 @@ body {
     gap: 1rem;
     margin-top: 0.5rem;
 }
+
 
 /* COS CUMPARATURI */
 .cos-gol {
@@ -1032,6 +1050,8 @@ body {
 .gp-optiune-adauga input:focus {
     border-color: #c97c2e;
 }
+
+
 
 /* MODALE COMUNE */
 .modal-overlay {
@@ -2224,3 +2244,102 @@ body {
 .badge-plata { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-top: 8px; margin-left: 10px; width: fit-content; }
 .plata-numerar { background-color: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
 .plata-card { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+
+/* --- ALERTE EXPIRARE & OFERTE ANTI-RISIPĂ (Cofetărie) --- */
+.alerta-expirare-container {
+    background-color: #ffebee;
+    border-left: 5px solid #f44336;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.alerta-expirare-header {
+    color: #d32f2f;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.alerta-expirare-text {
+    color: #b71c1c;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.alerta-expirare-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alerta-expirare-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #ffcdd2;
+}
+
+.alerta-expirare-detalii strong {
+    color: #333;
+}
+
+.alerta-expirare-preturi {
+    font-size: 0.85rem;
+    color: #757575;
+    display: block;
+    margin-top: 4px;
+}
+
+.btn-aplica-oferta {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.btn-aplica-oferta:hover {
+    background-color: #43a047;
+}
+
+/* --- AFIȘARE OFERTE (Vizualizare Client) --- */
+.badge-oferta {
+    background-color: #f44336;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+}
+
+.pret-container-oferta {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pret-vechi {
+    text-decoration: line-through;
+    color: #9e9e9e;
+    font-size: 0.9rem;
+}
+
+.pret-nou {
+    color: #d32f2f;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
