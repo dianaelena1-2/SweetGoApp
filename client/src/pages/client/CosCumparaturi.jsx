@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Cake, ShoppingCart, Trash2, AlertTriangle, Check, CreditCard, Banknote } from 'lucide-react'
 import api from '../../services/api'
+import NavbarClient from '../../components/NavbarClient';
 
 const MIJLOACE_TRANSPORT = [
     { id: 'bicicleta', nume: '🚲Bicicletă / Trotinetă', desc: 'Produse mici și rezistente' },
@@ -49,17 +50,20 @@ function CosCumparaturi() {
     }, [])
 
     useEffect(() => {
-        const fetchAdresaDefault = async () => {
+        const fetchDateProfil = async () => {
             try {
                 const res = await api.get('/client/profil');
                 if (res.data.adresa_default) {
                     setAdresaLivrare(res.data.adresa_default);
                 }
+                if (res.data.telefon) {
+                    setTelefon(res.data.telefon);
+                }
             } catch (err) {
                 console.error('Nu s-a putut încărca adresa implicită');
             }
         };
-        fetchAdresaDefault();
+        fetchDateProfil();
     }, []);
 
     const fetchDetalii = async (cofetarieId) => {
@@ -98,6 +102,7 @@ function CosCumparaturi() {
     const salveazaCos = (cosNou) => {
         setCos(cosNou)
         localStorage.setItem('cos', JSON.stringify(cosNou))
+        window.dispatchEvent(new Event('cos-updated'));
     }
 
     const scadeInCos = (produsId) => {
@@ -219,18 +224,13 @@ function CosCumparaturi() {
 
     return (
         <div className="acasa-container">
-            <nav className="navbar">
-                <h1 className="navbar-logo" onClick={() => navigate('/')}>
-                    SweetGo 🍰
-                </h1>
-                <div className="navbar-actiuni">
-                    <span>Bună, {utilizator?.nume}!</span>
-                    <button onClick={() => navigate('/profil')}>👤Profilul meu</button>
-                    <button onClick={() => navigate('/')}>Acasă</button>
-                    <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
-                    <button onClick={handleLogout} className="btn-logout">Deconectare</button>
-                </div>
-            </nav>
+            <NavbarClient 
+                utilizator={utilizator}
+                logout={logout}
+                searchValue=""
+                onSearchChange={() => {}}
+                showSearch={false}
+            />
 
             <div className="acasa-continut">
                 <button className="btn-inapoi" onClick={() => navigate(-1)}>← Înapoi</button>

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
 import { Cake, ShoppingCart, MapPin, Star, MessageSquare, X, Calendar } from 'lucide-react'
+import NotificationBell from '../../components/NotificationBell';
+import NavbarClient from '../../components/NavbarClient';
 
 function AcasaClient(){
     const [cofetarii, setCofetarii] = useState([])
@@ -66,28 +68,13 @@ function AcasaClient(){
 
     return (
         <div className="acasa-container">
-            <nav className="navbar">
-                <h1 className="navbar-logo">
-                    SweetGo 🍰
-                </h1>
-                <div className="navbar-search">
-                    <input
-                        type="text"
-                        placeholder="Caută cofetărie..."
-                        value={cautare}
-                        onChange={(e) => setCautare(e.target.value)}
-                    />
-                </div>
-                <div className="navbar-actiuni">
-                    <span>Bună, {utilizator?.nume}!</span>
-                    <button onClick={() => navigate('/profil')}>👤Profilul meu</button>
-                    <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
-                    <button className="btn-nav-icon" onClick={() => navigate('/cos-cumparaturi')}>
-                        🛒 Coș
-                    </button>
-                    <button onClick={handleLogout} className="btn-logout">Deconectare</button>
-                </div>
-            </nav>
+           <NavbarClient 
+                utilizator={utilizator}
+                logout={logout}
+                searchValue={cautare}
+                onSearchChange={setCautare}
+                showSearch={true}
+            />
 
             <div className="acasa-continut">
                 <h2>Cofetării disponibile</h2>

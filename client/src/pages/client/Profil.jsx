@@ -1,14 +1,15 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { User, Mail, MapPin, Lock, Heart } from 'lucide-react';
+import { User, Mail, MapPin, Lock, Heart, Phone } from 'lucide-react';
 import api from '../../services/api';
+import NavbarClient from '../../components/NavbarClient';
 
 function Profile(){
     const { utilizator, token, logout } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const [profil, setProfil] = useState({ nume: '', email: '', adresa_default: '' });
+    const [profil, setProfil] = useState({ nume: '', email: '', adresa_default: '', telefon: '' });
     const [loading, setLoading] = useState(true);
     const [eroare, setEroare] = useState('');
     const [succes, setSucces] = useState('');
@@ -16,6 +17,7 @@ function Profile(){
     const [parolaVeche, setParolaVeche] = useState('');
     const [parolaNoua, setParolaNoua] = useState('');
     const [confirmParola, setConfirmParola] = useState('');
+    
 
     const [favorite, setFavorite] = useState([]);
     const [loadingFavorite, setLoadingFavorite] = useState(false);
@@ -60,14 +62,13 @@ function Profile(){
             await api.put('/client/profil', {
                 nume: profil.nume,
                 email: profil.email,
-                adresa_default: profil.adresa_default
+                adresa_default: profil.adresa_default,
+                telefon: profil.telefon
             });
             setSucces('Profil actualizat cu succes.');
         
             const updatedUser = { ...utilizator, nume: profil.nume, email: profil.email };
             localStorage.setItem('utilizator', JSON.stringify(updatedUser));
-            
-            window.location.reload(); 
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la actualizare.');
         }
@@ -112,16 +113,13 @@ function Profile(){
 
     return (
         <div className="acasa-container">
-            <nav className="navbar">
-                <h1 className="navbar-logo" onClick={() => navigate('/')}>SweetGo 🍰</h1>
-                <div className="navbar-actiuni">
-                    <span>{utilizator?.nume}</span>
-                    <button onClick={() => navigate('/')}>Acasă</button>
-                    <button onClick={() => navigate('/cos-cumparaturi')}>🛒Coș</button>
-                    <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
-                    <button onClick={() => logout()} className="btn-logout">Deconectare</button>
-                </div>
-            </nav>
+            <NavbarClient 
+                utilizator={utilizator}
+                logout={logout}
+                searchValue=""
+                onSearchChange={() => {}}
+                showSearch={false}
+            />
 
             <div className="acasa-continut">
                 <h2>Profilul meu</h2>
@@ -145,6 +143,16 @@ function Profile(){
                                 <label><MapPin size={16} /> Adresă implicită de livrare</label>
                                 <input type="text" value={profil.adresa_default || ''} onChange={e => setProfil({...profil, adresa_default: e.target.value})} placeholder="Strada, număr, oraș" />
                                 <small className="text-muted">Această adresă va fi precompletată automat la plasarea comenzii.</small>
+                            </div>
+                            <div className="form-group">
+                                <label><Phone size={16} /> Număr de telefon</label>
+                                <input 
+                                    type="tel" 
+                                    value={profil.telefon || ''} 
+                                    onChange={e => setProfil({...profil, telefon: e.target.value})} 
+                                    placeholder="07xxxxxxxx"
+                                />
+                                <small className="text-muted">Acest număr va fi precompletat la plasarea comenzii.</small>
                             </div>
                             <button type="submit" className="btn-primar">Salvează modificările</button>
                         </form>

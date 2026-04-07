@@ -8,13 +8,13 @@ router.use(verifyToken, verifyRol('client'));
 
 //date profil
 router.get('/profil', (req, res) => {
-    const client = db.prepare('SELECT id, nume, email, adresa_default FROM utilizatori WHERE id = ?').get(req.utilizator.id);
+    const client = db.prepare('SELECT id, nume, email, adresa_default, telefon FROM utilizatori WHERE id = ?').get(req.utilizator.id);
     res.json(client);
 });
 
 //actualizare profil
 router.put('/profil', (req, res) => {
-    const { nume, email, adresa_default } = req.body;
+    const { nume, email, adresa_default, telefon } = req.body;
     const clientId = req.utilizator.id;
 
     if (email) {
@@ -24,8 +24,8 @@ router.put('/profil', (req, res) => {
         }
     }
 
-    db.prepare('UPDATE utilizatori SET nume = COALESCE(?, nume), email = COALESCE(?, email), adresa_default = COALESCE(?, adresa_default) WHERE id = ?')
-        .run(nume || null, email || null, adresa_default || null, clientId);
+    db.prepare('UPDATE utilizatori SET nume = COALESCE(?, nume), email = COALESCE(?, email), adresa_default = COALESCE(?, adresa_default), telefon = COALESCE(?, telefon) WHERE id = ?')
+        .run(nume || null, email || null, adresa_default || null, telefon || null, clientId);
     
     res.json({ mesaj: 'Profil actualizat cu succes.' });
 });
@@ -86,6 +86,34 @@ router.delete('/favorite/:cofetarieId', (req, res) => {
     const clientId = req.utilizator.id;
     db.prepare('DELETE FROM cofetarii_favorite WHERE client_id = ? AND cofetarie_id = ?').run(clientId, cofetarieId);
     res.json({ mesaj: 'Eliminată din favorite.' });
+});
+
+//notificari
+router.get('/notificari', (req, res) => {
+    const notificari = db.prepare(`
+        SELECT * FROM notificari 
+        WHERE client_id = ? 
+        ORDER BY data_creare DESC 
+        LIMIT 50
+    `).all(req.utilizator.id);
+    res.json(notificari);
+});
+
+//notificare citita
+router.put('/notificari/:id/citita', (req, res) => {
+    const { id } = req.params;
+    db.prepare('UPDATE notificari SET citita = 1 WHERE id = ? AND client_id = ?')
+        .run(id, req.utilizator.id);
+    res.json({ mesaj: 'Notificare marcată ca citită.' });
+});
+
+//numar notificari citite
+router.get('/notificari/necitite/count', (req, res) => {
+    const count = db.prepare(`
+        SELECT COUNT(*) as count FROM notificari 
+        WHERE client_id = ? AND citita = 0
+    `).get(req.utilizator.id);
+    res.json({ count: count.count });
 });
 
 module.exports = router;

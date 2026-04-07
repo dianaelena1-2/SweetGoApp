@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Cake, ShoppingCart, Store, MapPin, Phone, Pencil, Tag, ChevronDown, ChevronUp, Check, Filter  } from 'lucide-react'
 import api from '../../services/api'
+import NavbarClient from '../../components/NavbarClient';
 
 function DetaliiCofetarie() {
     const { id } = useParams()
@@ -52,6 +53,7 @@ function DetaliiCofetarie() {
 
     useEffect(() => {
         localStorage.setItem('cos', JSON.stringify(cos))
+        window.dispatchEvent(new Event('cos-updated'));
     }, [cos])
 
     useEffect(() => {
@@ -215,28 +217,13 @@ function DetaliiCofetarie() {
 
     return (
         <div className="acasa-container">
-            <nav className="navbar">
-                <h1 className="navbar-logo" onClick={() => navigate('/')}>
-                    SweetGo 🍰
-                </h1>
-                <div className="navbar-search">
-                    <input
-                        type="text"
-                        placeholder="Caută în meniu..."
-                        value={cautare}
-                        onChange={(e) => setCautare(e.target.value)}
-                    />
-                </div>
-                <div className="navbar-actiuni">
-                    <span>Bună, {utilizator?.nume}!</span>
-                    <button onClick={() => navigate('/profil')}>👤Profilul meu</button>
-                    <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
-                    <button onClick={() => navigate('/cos-cumparaturi')}>
-                        🛒 Coș {totalCos > 0 && `(${totalCos})`}
-                    </button>
-                    <button onClick={handleLogout} className="btn-logout">Deconectare</button>
-                </div>
-            </nav>
+           <NavbarClient 
+            utilizator={utilizator}
+            logout={logout}
+            searchValue=""
+            onSearchChange={setCautare}
+            showSearch={true}
+        />
 
             <div className="acasa-continut">
                 <button className="btn-inapoi" onClick={() => navigate('/')}>← Înapoi</button>

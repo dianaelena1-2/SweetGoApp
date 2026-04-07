@@ -2359,3 +2359,322 @@ body {
 .favorite-item:hover {
     background-color: #fffaf5;
 }
+
+/* --- NOTIFICARI --- */
+.notification-bell {
+    position: relative;
+}
+
+.btn-notification {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-notification:hover {
+    background: #fdecd8;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background: #c97c2e;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    border: 1px solid #f5d5a8;
+}
+
+.notification-header {
+    padding: 12px;
+    border-bottom: 1px solid #f5d5a8;
+    font-weight: bold;
+    color: #7a5230;
+}
+
+.notification-empty {
+    padding: 20px;
+    text-align: center;
+    color: #9a7a5a;
+}
+
+.notification-item {
+    padding: 12px;
+    border-bottom: 1px solid #f5d5a8;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notification-item-unread {
+    background: #fff9f2;
+}
+
+.notification-item-read {
+    background: white;
+}
+
+.notification-item:hover {
+    background: #fdecd8;
+}
+
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.notification-message {
+    flex: 1;
+}
+
+.notification-message p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #3d2c1e;
+}
+
+.notification-date {
+    color: #9a7a5a;
+    font-size: 0.7rem;
+}
+
+.notification-unread-dot {
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.notification-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-dropdown::-webkit-scrollbar-track {
+    background: #f5d5a8;
+    border-radius: 3px;
+}
+
+.notification-dropdown::-webkit-scrollbar-thumb {
+    background: #c97c2e;
+    border-radius: 3px;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background: white;
+    box-shadow: 0 2px 10px rgba(180, 120, 40, 0.06); /* Umbră mai fină */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-logo {
+    font-size: 1.5rem;
+    color: #c97c2e;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Căutarea centrată și mai lungă */
+.navbar-search-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 0 2rem;
+}
+
+.navbar-search-input {
+    width: 100%;
+    max-width: 500px; /* Lățime mai mare pentru echilibru */
+    padding: 0.6rem 1.2rem;
+    border: 1.5px solid #f5d5a8;
+    border-radius: 12px; /* Uniformizat cu restul elementelor */
+    font-size: 0.95rem;
+    outline: none;
+    background: #fffaf5;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.navbar-search-input:focus {
+    border-color: #c97c2e;
+    box-shadow: 0 0 0 3px rgba(201, 124, 46, 0.1);
+}
+
+.navbar-actiuni {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-shrink: 0;
+}
+
+/* Butoane tip "Ghost" (fără fundal vizibil până la hover) */
+.btn-nav-ghost {
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 8px;
+    color: #7a5230;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-nav-ghost:hover {
+    background: #fdecd8;
+}
+
+/* Butonul Principal pentru Coș */
+.btn-nav-cart {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.5rem 1.2rem;
+    background: #c97c2e;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    position: relative; /* Pentru badge */
+}
+
+.btn-nav-cart:hover {
+    background: #a8621e;
+}
+
+.btn-nav-cart:active {
+    transform: scale(0.98);
+}
+
+/* Badge (Bulina roșie) pentru Coș */
+.cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #e74c3c;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Modificare Notification Bell pentru a fi Ghost */
+.btn-notification {
+    background: transparent; /* Suprascris pentru a elimina fundalul colorat */
+}
+.btn-notification:hover {
+    background: #fdecd8;
+}
+
+
+/* ================= USER MENIU ================= */
+.user-menu {
+    position: relative;
+    margin-left: 0.5rem; 
+}
+
+.user-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1.2rem;
+    background: #fdecd8; 
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #7a5230;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.user-menu-btn:hover {
+    background: #f5d5a8;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f5d5a8;
+    min-width: 200px;
+    z-index: 1000;
+    overflow: hidden;
+    padding: 0.5rem 0; /* Spațiere interioară pentru a "respira" */
+}
+
+.user-dropdown button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.95rem;
+    color: #3d2c1e;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.user-dropdown button:hover {
+    background: #fffaf5;
+    color: #c97c2e;
+}
+
+.btn-dropdown-logout {
+    color: #e74c3c !important;
+    border-top: 1px solid #f5eadd !important;
+    margin-top: 0.5rem;
+}
+
+.btn-dropdown-logout:hover {
+    background: #fff5f5 !important;
+}

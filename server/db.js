@@ -8,6 +8,7 @@ db.exec(`
         email TEXT UNIQUE NOT NULL,
         parola TEXT NOT NULL,
         adresa_default TEXT,
+        telefon TEXT,
         rol TEXT CHECK(rol IN ('client', 'cofetarie', 'admin')) NOT NULL,
         creat_la DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -132,6 +133,19 @@ db.exec(`
     )
 `)
 
+db.exec(`
+    CREATE TABLE IF NOT EXISTS notificari (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id INTEGER NOT NULL,
+        mesaj TEXT NOT NULL,
+        tip TEXT DEFAULT 'info',
+        data_creare DATETIME DEFAULT CURRENT_TIMESTAMP,
+        citita BOOLEAN DEFAULT 0,
+        link TEXT,
+        FOREIGN KEY (client_id) REFERENCES utilizatori(id) ON DELETE CASCADE
+    )
+`)
+
 function actualizeazaProduseExpirate() {
     const result = db.prepare(`
         UPDATE produse 
@@ -142,5 +156,15 @@ function actualizeazaProduseExpirate() {
 }
 
 db.actualizeazaProduseExpirate = actualizeazaProduseExpirate;
+
+function creeazaNotificare(clientId, mesaj, tip = 'info', link = null) {
+    const stmt = db.prepare(`
+        INSERT INTO notificari (client_id, mesaj, tip, link)
+        VALUES (?, ?, ?, ?)
+    `);
+    return stmt.run(clientId, mesaj, tip, link);
+}
+
+db.creeazaNotificare = creeazaNotificare;
 
 module.exports = db;

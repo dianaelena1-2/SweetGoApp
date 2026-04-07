@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
 import { Cake, ShoppingCart, Store, Calendar, MapPin, Star, MessageSquare, Check, X } from 'lucide-react'
+import NavbarClient from '../../components/NavbarClient';
 
 const STATUSURI = ['toate', 'plasata', 'confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata']
 
@@ -133,20 +134,13 @@ function IstoricComenzi() {
 
     return (
         <div className="acasa-container">
-            <nav className="navbar">
-                <h1 className="navbar-logo" onClick={() => navigate('/')}>
-                    SweetGo 🍰
-                </h1>
-                <div className="navbar-actiuni">
-                    <span>Bună, {utilizator?.nume}!</span>
-                    <button onClick={() => navigate('/profil')}>👤Profilul meu</button>
-                    <button onClick={() => navigate('/')}>Acasă</button>
-                    <button className="btn-nav-icon" onClick={() => navigate('/cos-cumparaturi')}>
-                        🛒 Coș
-                    </button>
-                    <button onClick={handleLogout} className="btn-logout">Deconectare</button>
-                </div>
-            </nav>
+            <NavbarClient 
+                utilizator={utilizator}
+                logout={logout}
+                searchValue=""
+                onSearchChange={() => {}}
+                showSearch={false}
+            />
 
             <div className="acasa-continut">
                 <h2>Comenzile mele</h2>

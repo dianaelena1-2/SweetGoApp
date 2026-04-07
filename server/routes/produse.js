@@ -182,6 +182,18 @@ router.put('/:id/aplica-oferta', verifyToken, verifyRol('cofetarie'), (req, res)
     }
     
     db.prepare('UPDATE produse SET este_la_oferta = 1 WHERE id = ?').run(produsId);
+
+    const produs = db.prepare('SELECT cofetarie_id, numeProdus FROM produse WHERE id = ?').get(produsId);
+    const cofetarie = db.prepare('SELECT numeCofetarie FROM cofetarii WHERE id = ?').get(produs.cofetarie_id);
+
+    const clientiFavorite = db.prepare(`
+        SELECT client_id FROM cofetarii_favorite WHERE cofetarie_id = ?
+    `).all(produs.cofetarie_id);
+
+    for (const row of clientiFavorite) {
+        const mesaj = `🍰 Ofertă anti-risipă: ${cofetarie.numeCofetarie} a redus produsul "${produs.numeProdus}" cu 40%!`;
+        db.creeazaNotificare(row.client_id, mesaj, 'oferta', `/cofetarie/${produs.cofetarie_id}`);
+    }
     
     res.json({ mesaj: 'Oferta de 40% a fost aplicată cu succes!' });
 });
