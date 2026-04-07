@@ -139,6 +139,7 @@ function IstoricComenzi() {
                 </h1>
                 <div className="navbar-actiuni">
                     <span>Bună, {utilizator?.nume}!</span>
+                    <button onClick={() => navigate('/profil')}>👤Profilul meu</button>
                     <button onClick={() => navigate('/')}>Acasă</button>
                     <button className="btn-nav-icon" onClick={() => navigate('/cos-cumparaturi')}>
                         🛒 Coș

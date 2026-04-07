@@ -48,6 +48,20 @@ function CosCumparaturi() {
         }
     }, [])
 
+    useEffect(() => {
+        const fetchAdresaDefault = async () => {
+            try {
+                const res = await api.get('/client/profil');
+                if (res.data.adresa_default) {
+                    setAdresaLivrare(res.data.adresa_default);
+                }
+            } catch (err) {
+                console.error('Nu s-a putut încărca adresa implicită');
+            }
+        };
+        fetchAdresaDefault();
+    }, []);
+
     const fetchDetalii = async (cofetarieId) => {
         try {
             const raspuns = await api.get(`/cofetarii/${cofetarieId}`)
@@ -211,6 +225,7 @@ function CosCumparaturi() {
                 </h1>
                 <div className="navbar-actiuni">
                     <span>Bună, {utilizator?.nume}!</span>
+                    <button onClick={() => navigate('/profil')}>👤Profilul meu</button>
                     <button onClick={() => navigate('/')}>Acasă</button>
                     <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
                     <button onClick={handleLogout} className="btn-logout">Deconectare</button>

@@ -7,7 +7,7 @@ db.exec(`
         nume TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         parola TEXT NOT NULL,
-        adresa_default TEXT
+        adresa_default TEXT,
         rol TEXT CHECK(rol IN ('client', 'cofetarie', 'admin')) NOT NULL,
         creat_la DATETIME DEFAULT CURRENT_TIMESTAMP
     )

@@ -11,6 +11,7 @@ import AcasaClient from './pages/client/AcasaClient'
 import DetaliiCofetarie from './pages/client/DetaliiCofetarie'
 import CosCumparaturi from './pages/client/CosCumparaturi'
 import IstoricComenzi from './pages/client/IstoricComenzi'
+import Profile from './pages/client/Profil'
 
 //cofetarie pages
 import DashboardCofetarie from './pages/cofetarie/DashboardCofetarie'
@@ -43,6 +44,7 @@ function App(){
         <Route path="/cofetarie/:id" element={<ProtectedRoute rol="client"><DetaliiCofetarie /></ProtectedRoute>} />
         <Route path="/cos-cumparaturi" element={<ProtectedRoute rol="client"><CosCumparaturi /></ProtectedRoute>} />
         <Route path="/comenzile-mele" element={<ProtectedRoute rol="client"><IstoricComenzi /></ProtectedRoute>} />
+        <Route path="/profil" element={<ProtectedRoute rol="client"><Profile /></ProtectedRoute>} />
 
         {/*cofetarie*/}
         <Route path="/cofetarie/dashboard" element={<ProtectedRoute rol="cofetarie"><DashboardCofetarie /></ProtectedRoute>} />

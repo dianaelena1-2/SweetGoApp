@@ -14,6 +14,9 @@ function DetaliiCofetarie() {
     const [produse, setProduse] = useState([])
     const [loading, setLoading] = useState(true)
     const [categorieActiva, setCategorieActiva] = useState('Toate')
+    const [esteFavorita, setEsteFavorita] = useState(false);
+    const [loadingFav, setLoadingFav] = useState(false);
+    const [eroare, setEroare] = useState('');
 
     const [ingredienteExtinse, setIngredienteExtinse] = useState(false)
 
@@ -50,6 +53,35 @@ function DetaliiCofetarie() {
     useEffect(() => {
         localStorage.setItem('cos', JSON.stringify(cos))
     }, [cos])
+
+    useEffect(() => {
+        const checkFavorite = async () => {
+            try {
+                const res = await api.get('/client/favorite');
+                setEsteFavorita(res.data.some(fav => fav.id === parseInt(id)));
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        if (utilizator?.rol === 'client') checkFavorite();
+    }, [id, utilizator])
+
+    const toggleFavorite = async () => {
+        setLoadingFav(true);
+        try {
+            if (esteFavorita) {
+                await api.delete(`/client/favorite/${id}`);
+                setEsteFavorita(false);
+            } else {
+                await api.post(`/client/favorite/${id}`);
+                setEsteFavorita(true);
+            }
+        } catch (err) {
+            setEroare(err.response?.data?.mesaj || 'Eroare la modificarea favorite.');
+        } finally {
+            setLoadingFav(false);
+        }
+    };
 
     const produseFiltrate = produse.filter(produs => {
         const term = cautare.toLowerCase().trim();
@@ -197,6 +229,7 @@ function DetaliiCofetarie() {
                 </div>
                 <div className="navbar-actiuni">
                     <span>Bună, {utilizator?.nume}!</span>
+                    <button onClick={() => navigate('/profil')}>👤Profilul meu</button>
                     <button onClick={() => navigate('/comenzile-mele')}>Comenzile mele</button>
                     <button onClick={() => navigate('/cos-cumparaturi')}>
                         🛒 Coș {totalCos > 0 && `(${totalCos})`}
@@ -228,6 +261,17 @@ function DetaliiCofetarie() {
                                     : '(fără recenzii)'}
                             </span>
                         </div>
+                        {utilizator?.rol === 'client' && (
+                            <button 
+                                onClick={toggleFavorite} 
+                                disabled={loadingFav} 
+                                className="btn-secundar" 
+                                style={{ marginTop: '12px', width: 'auto', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                            >
+                                {esteFavorita ? '❤️ Favorită' : '🤍 Adaugă la favorite'}
+                            </button>
+                        )}
+                        {eroare && <div className="eroare" style={{ marginTop: '8px' }}>{eroare}</div>}
                     </div>
                 </div>
 

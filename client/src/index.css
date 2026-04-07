@@ -2343,3 +2343,19 @@ body {
     font-weight: bold;
     font-size: 1.2rem;
 }
+
+.profile-layout {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+.profile-layout .gp-card {
+    flex: 1;
+    min-width: 280px;
+}
+.text-muted {
+    color: #9a7a5a;
+}
+.favorite-item:hover {
+    background-color: #fffaf5;
+}

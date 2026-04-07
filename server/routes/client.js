@@ -63,7 +63,7 @@ router.post('/favorite/:cofetarieId', (req, res) => {
     const { cofetarieId } = req.params;
     const clientId = req.utilizator.id;
 
-    const cofetarie = db.prepare('SELECT id FROM cofetarii WHERE id = ? AND status = "aprobata"').get(cofetarieId);
+    const cofetarie = db.prepare(`SELECT id FROM cofetarii WHERE id = ? AND status = 'aprobata'`).get(cofetarieId);
     if (!cofetarie) {
         return res.status(404).json({ mesaj: 'Cofetăria nu există sau nu este aprobată.' });
     }
