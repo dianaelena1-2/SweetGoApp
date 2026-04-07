@@ -34,9 +34,8 @@ router.get('/:id/toate-recenziile', (req, res) => {
 });
 
 //detalii cofetarie
-// În server/routes/cofetarii.js
-
 router.get('/:id', (req, res) => {
+    db.actualizeazaProduseExpirate();
     const { id } = req.params;
 
     try {

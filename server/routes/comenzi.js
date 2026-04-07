@@ -5,6 +5,7 @@ const { verifyToken, verifyRol } = require('../middleware/auth')
 
 //plasare comanda
 router.post('/', verifyToken, verifyRol('client'), (req,res) => {
+    db.actualizeazaProduseExpirate();
     const { cofetarie_id, adresa_livrare, telefon, observatii, produse, este_cadou, mesaj_cadou, tip_transport, metoda_plata, status_plata } = req.body
 
     if (!cofetarie_id || !adresa_livrare || !telefon || !produse || produse.length === 0) {

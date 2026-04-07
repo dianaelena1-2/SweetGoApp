@@ -7,6 +7,7 @@ db.exec(`
         nume TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         parola TEXT NOT NULL,
+        adresa_default TEXT
         rol TEXT CHECK(rol IN ('client', 'cofetarie', 'admin')) NOT NULL,
         creat_la DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -24,6 +25,17 @@ db.exec(`
         imagine_coperta TEXT,
         status TEXT DEFAULT 'in_asteptare',
         FOREIGN KEY (utilizator_id) REFERENCES utilizatori(id)
+    )
+`)
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS cofetarii_favorite (
+        client_id INTEGER NOT NULL,
+        cofetarie_id INTEGER NOT NULL,
+        creat_la DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (client_id, cofetarie_id),
+        FOREIGN KEY (client_id) REFERENCES utilizatori(id) ON DELETE CASCADE,
+        FOREIGN KEY (cofetarie_id) REFERENCES cofetarii(id) ON DELETE CASCADE
     )
 `)
 
@@ -120,4 +132,15 @@ db.exec(`
     )
 `)
 
-module.exports = db
+function actualizeazaProduseExpirate() {
+    const result = db.prepare(`
+        UPDATE produse 
+        SET stoc = 0, disponibil = 0 
+        WHERE data_expirare IS NOT NULL 
+        AND data_expirare < date('now')
+    `).run();
+}
+
+db.actualizeazaProduseExpirate = actualizeazaProduseExpirate;
+
+module.exports = db;

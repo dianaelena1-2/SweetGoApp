@@ -102,7 +102,7 @@ if (!cofetarieExistenta) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(cofetarieId, 'Macarons Vanilie', 'Set de 6 macarons cu cremă de vanilie', 42, 'Macarons', 5, 1, 'bicicleta', '2026-04-06', imagine5)
     adaugaIngredienteProdus(infoProdus5.lastInsertRowid, ['făină de migdale', 'zahăr', 'albș', 'vanilie', 'colorant'])
-    console.log('✓ Produs: Macarons Vanilie (Macarons) - 42 lei, expiră 2026-04-06 (mâine)')
+    console.log('✓ Produs: Macarons Vanilie (Macarons) - 42 lei, expiră 2026-04-06')
 
     // ===== 6. Macarons fructe =====
     const imagine6 = 'partner_documents/product_images/macarons_fructe.png'
@@ -118,9 +118,9 @@ if (!cofetarieExistenta) {
     const infoProdus7 = db.prepare(`
         INSERT INTO produse (cofetarie_id, numeProdus, descriere, pret, categorie, stoc, disponibil, transport_recomandat, data_expirare, imagine)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(cofetarieId, 'Cupcake cu Ciocolată', 'Cupcake cu blat de ciocolată și topping cremos', 12, 'Cupcakes', 15, 1, 'masina', '2026-04-06', imagine7)
+    `).run(cofetarieId, 'Cupcake cu Ciocolată', 'Cupcake cu blat de ciocolată și topping cremos', 12, 'Cupcakes', 15, 1, 'masina', '2026-04-05', imagine7)
     adaugaIngredienteProdus(infoProdus7.lastInsertRowid, ['făină', 'cacao', 'zahăr', 'ouă', 'unt', 'ciocolată', 'lapte'])
-    console.log('✓ Produs: Cupcake cu Ciocolată (Cupcakes) - 12 lei, expiră 2026-04-06 (mâine)')
+    console.log('✓ Produs: Cupcake cu Ciocolată (Cupcakes) - 12 lei, expiră 2026-04-05')
 
     // ===== 8. Cupcake vanilie =====
     const imagine8 = 'partner_documents/product_images/cupcake_vanilie.jpg'
@@ -156,8 +156,8 @@ if (!cofetarieExistenta) {
         }
     }
 
-    adaugaOptiuniDecor(infoProdus1.lastInsertRowid, ['Trandafiri cremă', 'Scris manual', 'Fulgii de ciocolată', 'Glazură lucioasă'])
-    adaugaOptiuniDecor(infoProdus2.lastInsertRowid, ['Fructe proaspete', 'Jeu de fructe', 'Flori comestibile'])
+    adaugaOptiuniDecor(infoProdus1.lastInsertRowid, ['Trandafiri cremă', 'Scris manual', 'Fulgi de ciocolată', 'Glazură lucioasă'])
+    adaugaOptiuniDecor(infoProdus2.lastInsertRowid, ['Fructe proaspete', 'Jeleu de fructe', 'Flori comestibile'])
 
     console.log('✓ Opțiuni decor adăugate pentru torturi')
     console.log('✓ Cofetarie creata si aprobata - Email: ion.popescu@dulcegarii.com | Parola: 123456')

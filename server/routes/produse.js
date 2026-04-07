@@ -4,8 +4,10 @@ const db = require('../db')
 const { verifyToken, verifyRol } = require('../middleware/auth')
 const { uploadImaginiProduse } = require('../middleware/upload_documents')
 
+
 //toate produsele din cofetarie
 router.get('/cofetarie/:id', verifyToken, verifyRol('cofetarie'), (req, res) => {
+    db.actualizeazaProduseExpirate();
     db.prepare("UPDATE produse SET stoc = 0, disponibil = 0 WHERE data_expirare < date('now')").run();
     const cofetarie = db.prepare('SELECT id FROM cofetarii WHERE utilizator_id = ?').get(req.utilizator.id)
     
@@ -154,6 +156,7 @@ function gestioneazaIngrediente(produsId, ingredienteAlese, ingredientNou) {
 
 //afisare produse care nu sunt la oferta si expira a doua zi
 router.get('/alerte-expirare', verifyToken, verifyRol('cofetarie'), (req, res) => {
+    db.actualizeazaProduseExpirate(); 
     const cofetarie = db.prepare('SELECT id FROM cofetarii WHERE utilizator_id = ?').get(req.utilizator.id);
     
     const alerte = db.prepare(`
