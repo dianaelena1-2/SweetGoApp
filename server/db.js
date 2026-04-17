@@ -82,6 +82,7 @@ db.exec(`
         cofetarie_id INTEGER NOT NULL,
         status TEXT DEFAULT 'plasata',
         total REAL NOT NULL,
+        cost_livrare REAL,
         adresa_livrare TEXT NOT NULL,
         telefon TEXT,
         observatii TEXT,
@@ -146,16 +147,45 @@ db.exec(`
     )
 `)
 
-function actualizeazaProduseExpirate() {
-    const result = db.prepare(`
-        UPDATE produse 
-        SET stoc = 0, disponibil = 0 
-        WHERE data_expirare IS NOT NULL 
-        AND data_expirare < date('now')
-    `).run();
+db.exec(`
+    CREATE TABLE IF NOT EXISTS cos_salvat (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id INTEGER NOT NULL UNIQUE,
+        continut TEXT NOT NULL,
+        data_modificare DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (client_id) REFERENCES utilizatori(id) ON DELETE CASCADE
+    )
+`)
+
+const tableInfoComenzi = db.prepare("PRAGMA table_info(comenzi)").all();
+const hasCostLivrare = tableInfoComenzi.some(col => col.name === 'cost_livrare');
+if (!hasCostLivrare) {
+    db.exec("ALTER TABLE comenzi ADD COLUMN cost_livrare REAL DEFAULT 0");
+    console.log("✓ Coloana cost_livrare adăugată în tabela comenzi");
 }
 
-db.actualizeazaProduseExpirate = actualizeazaProduseExpirate;
+function actualizeazaDisponibilitateProduse() {
+    const expirate = db.prepare(`
+        UPDATE produse 
+        SET disponibil = 0, este_la_oferta = 0, stoc = 0
+        WHERE data_expirare IS NOT NULL 
+        AND data_expirare <= date('now', 'localtime')
+    `).run();
+    const faraStoc = db.prepare(`
+        UPDATE produse 
+        SET disponibil = 0, este_la_oferta = 0 
+        WHERE stoc = 0
+    `).run();
+    const valabile = db.prepare(`
+        UPDATE produse 
+        SET disponibil = 1 
+        WHERE (data_expirare IS NULL OR data_expirare > date('now', 'localtime'))
+          AND stoc > 0
+    `).run();
+    
+}
+
+db.actualizeazaDisponibilitateProduse = actualizeazaDisponibilitateProduse;
 
 function creeazaNotificare(clientId, mesaj, tip = 'info', link = null) {
     const stmt = db.prepare(`

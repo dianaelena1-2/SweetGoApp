@@ -1,14 +1,15 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, ShoppingCart, Store, MapPin, Phone, Pencil, Tag, ChevronDown, ChevronUp, Check, Filter  } from 'lucide-react'
+import { Cake, ShoppingCart, Store, MapPin, Phone, Pencil, Tag, ChevronDown, ChevronUp, Check, Filter, Star, X, MessageSquare, Calendar  } from 'lucide-react'
 import api from '../../services/api'
 import NavbarClient from '../../components/NavbarClient';
 
 function DetaliiCofetarie() {
     const { id } = useParams()
     const navigate = useNavigate()
-    const { utilizator, logout } = useContext(AuthContext)
+    const { utilizator, logout, salveazaCosPeServer } = useContext(AuthContext)
+    const isFirstRender = useRef(true)
 
     const [cofetarie, setCofetarie] = useState(null)
     const [cautare, setCautare] = useState('')
@@ -18,6 +19,8 @@ function DetaliiCofetarie() {
     const [esteFavorita, setEsteFavorita] = useState(false);
     const [loadingFav, setLoadingFav] = useState(false);
     const [eroare, setEroare] = useState('');
+    const [modalRecenzii, setModalRecenzii] = useState(null)
+    const [loadingRecenzii, setLoadingRecenzii] = useState(false)
 
     const [ingredienteExtinse, setIngredienteExtinse] = useState(false)
 
@@ -51,9 +54,30 @@ function DetaliiCofetarie() {
         fetchDetalii()
     }, [id])
 
+    // Salvează coșul în localStorage și pe server (după prima randare)
     useEffect(() => {
         localStorage.setItem('cos', JSON.stringify(cos))
-        window.dispatchEvent(new Event('cos-updated'));
+        if (!isFirstRender.current) {
+            window.dispatchEvent(new Event('cos-updated'))
+            if (salveazaCosPeServer) salveazaCosPeServer()
+        } else {
+            isFirstRender.current = false
+        }
+    }, [cos, salveazaCosPeServer])
+
+    // Ascultă evenimentul de actualizare a coșului (din context sau alte tab-uri)
+    useEffect(() => {
+        const handleCosUpdated = () => {
+            const cosSalvat = localStorage.getItem('cos')
+            if (cosSalvat) {
+                const newCos = JSON.parse(cosSalvat)
+                if (JSON.stringify(newCos) !== JSON.stringify(cos)) {
+                    setCos(newCos)
+                }
+            }
+        }
+        window.addEventListener('cos-updated', handleCosUpdated)
+        return () => window.removeEventListener('cos-updated', handleCosUpdated)
     }, [cos])
 
     useEffect(() => {
@@ -199,15 +223,36 @@ function DetaliiCofetarie() {
         return produs ? produs.cantitate : 0
     }
 
+    const deschideRecenzii = async (e, cofetarie) => {
+        e.stopPropagation();
+        setLoadingRecenzii(true);
+        setModalRecenzii({ id: cofetarie.id, nume: cofetarie.numeCofetarie, lista: [] });
+        
+        try {
+            const raspuns = await api.get(`/cofetarii/${cofetarie.id}/toate-recenziile`);
+            setModalRecenzii(prev => ({ ...prev, lista: raspuns.data }));
+        } catch (err) {
+            console.error("Eroare la incarcarea recenziilor");
+        } finally {
+            setLoadingRecenzii(false);
+        }
+    };
+
     const handleLogout = () => {
         logout()
         navigate('/login')
     }
 
-    const renderStele = (rating) => {
-        if (!rating) return '☆☆☆☆☆'
-        const stelePane = Math.round(rating)
-        return '★'.repeat(stelePane) + '☆'.repeat(5 - stelePane)
+    const renderStele = (rating, size = 14) => {
+        const stele = rating ? Math.round(rating) : 0
+        return [...Array(5)].map((_, i) => (
+            <Star 
+                key={i} 
+                size={size} 
+                fill={i < stele ? "#c97c2e" : "transparent"} 
+                color={i < stele ? "#c97c2e" : "#ccc"} 
+            />
+        ))
     }
 
     const totalCos = cos.produse.reduce((acc, p) => acc + p.cantitate, 0)
@@ -220,9 +265,10 @@ function DetaliiCofetarie() {
            <NavbarClient 
             utilizator={utilizator}
             logout={logout}
-            searchValue=""
+            searchValue={cautare}
             onSearchChange={setCautare}
             showSearch={true}
+            searchPlaceholder="Caută produs..."
         />
 
             <div className="acasa-continut">
@@ -242,10 +288,10 @@ function DetaliiCofetarie() {
                         <p><Phone size={16} /> {cofetarie.telefon}</p>
                         <div className="rating">
                             <span className="stele">{renderStele(cofetarie.rating_mediu)}</span>
-                            <span className="numar-recenzii">
-                                {cofetarie.numar_recenzii > 0
-                                    ? `(${cofetarie.numar_recenzii} recenzii)`
-                                    : '(fără recenzii)'}
+                            <span className="numar-recenzii numar-recenzii-link" 
+                                onClick={(e) => deschideRecenzii(e, cofetarie)}
+                                >
+                                {cofetarie.numar_recenzii > 0 ? `(${cofetarie.numar_recenzii} recenzii)` : '(fără recenzii)'}
                             </span>
                         </div>
                         {utilizator?.rol === 'client' && (
@@ -481,6 +527,40 @@ function DetaliiCofetarie() {
                     </div>
                 </div>
             )}
+
+            {/* MODAL VIZUALIZARE RECENZII */}
+            {modalRecenzii && (
+                <div className="modal-overlay" onClick={() => setModalRecenzii(null)}>
+                    <div className="modal-continut modal-recenzii" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-inchide" onClick={() => setModalRecenzii(null)}><X size={20} /></button>
+                        <h3 className="modal-titlu">
+                            <MessageSquare size={24} color="#c97c2e" /> Recenzii {modalRecenzii.nume}
+                        </h3>
+
+                        <div className="modal-scroll-container">
+                            {loadingRecenzii ? (
+                                <p className="text-centrat">Se încarcă recenziile...</p>
+                            ) : modalRecenzii.lista.length === 0 ? (
+                                <p className="text-gol">Nu există încă recenzii scrise.</p>
+                            ) : (
+                                modalRecenzii.lista.map(r => (
+                                    <div key={r.id} className="recenzie-item">
+                                        <div className="recenzie-header">
+                                            <strong className="recenzie-autor">{r.numeClient}</strong>
+                                            <div className="recenzie-stele">{renderStele(r.rating, 12)}</div>
+                                        </div>
+                                        <p className="recenzie-comentariu">"{r.comentariu || 'Fără comentariu'}"</p>
+                                        <small className="recenzie-data">
+                                            <Calendar size={12} /> {new Date(r.creat_la + 'Z').toLocaleDateString('ro-RO')}
+                                        </small>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }

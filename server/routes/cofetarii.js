@@ -33,9 +33,31 @@ router.get('/:id/toate-recenziile', (req, res) => {
     }
 });
 
+//afisare recenzii
+router.get('/recenzii', verifyToken, verifyRol('cofetarie'), (req, res) => {
+    const cofetarie = db.prepare('SELECT id FROM cofetarii WHERE utilizator_id = ?').get(req.utilizator.id);
+    if (!cofetarie) {
+        return res.status(404).json({ mesaj: 'Cofetăria nu a fost găsită.' });
+    }
+
+    const recenzii = db.prepare(`
+        SELECT r.*, u.nume as numeClient, u.email
+        FROM recenzii r
+        JOIN utilizatori u ON r.client_id = u.id
+        WHERE r.cofetarie_id = ?
+        ORDER BY r.creat_la DESC
+    `).all(cofetarie.id);
+    
+    const ratingMediu = db.prepare(`
+        SELECT AVG(rating) as medie FROM recenzii WHERE cofetarie_id = ?
+    `).get(cofetarie.id).medie || 0;
+
+    res.json({ recenzii, ratingMediu, totalRecenzii: recenzii.length });
+});
+
 //detalii cofetarie
 router.get('/:id', (req, res) => {
-    db.actualizeazaProduseExpirate();
+    db.actualizeazaDisponibilitateProduse();
     const { id } = req.params;
 
     try {

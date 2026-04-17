@@ -1,21 +1,26 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Cake, ShoppingCart, Trash2, AlertTriangle, Check, CreditCard, Banknote } from 'lucide-react'
 import api from '../../services/api'
-import NavbarClient from '../../components/NavbarClient';
+import NavbarClient from '../../components/NavbarClient'
 
 const MIJLOACE_TRANSPORT = [
-    { id: 'bicicleta', nume: '🚲Bicicletă / Trotinetă', desc: 'Produse mici și rezistente' },
-    { id: 'masina', nume: '🚗Mașină Standard', desc: 'Prăjituri și pachete medii'},
-    { id: 'frigorific', nume: '❄️Mașină Frigorifică', desc: 'Torturi și produse sensibile' }
-];
+    { id: 'bicicleta', nume: '🚲 Bicicletă / Trotinetă', desc: 'Produse mici și rezistente' },
+    { id: 'masina', nume: '🚗 Mașină Standard', desc: 'Prăjituri și pachete medii' },
+    { id: 'frigorific', nume: '❄️ Mașină Frigorifică', desc: 'Torturi și produse sensibile' }
+]
 
 function CosCumparaturi() {
-    const { utilizator, logout } = useContext(AuthContext)
+    const { utilizator, logout, salveazaCosPeServer } = useContext(AuthContext)
     const navigate = useNavigate()
+    const isFirstRender = useRef(true)
 
-    const [cos, setCos] = useState({ cofetarie_id: null, produse: [] })
+    // Inițializare cos din localStorage
+    const [cos, setCos] = useState(() => {
+        const cosSalvat = localStorage.getItem('cos')
+        return cosSalvat ? JSON.parse(cosSalvat) : { cofetarie_id: null, produse: [] }
+    })
     const [produseProduse, setProduseProduse] = useState([])
     const [cofetarie, setCofetarie] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -26,45 +31,61 @@ function CosCumparaturi() {
     const [adresaLivrare, setAdresaLivrare] = useState('')
     const [telefon, setTelefon] = useState('')
     const [observatii, setObservatii] = useState('')
-    
-    const [tipTransport, setTipTransport] = useState('masina');
+    const [tipTransport, setTipTransport] = useState('masina')
     const [esteCadou, setEsteCadou] = useState(false)
     const [mesajCadou, setMesajCadou] = useState('')
-
     const [metodaPlata, setMetodaPlata] = useState('numerar')
-    const [simularePlata, setSimularePlata] = useState({ activa: false, status: 'procesare' }) 
+    const [simularePlata, setSimularePlata] = useState({ activa: false, status: 'procesare' })
+    const [costLivrare, setCostLivrare] = useState(0);
 
+    // Încarcă detaliile cofetăriei dacă există produse în coș
     useEffect(() => {
-        const cosSalvat = localStorage.getItem('cos')
-        if (cosSalvat) {
-            const cosParsat = JSON.parse(cosSalvat)
-            setCos(cosParsat)
-            if (cosParsat.cofetarie_id) {
-                fetchDetalii(cosParsat.cofetarie_id)
-            } else {
-                setLoading(false)
-            }
+        if (cos.cofetarie_id) {
+            fetchDetalii(cos.cofetarie_id)
         } else {
             setLoading(false)
         }
-    }, [])
+    }, [cos.cofetarie_id])
 
+    // Încarcă adresa și telefonul din profil
     useEffect(() => {
         const fetchDateProfil = async () => {
             try {
-                const res = await api.get('/client/profil');
-                if (res.data.adresa_default) {
-                    setAdresaLivrare(res.data.adresa_default);
-                }
-                if (res.data.telefon) {
-                    setTelefon(res.data.telefon);
-                }
+                const res = await api.get('/client/profil')
+                if (res.data.adresa_default) setAdresaLivrare(res.data.adresa_default)
+                if (res.data.telefon) setTelefon(res.data.telefon)
             } catch (err) {
-                console.error('Nu s-a putut încărca adresa implicită');
+                console.error('Nu s-a putut încărca adresa implicită')
             }
-        };
-        fetchDateProfil();
-    }, []);
+        }
+        fetchDateProfil()
+    }, [])
+
+    // Salvează cos în localStorage și pe server (după prima randare)
+    useEffect(() => {
+        localStorage.setItem('cos', JSON.stringify(cos))
+        if (!isFirstRender.current) {
+            window.dispatchEvent(new Event('cos-updated'))
+            if (salveazaCosPeServer) salveazaCosPeServer()
+        } else {
+            isFirstRender.current = false
+        }
+    }, [cos, salveazaCosPeServer])
+
+    // Ascultă evenimentul de actualizare a coșului (din context sau alte tab-uri)
+    useEffect(() => {
+        const handleCosUpdated = () => {
+            const cosSalvat = localStorage.getItem('cos')
+            if (cosSalvat) {
+                const newCos = JSON.parse(cosSalvat)
+                if (JSON.stringify(newCos) !== JSON.stringify(cos)) {
+                    setCos(newCos)
+                }
+            }
+        }
+        window.addEventListener('cos-updated', handleCosUpdated)
+        return () => window.removeEventListener('cos-updated', handleCosUpdated)
+    }, [cos])
 
     const fetchDetalii = async (cofetarieId) => {
         try {
@@ -72,43 +93,35 @@ function CosCumparaturi() {
             setCofetarie(raspuns.data.cofetarie)
             setProduseProduse(raspuns.data.produse)
         } catch (err) {
-            setEroare('Eroare la incarcarea detaliilor')
+            setEroare('Eroare la încărcarea detaliilor')
         } finally {
             setLoading(false)
         }
     }
 
     const obtineMetodaRecomandata = () => {
-        if (cos.produse.length === 0 || produseProduse.length === 0) return 'masina';
-
+        if (cos.produse.length === 0 || produseProduse.length === 0) return 'masina'
         const detaliiProduseCos = cos.produse.map(itemCos => 
             produseProduse.find(p => p.id === itemCos.id)
-        ).filter(Boolean);
+        ).filter(Boolean)
+        if (detaliiProduseCos.some(p => p.transport_recomandat === 'frigorific')) return 'frigorific'
+        if (detaliiProduseCos.some(p => p.transport_recomandat === 'masina')) return 'masina'
+        return 'bicicleta'
+    }
 
-        if (detaliiProduseCos.some(p => p.transport_recomandat === 'frigorific')) return 'frigorific';
-        if (detaliiProduseCos.some(p => p.transport_recomandat === 'masina')) return 'masina';
-        
-        return 'bicicleta';
-    };
-
-    const recomandat = obtineMetodaRecomandata();
+    const recomandat = obtineMetodaRecomandata()
 
     useEffect(() => {
         if (produseProduse.length > 0) {
-            setTipTransport(obtineMetodaRecomandata());
+            setTipTransport(obtineMetodaRecomandata())
         }
-    }, [produseProduse, cos.produse]);
+    }, [produseProduse, cos.produse])
 
-    const salveazaCos = (cosNou) => {
-        setCos(cosNou)
-        localStorage.setItem('cos', JSON.stringify(cosNou))
-        window.dispatchEvent(new Event('cos-updated'));
-    }
+    const salveazaCos = (cosNou) => setCos(cosNou)
 
     const scadeInCos = (produsId) => {
         const produseActualizate = [...cos.produse]
         const index = produseActualizate.findIndex(p => p.id === produsId)
-
         if (index >= 0) {
             if (produseActualizate[index].cantitate === 1) {
                 produseActualizate.splice(index, 1)
@@ -116,7 +129,6 @@ function CosCumparaturi() {
                 produseActualizate[index].cantitate -= 1
             }
         }
-
         salveazaCos({
             cofetarie_id: produseActualizate.length > 0 ? cos.cofetarie_id : null,
             produse: produseActualizate
@@ -126,11 +138,9 @@ function CosCumparaturi() {
     const cresteInCos = (produsId, stocRamas) => {
         const produseActualizate = [...cos.produse]
         const index = produseActualizate.findIndex(p => p.id === produsId)
-
         if (index >= 0 && produseActualizate[index].cantitate < stocRamas) {
             produseActualizate[index].cantitate += 1
         }
-
         salveazaCos({ ...cos, produse: produseActualizate })
     }
 
@@ -152,10 +162,23 @@ function CosCumparaturi() {
         return produs.cantitate > stoc
     }
 
-    const total = cos.produse.reduce((acc, p) => {
+    const getCostLivrare = (transport) => {
+        switch(transport) {
+            case 'bicicleta': return 5;
+            case 'masina': return 10;
+            case 'frigorific': return 15;
+            default: return 0;
+        }
+    }
+    useEffect(() => {
+        setCostLivrare(getCostLivrare(tipTransport));
+    }, [tipTransport])
+
+    const totalProduse = cos.produse.reduce((acc, p) => {
         const produsDB = produseProduse.find(db => db.id === p.id)
         return acc + (produsDB?.pret || p.pret) * p.cantitate
     }, 0)
+    const total = totalProduse + costLivrare
 
     const areProbleme = cos.produse.some(p => stocInsuficient(p))
 
@@ -171,6 +194,7 @@ function CosCumparaturi() {
                 mesaj_cadou: esteCadou ? mesajCadou : null,
                 metoda_plata: metodaPlata,
                 status_plata: statusPlata,
+                cost_livrare: costLivrare,
                 produse: cos.produse.map(p => ({
                     id: p.id,
                     cantitate: p.cantitate,
@@ -178,8 +202,10 @@ function CosCumparaturi() {
                     observatii: p.observatii || null
                 }))
             })
-
             golestesCos()
+            await api.delete('/client/cos')
+            localStorage.removeItem('cos')
+            window.dispatchEvent(new Event('cos-updated'))
             setSucces('Comandă plasată cu succes!')
             setTimeout(() => navigate('/cos-cumparaturi'), 2000)
         } catch (err) {
@@ -191,20 +217,15 @@ function CosCumparaturi() {
 
     const handlePlaseazaComanda = async () => {
         setEroare('')
-        if (!adresaLivrare.trim()) { setEroare('Adresa de livrare este obligatorie'); return; }
-        if (!telefon.trim()) { setEroare('Telefonul este obligatoriu'); return; }
-        if (areProbleme) { setEroare('Unele produse din coș depășesc stocul disponibil'); return; }
+        if (!adresaLivrare.trim()) { setEroare('Adresa de livrare este obligatorie'); return }
+        if (!telefon.trim()) { setEroare('Telefonul este obligatoriu'); return }
+        if (areProbleme) { setEroare('Unele produse din coș depășesc stocul disponibil'); return }
 
         setLoadingComanda(true)
-
-        // LOGICĂ DE PLATĂ
         if (metodaPlata === 'card') {
             setSimularePlata({ activa: true, status: 'procesare' })
-            
-            // Așteptăm 2.5 secunde pentru a simula procesarea bancară
             setTimeout(() => {
                 setSimularePlata({ activa: true, status: 'succes' })
-                
                 setTimeout(() => {
                     setSimularePlata({ activa: false, status: 'procesare' })
                     plaseazaComandaFinala('platita')
@@ -231,11 +252,9 @@ function CosCumparaturi() {
                 onSearchChange={() => {}}
                 showSearch={false}
             />
-
             <div className="acasa-continut">
                 <button className="btn-inapoi" onClick={() => navigate(-1)}>← Înapoi</button>
                 <h2>Coșul meu 🛒</h2>
-
                 {eroare && <div className="eroare">{eroare}</div>}
                 {succes && <div className="succes">{succes}</div>}
 
@@ -255,12 +274,10 @@ function CosCumparaturi() {
                                     <Trash2 size={16} /> Golește coșul
                                 </button>
                             </div>
-
                             {cos.produse.map(produs => {
                                 const produsDB = produseProduse.find(p => p.id === produs.id)
                                 const stocRamas = produsDB?.stoc || 0
                                 const depasesteStoc = produs.cantitate > stocRamas
-
                                 return (
                                     <div key={produs.id} className={`cos-produs-card ${depasesteStoc ? 'cos-produs-problema' : ''}`}>
                                         <div className="cos-produs-imagine">
@@ -271,59 +288,33 @@ function CosCumparaturi() {
                                         <div className="cos-produs-info">
                                             <h4>{produs.numeProdus}</h4>
                                             <p className="cos-produs-pret">{produsDB?.pret || produs.pret} lei / buc</p>
-                                            {produs.optiune_decor && (
-                                                <p className="cos-produs-detaliu">🎨 Decor: {produs.optiune_decor}</p>
-                                            )}
-                                            {produs.observatii && (
-                                                <p className="cos-produs-detaliu">📝 {produs.observatii}</p>
-                                            )}
-                                            {depasesteStoc && (
-                                                <p className="cos-avertisment">
-                                                    <AlertTriangle size={14} /> Stoc disponibil: doar {stocRamas} buc
-                                                </p>
-                                            )}
+                                            {produs.optiune_decor && <p className="cos-produs-detaliu">🎨 Decor: {produs.optiune_decor}</p>}
+                                            {produs.observatii && <p className="cos-produs-detaliu">📝 {produs.observatii}</p>}
+                                            {depasesteStoc && <p className="cos-avertisment"><AlertTriangle size={14} /> Stoc disponibil: doar {stocRamas} buc</p>}
                                         </div>
                                         <div className="cos-produs-cantitate">
                                             <div className="cantitate-control">
                                                 <button onClick={() => scadeInCos(produs.id)}>−</button>
                                                 <span>{produs.cantitate}</span>
-                                                <button
-                                                    onClick={() => cresteInCos(produs.id, stocRamas)}
-                                                    disabled={produs.cantitate >= stocRamas}
-                                                >+</button>
+                                                <button onClick={() => cresteInCos(produs.id, stocRamas)} disabled={produs.cantitate >= stocRamas}>+</button>
                                             </div>
-                                            <p className="cos-subtotal">
-                                                {((produsDB?.pret || produs.pret) * produs.cantitate).toFixed(2)} lei
-                                            </p>
+                                            <p className="cos-subtotal">{((produsDB?.pret || produs.pret) * produs.cantitate).toFixed(2)} lei</p>
                                         </div>
                                         <button className="cos-sterge-produs" onClick={() => stergeProdusDinCos(produs.id)}>✕</button>
                                     </div>
                                 )
                             })}
                         </div>
-
                         <div className="cos-comanda-form">
                             <h3>Detalii comandă</h3>
-
                             <div className="form-group">
                                 <label>Adresă de livrare *</label>
-                                <input
-                                    type="text"
-                                    value={adresaLivrare}
-                                    onChange={(e) => setAdresaLivrare(e.target.value)}
-                                    placeholder="Strada, număr, oraș"
-                                />
+                                <input type="text" value={adresaLivrare} onChange={(e) => setAdresaLivrare(e.target.value)} placeholder="Strada, număr, oraș" />
                             </div>
                             <div className="form-group">
                                 <label>Telefon *</label>
-                                <input
-                                    type="text"
-                                    value={telefon}
-                                    onChange={(e) => setTelefon(e.target.value)}
-                                    placeholder="07xxxxxxxx"
-                                />
+                                <input type="text" value={telefon} onChange={(e) => setTelefon(e.target.value)} placeholder="07xxxxxxxx" />
                             </div>
-
                             <div className="form-group">
                                 <label>Metodă de plată *</label>
                                 <div className="plata-selectie-grid">
@@ -339,18 +330,12 @@ function CosCumparaturi() {
                                     </div>
                                 </div>
                             </div>
-                            
                             <div className="form-group">
                                 <label>Mijloc de transport livrare *</label>
                                 <div className="transport-selectie-grid">
                                     {MIJLOACE_TRANSPORT.map(t => (
-                                        <div 
-                                            key={t.id} 
-                                            className={`transport-option ${tipTransport === t.id ? 'active' : ''} ${recomandat === t.id ? 'recommended' : ''}`}
-                                            onClick={() => setTipTransport(t.id)}
-                                        >
+                                        <div key={t.id} className={`transport-option ${tipTransport === t.id ? 'active' : ''} ${recomandat === t.id ? 'recommended' : ''}`} onClick={() => setTipTransport(t.id)}>
                                             <div className="transport-header">
-                                                {t.icon}
                                                 {tipTransport === t.id && <Check size={16} className="check-icon" />}
                                             </div>
                                             <div className="transport-body">
@@ -361,68 +346,43 @@ function CosCumparaturi() {
                                     ))}
                                 </div>
                             </div>
-
                             <div className="form-group">
                                 <label>Observații generale</label>
-                                <textarea
-                                    value={observatii}
-                                    onChange={(e) => setObservatii(e.target.value)}
-                                    placeholder="ex: Etaj 2, interfon 14..."
-                                    rows={3}
-                                />
+                                <textarea value={observatii} onChange={(e) => setObservatii(e.target.value)} placeholder="ex: Etaj 2, interfon 14..." rows={3} />
                             </div>
-
                             <div className="cadou-sectiune">
                                 <label className="cadou-label">
-                                    <input
-                                        type="checkbox"
-                                        checked={esteCadou}
-                                        onChange={(e) => setEsteCadou(e.target.checked)}
-                                        className="cadou-checkbox"
-                                    />
+                                    <input type="checkbox" checked={esteCadou} onChange={(e) => setEsteCadou(e.target.checked)} className="cadou-checkbox" />
                                     <span className="cadou-icon">🎁</span> Trimite un cadou dulce!
                                 </label>
-                                <p className="cadou-help-text">
-                                    Numele tău nu va apărea pe eticheta de livrare.
-                                </p>
-
+                                <p className="cadou-help-text">Numele tău nu va apărea pe eticheta de livrare.</p>
                                 {esteCadou && (
                                     <div className="cadou-mesaj-container">
                                         <label className="cadou-mesaj-label">Mesaj pentru destinatar (va fi printat pe felicitare)</label>
-                                        <textarea
-                                            value={mesajCadou}
-                                            onChange={(e) => setMesajCadou(e.target.value)}
-                                            placeholder="ex: La mulți ani! Cu drag..."
-                                            rows={2}
-                                            className="cadou-mesaj-textarea"
-                                        />
+                                        <textarea value={mesajCadou} onChange={(e) => setMesajCadou(e.target.value)} placeholder="ex: La mulți ani! Cu drag..." rows={2} className="cadou-mesaj-textarea" />
                                     </div>
                                 )}
                             </div>
-
                             <div className="cos-total">
-                                <span>Total</span>
+                                <span>Total produse:</span>
+                                <span>{totalProduse.toFixed(2)} lei</span>
+                            </div>
+                            <div className="cos-total">
+                                <span>Cost livrare ({tipTransport === 'bicicleta' ? 'Bicicletă' : tipTransport === 'masina' ? 'Mașină' : 'Frigorific'}):</span>
+                                <span>{costLivrare.toFixed(2)} lei</span>
+                            </div>
+                            <div className="cos-total" style={{ borderTop: '2px solid #f5d5a8', marginTop: '0.5rem', paddingTop: '0.5rem' }}>
+                                <span>Total de plată:</span>
                                 <span className="cos-total-pret">{total.toFixed(2)} lei</span>
                             </div>
-
-                            <button
-                                className="btn-primar cos-btn-comanda"
-                                onClick={handlePlaseazaComanda}
-                                disabled={loadingComanda || areProbleme}
-                            >
+                            <button className="btn-primar cos-btn-comanda" onClick={handlePlaseazaComanda} disabled={loadingComanda || areProbleme}>
                                 {loadingComanda ? 'Se plasează...' : '✓ Plasează comanda'}
                             </button>
-
-                            {areProbleme && (
-                                <p className="cos-avertisment pt-margin">
-                                    <AlertTriangle size={14} /> Verifica stocul produselor selectate
-                                </p>
-                            )}
+                            {areProbleme && <p className="cos-avertisment pt-margin"><AlertTriangle size={14} /> Verifica stocul produselor selectate</p>}
                         </div>
                     </div>
                 )}
             </div>
-            {/*MODAL PLATA*/}
             {simularePlata.activa && (
                 <div className="modal-plata-overlay">
                     <div className="modal-plata-content">

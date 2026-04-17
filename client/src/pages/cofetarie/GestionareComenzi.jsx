@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Cake, User, Calendar, MapPin, Phone, Palette, StickyNote, Check, ChefHat, Bike, CheckCircle, X } from 'lucide-react'
 import api from '../../services/api'
+import NavbarCofetarie from '../../components/NavbarCofetarie';
 
 const STATUSURI = ['toate', 'plasata', 'confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata']
 
@@ -107,17 +108,7 @@ function GestionareComenzi() {
 
     return (
         <div className="acasa-container">
-            <nav className="navbar">
-                <h1 className="navbar-logo" onClick={() => navigate('/cofetarie/dashboard')} style={{ cursor: 'pointer' }}>
-                    SweetGo 🍰
-                </h1>
-                <div className="navbar-actiuni">
-                    <span>{utilizator?.nume}</span>
-                    <button onClick={() => navigate('/cofetarie/dashboard')}>Dashboard</button>
-                    <button onClick={() => navigate('/cofetarie/produse')}>Produse</button>
-                    <button onClick={handleLogout} className="btn-logout">Deconectare</button>
-                </div>
-            </nav>
+            <NavbarCofetarie />
 
             <div className="acasa-continut">
                 <h2>Comenzi primite</h2>

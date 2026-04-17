@@ -13,6 +13,7 @@ const clientRoutes = require('./routes/client');
 
 dotenv.config()
 const db = require('./db')
+db.actualizeazaDisponibilitateProduse();
 
 const app = express()
 

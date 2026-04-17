@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Cake, Bell, Hourglass, Coins, Package, User, Calendar, MapPin } from 'lucide-react'
 import api from '../../services/api'
+import NavbarCofetarie from '../../components/NavbarCofetarie';
 
 const statusLabel = {
     plasata: { text: 'Plasată', cls: 'status-plasata' },
@@ -88,17 +89,7 @@ function DashboardCofetarie() {
 
     return (
         <div className="acasa-container">
-            <nav className="navbar">
-                <h1 className="navbar-logo" style={{ cursor: 'default' }}>
-                    SweetGo 🍰
-                </h1>
-                <div className="navbar-actiuni">
-                    <span>{utilizator?.nume}</span>
-                    <button onClick={() => navigate('/cofetarie/produse')}>Produse</button>
-                    <button onClick={() => navigate('/cofetarie/comenzi')}>Comenzi</button>
-                    <button onClick={handleLogout} className="btn-logout">Deconectare</button>
-                </div>
-            </nav>
+            <NavbarCofetarie />
 
             <div className="acasa-continut">
                 <h2>Bună, {utilizator?.nume}! 👋</h2>
@@ -149,6 +140,9 @@ function DashboardCofetarie() {
                             </button>
                             <button className="db-actiune-btn" onClick={() => navigate('/cofetarie/comenzi')}>
                                 📦 Vezi toate comenzile
+                            </button>
+                            <button className="db-actiune-btn" onClick={() => navigate('/cofetarie/recenzii')}>
+                                ⭐Vezi recenziile tale
                             </button>
                             {alerteExpirare.length > 0 && (
                                 <button 

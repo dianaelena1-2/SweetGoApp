@@ -84,7 +84,7 @@ function NavbarClient({ utilizator, logout, searchValue, onSearchChange, showSea
                 <NotificationBell />
                 
                 <button className="btn-nav-cart" onClick={() => navigate('/cos-cumparaturi')}>
-                    <ShoppingCart size={18} /> Coș 
+                    🛒 Coș 
                     {cosCount > 0 && <span className="cart-badge">{cosCount}</span>}
                 </button>
                 

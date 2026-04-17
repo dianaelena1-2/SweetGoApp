@@ -17,6 +17,7 @@ import Profile from './pages/client/Profil'
 import DashboardCofetarie from './pages/cofetarie/DashboardCofetarie'
 import GestionareProduse from './pages/cofetarie/GestionareProduse'
 import GestionareComenzi from './pages/cofetarie/GestionareComenzi'
+import RecenziiCofetarie from './pages/cofetarie/RecenziiCofetarie'
 
 //admin pages
 import DashboardAdmin from './pages/admin/DashboardAdmin'
@@ -50,6 +51,7 @@ function App(){
         <Route path="/cofetarie/dashboard" element={<ProtectedRoute rol="cofetarie"><DashboardCofetarie /></ProtectedRoute>} />
         <Route path="/cofetarie/produse" element={<ProtectedRoute rol="cofetarie"><GestionareProduse/></ProtectedRoute>} />
         <Route path="/cofetarie/comenzi" element={<ProtectedRoute rol="cofetarie"><GestionareComenzi /></ProtectedRoute>} />
+        <Route path="/cofetarie/recenzii" element={<ProtectedRoute rol="cofetarie"><RecenziiCofetarie /></ProtectedRoute>} />
 
         {/*admin*/}
         <Route path="/admin/dashboard" element={<ProtectedRoute rol="admin"><DashboardAdmin /></ProtectedRoute>} />

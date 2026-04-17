@@ -116,4 +116,36 @@ router.get('/notificari/necitite/count', (req, res) => {
     res.json({ count: count.count });
 });
 
+//cos
+router.get('/cos', verifyToken, verifyRol('client'), (req, res) => {
+    const clientId = req.utilizator.id;
+    const cos = db.prepare('SELECT continut FROM cos_salvat WHERE client_id = ?').get(clientId);
+    if (cos) {
+        try {
+            const continut = JSON.parse(cos.continut);
+            res.json(continut);
+        } catch(e) {
+            res.json({ cofetarie_id: null, produse: [] });
+        }
+    } else {
+        res.json({ cofetarie_id: null, produse: [] });
+    }
+});
+router.put('/cos', verifyToken, verifyRol('client'), (req, res) => {
+    const clientId = req.utilizator.id;
+    const continut = JSON.stringify(req.body);
+    const existing = db.prepare('SELECT id FROM cos_salvat WHERE client_id = ?').get(clientId);
+    if (existing) {
+        db.prepare('UPDATE cos_salvat SET continut = ?, data_modificare = CURRENT_TIMESTAMP WHERE client_id = ?').run(continut, clientId);
+    } else {
+        db.prepare('INSERT INTO cos_salvat (client_id, continut) VALUES (?, ?)').run(clientId, continut);
+    }
+    res.json({ mesaj: 'Coș salvat cu succes.' });
+});
+router.delete('/cos', verifyToken, verifyRol('client'), (req, res) => {
+    const clientId = req.utilizator.id;
+    db.prepare('DELETE FROM cos_salvat WHERE client_id = ?').run(clientId);
+    res.json({ mesaj: 'Coș șters cu succes.' });
+});
+
 module.exports = router;

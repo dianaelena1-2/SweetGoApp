@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Cake, PlusCircle, Tag, Check, X, Package, Pencil, Trash2, Palette, Bike, Car, Snowflake, ListChecks, AlertTriangle, Calendar } from 'lucide-react'
 import api from '../../services/api'
+import NavbarCofetarie from '../../components/NavbarCofetarie';
 
 const CATEGORII = ['Torturi', 'Prăjituri', 'Macarons', 'Cupcakes', 'Croissante']
 
-// Adăugat transport_recomandat în obiectul inițial
 const produsGol = {
     numeProdus: '',
     descriere: '',
@@ -41,13 +41,22 @@ function GestionareProduse() {
     const [ingredienteAlese, setIngredienteAlese] = useState([])
     const [numeIngredientNou, setNumeIngredientNou] = useState('')
 
-    const [alerteExpirare, setAlerteExpirare] = useState([]);
+    const [alerteExpirare, setAlerteExpirare] = useState([])
     const [esteDupaOra20, setEsteDupaOra20] = useState(false)
+
+    const [showExpired, setShowExpired] = useState(false)
+    const [showUnavailable, setShowUnavailable] = useState(false)
+    const [produseExpirate, setProduseExpirate] = useState([])
+    const [loadingExpired, setLoadingExpired] = useState(false)
+    const [produseIndisponibile, setProduseIndisponibile] = useState([])
+    const [loadingIndisponibile, setLoadingIndisponibile] = useState(false)
 
     useEffect(() => {
         fetchProduse()
         fetchIngrediente()
         fetchAlerte()
+        fetchProduseExpirate()
+        fetchProduseIndisponibile()
     }, [])
 
     useEffect(() => {
@@ -94,6 +103,30 @@ function GestionareProduse() {
             const raspuns = await api.get('/produse/alerte-expirare');
             setAlerteExpirare(raspuns.data);
         } catch (err) { console.error(err); }
+    }
+
+    const fetchProduseExpirate = async () => {
+        setLoadingExpired(true);
+        try {
+            const raspuns = await api.get('/produse/expirate');
+            setProduseExpirate(raspuns.data);
+        } catch (err) {
+            setEroare('Eroare la încărcarea produselor expirate');
+        } finally {
+            setLoadingExpired(false);
+        }
+    }
+
+    const fetchProduseIndisponibile = async () => {
+        setLoadingIndisponibile(true);
+        try {
+            const raspuns = await api.get('/produse/indisponibile');
+            setProduseIndisponibile(raspuns.data);
+        } catch (err) {
+            setEroare('Eroare la încărcarea produselor indisponibile');
+        } finally {
+            setLoadingIndisponibile(false);
+        }
     }
 
     const handleLogout = () => {
@@ -212,6 +245,8 @@ function GestionareProduse() {
 
             afiseazaSucces('Produs actualizat cu succes!')
             fetchProduse()
+            fetchProduseExpirate()
+            fetchProduseIndisponibile()
             fetchIngrediente()
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la actualizarea produsului')
@@ -224,6 +259,8 @@ function GestionareProduse() {
             await api.delete(`/produse/${id}`)
             afiseazaSucces('Produs șters cu succes!')
             fetchProduse()
+            fetchProduseExpirate()
+            fetchProduseIndisponibile()
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la ștergerea produsului')
         }
@@ -302,7 +339,6 @@ function GestionareProduse() {
                 <ListChecks size={18} /> Ingrediente produs
             </label>
 
-            {/* lista de ingrediente */}
             <div className="ingrediente-selector-container">
                 {listaGlobalaIngrediente.map(ing => (
                     <div 
@@ -321,14 +357,12 @@ function GestionareProduse() {
                 ))}
             </div>
 
-            {/* Camp adaugare ingredient nou */}
             <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
                 <input 
                     type="text" 
                     placeholder="Ingredient nou? (ex: Sirop de agave)" 
                     value={numeIngredientNou}
                     onChange={(e) => setNumeIngredientNou(e.target.value)}
-                    // Permitem adăugarea prin tasta Enter
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                             e.preventDefault(); 
@@ -352,17 +386,7 @@ function GestionareProduse() {
 
     return (
         <div className="acasa-container">
-            <nav className="navbar">
-                <h1 className="navbar-logo" onClick={() => navigate('/cofetarie/dashboard')} style={{ cursor: 'pointer' }}>
-                    SweetGo 🍰
-                </h1>
-                <div className="navbar-actiuni">
-                    <span>{utilizator?.nume}</span>
-                    <button onClick={() => navigate('/cofetarie/dashboard')}>Dashboard</button>
-                    <button onClick={() => navigate('/cofetarie/comenzi')}>Comenzi</button>
-                    <button onClick={handleLogout} className="btn-logout">Deconectare</button>
-                </div>
-            </nav>
+            <NavbarCofetarie />
 
             <div className="acasa-continut">
                 <h2>Gestionare Produse</h2>
@@ -374,6 +398,7 @@ function GestionareProduse() {
                 <div className="gp-card">
                     <h3 className="gp-card-titlu">➕ Adaugă produs nou</h3>
                     <div className="gp-form">
+                        {/* ... păstrează același formular ca în original ... */}
                         <div className="form-group">
                             <label>Nume produs</label>
                             <input
@@ -440,7 +465,6 @@ function GestionareProduse() {
                                     <option value={0}>Nu</option>
                                 </select>
                             </div>
-                            {/* Selector Transport pentru Produs Nou */}
                             <div className="form-group">
                                 <label>Transport recomandat</label>
                                 <select
@@ -524,179 +548,319 @@ function GestionareProduse() {
                 )}
 
                 {/* LISTA PRODUSE */}
-                <h3 className="sectiune-titlu">Produsele tale ({produse.length})</h3>
-
-                {loading ? (
-                    <p className="loading">Se încarcă...</p>
-                ) : produse.length === 0 ? (
-                    <p className="gol">Nu ai adăugat niciun produs încă.</p>
-                ) : (
-                    <div className="gp-lista">
-                        {produse.map(produs => (
-                            <div key={produs.id} className="gp-produs-card">
-                                {editareId === produs.id ? (
-                                    /* MOD EDITARE */
-                                    <div className="gp-editare">
-                                        <div className="gp-produs-imagine">
-                                            {produs.imagine ? (
-                                                <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
-                                            ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
-                                        </div>
-                                        <div className="gp-form gp-form-editare">
-                                            <div className="form-group">
-                                                <label>Nume produs</label>
-                                                <input
-                                                    type="text"
-                                                    value={formEditare.numeProdus}
-                                                    onChange={(e) => setFormEditare({ ...formEditare, numeProdus: e.target.value })}
-                                                />
-                                            </div>
-                                            <div className="form-group">
-                                                <label>Descriere</label>
-                                                <input
-                                                    type="text"
-                                                    value={formEditare.descriere}
-                                                    onChange={(e) => setFormEditare({ ...formEditare, descriere: e.target.value })}
-                                                />
-                                            </div>
-                                            <div className="gp-form-row">
-                                                <div className="form-group">
-                                                    <label>Preț (lei)</label>
-                                                    <input
-                                                        type="number"
-                                                        value={formEditare.pret}
-                                                        onChange={(e) => setFormEditare({ ...formEditare, pret: e.target.value })}
-                                                        min="0"
-                                                    />
-                                                </div>
-                                                <div className="form-group">
-                                                    <label>Stoc (bucăți)</label>
-                                                    <input
-                                                        type="number"
-                                                        value={formEditare.stoc}
-                                                        onChange={(e) => setFormEditare({ ...formEditare, stoc: e.target.value })}
-                                                        min="0"
-                                                    />
-                                                </div>
-                                                <div className="form-group">
-                                                    <label>Dată expirare</label>
-                                                    <input
-                                                        type="date"
-                                                        value={formEditare.data_expirare}
-                                                        onChange={(e) => setFormEditare({ ...formEditare, data_expirare: e.target.value })}
-                                                    />
-                                                </div>
-                                                <div className="form-group">
-                                                    <label>Categorie</label>
-                                                    <select
-                                                        value={formEditare.categorie}
-                                                        onChange={(e) => setFormEditare({ ...formEditare, categorie: e.target.value })}
-                                                    >
-                                                        {CATEGORII.map(c => <option key={c} value={c}>{c}</option>)}
-                                                    </select>
-                                                </div>
-                                                <div className="form-group">
-                                                    <label>Disponibil</label>
-                                                    <select
-                                                        value={formEditare.disponibil}
-                                                        onChange={(e) => setFormEditare({ ...formEditare, disponibil: parseInt(e.target.value) })}
-                                                    >
-                                                        <option value={1}>Da</option>
-                                                        <option value={0}>Nu</option>
-                                                    </select>
-                                                </div>
-                                                {/* Selector Transport pentru Editare */}
-                                                <div className="form-group">
-                                                    <label>Transport recomandat</label>
-                                                    <select
-                                                        value={formEditare.transport_recomandat}
-                                                        onChange={(e) => setFormEditare({ ...formEditare, transport_recomandat: e.target.value })}
-                                                    >
-                                                        <option value="bicicleta">🚲 Bicicletă / Trotinetă</option>
-                                                        <option value="masina">🚗 Mașină Standard</option>
-                                                        <option value="frigorific">❄️ Mașină Frigorifică</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            {renderSectiuneIngrediente()}
-
-                                            <div className="form-group">
-                                                <label>Imagine nouă (opțional)</label>
-                                                <input
-                                                    type="file"
-                                                    accept=".jpg,.jpeg,.png"
-                                                    onChange={(e) => setImagineEditare(e.target.files[0])}
-                                                />
-                                            </div>
-
-                                            {formEditare.categorie === 'Torturi' && renderOptiuniDecor(produs)}
-
-                                            <div className="gp-butoane-editare">
-                                                <button className="btn-primar" onClick={() => handleSalveazaEditare(produs.id)}>
-                                                    Salvează
-                                                </button>
-                                                <button className="btn-secundar" onClick={() => setEditareId(-1)}>
-                                                    Anulează
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    /* MOD VIZUALIZARE */
-                                    <div className="gp-produs-vizualizare" style={{ flexWrap: 'wrap' }}>
-                                        <div className="gp-produs-imagine">
-                                            {produs.imagine ? (
-                                                <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
-                                            ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
-                                        </div>
-                                        <div className="gp-produs-info">
-                                            <h4>{produs.numeProdus}</h4>
-                                            <p className="produs-descriere">{produs.descriere}</p>
-                                            {produs.ingrediente && produs.ingrediente.length > 0 && (
-                                                <div style={{ margin: '8px 0', fontSize: '0.85rem', color: '#7a5230' }}>
-                                                    <strong>Ingrediente:</strong> {produs.ingrediente.map(i => i.nume).join(', ')}
-                                                </div>
-                                            )}
-                                            <div className="gp-produs-meta">
-                                                <span className="produs-pret">{produs.pret} lei</span>
-                                                <span className="produs-categorie"><Tag size={14} /> {produs.categorie}</span>
-                                                <span className={produs.disponibil ? 'badge-disponibil' : 'badge-indisponibil'}>
-                                                    {produs.disponibil ? <><Check size={14} /> Disponibil</> : <><X size={14} /> Indisponibil</>}
-                                                </span>
-                                                <span><Package size={14} /> {produs.stoc} buc</span>
-                                                
-                                                {/* Afișare Transport Recomandat în mod vizualizare */}
-                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    {produs.transport_recomandat === 'bicicleta' && <><Bike size={14} /> Bicicletă</>}
-                                                    {produs.transport_recomandat === 'masina' && <><Car size={14} /> Mașină</>}
-                                                    {produs.transport_recomandat === 'frigorific' && <><Snowflake size={14} /> Frigorific</>}
-                                                </span>
-                                                {produs.data_expirare && (
-                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#d32f2f' }}>
-                                                        <Calendar size={14} /> Expiră: {produs.data_expirare}
-                                                    </span>
-                                                )}
-                                                {produs.este_la_oferta === 1 && (
-                                                    <span className="badge-oferta" style={{margin: '0'}}>La Ofertă (-40%)</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="gp-produs-actiuni">
-                                            <button className="btn-editare" onClick={() => handleIncepeEditare(produs)}>
-                                                <Pencil size={16} /> Editează
-                                            </button>
-                                            <button className="btn-stergere" onClick={() => handleSterge(produs.id)}>
-                                                <Trash2 size={16} /> Șterge
-                                            </button>
-                                        </div>
-
-                                        {produs.categorie === 'Torturi' && renderOptiuniDecor(produs)}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+                <div className="produse-header-actions">
+                    <h3 className="sectiune-titlu" style={{ margin: 0 }}>
+                        {showExpired ? '📅 Produse expirate' : showUnavailable ? '🚫 Produse indisponibile' : `📦 Produsele tale (${produse.length})`}
+                    </h3>
+                    <div className="produse-buttons">
+                        <button 
+                            className={!showExpired && !showUnavailable ? 'btn-primar' : 'btn-secundar'}
+                            onClick={() => { setShowExpired(false); setShowUnavailable(false); }}
+                        >
+                            Toate produsele ({produse.length})
+                        </button>
+                        <button 
+                            className={showExpired ? 'btn-primar' : 'btn-secundar'}
+                            onClick={() => { setShowExpired(true); setShowUnavailable(false); }}
+                        >
+                            ⚠️ Expirate ({produseExpirate.length})
+                        </button>
+                        <button 
+                            className={showUnavailable ? 'btn-primar' : 'btn-secundar'}
+                            onClick={() => { setShowExpired(false); setShowUnavailable(true); }}
+                        >
+                            🚫 Indisponibile ({produseIndisponibile.length})
+                        </button>
                     </div>
+                </div>
+
+                {showExpired ? (
+                    loadingExpired ? (
+                        <p className="loading">Se încarcă produsele expirate...</p>
+                    ) : produseExpirate.length === 0 ? (
+                        <p className="gol">Nu ai produse expirate.</p>
+                    ) : (
+                        <div className="gp-lista">
+                            {produseExpirate.map(produs => (
+                                <div key={produs.id} className="gp-produs-card produs-expirat-card">
+                                    {editareId === produs.id ? (
+                                        /* MOD EDITARE - la fel ca în original */
+                                        <div className="gp-editare">
+                                            <div className="gp-produs-imagine">
+                                                {produs.imagine ? (
+                                                    <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
+                                                ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                            </div>
+                                            <div className="gp-form gp-form-editare">
+                                                <div className="form-group">
+                                                    <label>Nume produs</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formEditare.numeProdus}
+                                                        onChange={(e) => setFormEditare({ ...formEditare, numeProdus: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>Descriere</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formEditare.descriere}
+                                                        onChange={(e) => setFormEditare({ ...formEditare, descriere: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div className="gp-form-row">
+                                                    <div className="form-group">
+                                                        <label>Preț (lei)</label>
+                                                        <input
+                                                            type="number"
+                                                            value={formEditare.pret}
+                                                            onChange={(e) => setFormEditare({ ...formEditare, pret: e.target.value })}
+                                                            min="0"
+                                                        />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Stoc (bucăți)</label>
+                                                        <input
+                                                            type="number"
+                                                            value={formEditare.stoc}
+                                                            onChange={(e) => setFormEditare({ ...formEditare, stoc: e.target.value })}
+                                                            min="0"
+                                                        />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Dată expirare</label>
+                                                        <input
+                                                            type="date"
+                                                            value={formEditare.data_expirare}
+                                                            onChange={(e) => setFormEditare({ ...formEditare, data_expirare: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Categorie</label>
+                                                        <select
+                                                            value={formEditare.categorie}
+                                                            onChange={(e) => setFormEditare({ ...formEditare, categorie: e.target.value })}
+                                                        >
+                                                            {CATEGORII.map(c => <option key={c} value={c}>{c}</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Disponibil</label>
+                                                        <select
+                                                            value={formEditare.disponibil}
+                                                            onChange={(e) => setFormEditare({ ...formEditare, disponibil: parseInt(e.target.value) })}
+                                                        >
+                                                            <option value={1}>Da</option>
+                                                            <option value={0}>Nu</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Transport recomandat</label>
+                                                        <select
+                                                            value={formEditare.transport_recomandat}
+                                                            onChange={(e) => setFormEditare({ ...formEditare, transport_recomandat: e.target.value })}
+                                                        >
+                                                            <option value="bicicleta">🚲 Bicicletă / Trotinetă</option>
+                                                            <option value="masina">🚗 Mașină Standard</option>
+                                                            <option value="frigorific">❄️ Mașină Frigorifică</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                {renderSectiuneIngrediente()}
+                                                <div className="form-group">
+                                                    <label>Imagine nouă (opțional)</label>
+                                                    <input
+                                                        type="file"
+                                                        accept=".jpg,.jpeg,.png"
+                                                        onChange={(e) => setImagineEditare(e.target.files[0])}
+                                                    />
+                                                </div>
+                                                {formEditare.categorie === 'Torturi' && renderOptiuniDecor(produs)}
+                                                <div className="gp-butoane-editare">
+                                                    <button className="btn-primar" onClick={() => handleSalveazaEditare(produs.id)}>Salvează</button>
+                                                    <button className="btn-secundar" onClick={() => setEditareId(-1)}>Anulează</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="gp-produs-vizualizare" style={{ flexWrap: 'wrap' }}>
+                                            <div className="gp-produs-imagine">
+                                                {produs.imagine ? (
+                                                    <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
+                                                ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                            </div>
+                                            <div className="gp-produs-info">
+                                                <h4>{produs.numeProdus}</h4>
+                                                <p className="produs-descriere">{produs.descriere}</p>
+                                                <div className="gp-produs-meta">
+                                                    <span className="produs-pret">{produs.pret} lei</span>
+                                                    <span className="produs-categorie"><Tag size={14} /> {produs.categorie}</span>
+                                                    <span className="badge-indisponibil"><X size={14} /> EXPIRAT</span>
+                                                    <span><Package size={14} /> {produs.stoc} buc</span>
+                                                    {produs.data_expirare && (
+                                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#d32f2f' }}>
+                                                            <Calendar size={14} /> Expiră: {produs.data_expirare}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="gp-produs-actiuni">
+                                                <button className="btn-editare" onClick={() => handleIncepeEditare(produs)}><Pencil size={16} /> Editează</button>
+                                                <button className="btn-stergere" onClick={() => handleSterge(produs.id)}><Trash2 size={16} /> Șterge</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )
+                ) : showUnavailable ? (
+                    loadingIndisponibile ? (
+                        <p className="loading">Se încarcă produsele indisponibile...</p>
+                    ) : produseIndisponibile.length === 0 ? (
+                        <p className="gol">Nu ai produse indisponibile.</p>
+                    ) : (
+                        <div className="gp-lista">
+                            {produseIndisponibile.map(produs => (
+                                <div key={produs.id} className="gp-produs-card">
+                                    {editareId === produs.id ? (
+                                        /* Același mod editare ca mai sus */
+                                        <div className="gp-editare">
+                                            <div className="gp-produs-imagine">
+                                                {produs.imagine ? <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                            </div>
+                                            <div className="gp-form gp-form-editare">
+                                                <div className="form-group">
+                                                    <label>Nume produs</label>
+                                                    <input type="text" value={formEditare.numeProdus} onChange={(e) => setFormEditare({ ...formEditare, numeProdus: e.target.value })} />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>Descriere</label>
+                                                    <input type="text" value={formEditare.descriere} onChange={(e) => setFormEditare({ ...formEditare, descriere: e.target.value })} />
+                                                </div>
+                                                <div className="gp-form-row">
+                                                    <div className="form-group"><label>Preț (lei)</label><input type="number" value={formEditare.pret} onChange={(e) => setFormEditare({ ...formEditare, pret: e.target.value })} min="0" /></div>
+                                                    <div className="form-group"><label>Stoc (bucăți)</label><input type="number" value={formEditare.stoc} onChange={(e) => setFormEditare({ ...formEditare, stoc: e.target.value })} min="0" /></div>
+                                                    <div className="form-group"><label>Dată expirare</label><input type="date" value={formEditare.data_expirare} onChange={(e) => setFormEditare({ ...formEditare, data_expirare: e.target.value })} /></div>
+                                                    <div className="form-group"><label>Categorie</label><select value={formEditare.categorie} onChange={(e) => setFormEditare({ ...formEditare, categorie: e.target.value })}>{CATEGORII.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                                                    <div className="form-group"><label>Disponibil</label><select value={formEditare.disponibil} onChange={(e) => setFormEditare({ ...formEditare, disponibil: parseInt(e.target.value) })}><option value={1}>Da</option><option value={0}>Nu</option></select></div>
+                                                    <div className="form-group"><label>Transport recomandat</label><select value={formEditare.transport_recomandat} onChange={(e) => setFormEditare({ ...formEditare, transport_recomandat: e.target.value })}><option value="bicicleta">🚲 Bicicletă / Trotinetă</option><option value="masina">🚗 Mașină Standard</option><option value="frigorific">❄️ Mașină Frigorifică</option></select></div>
+                                                </div>
+                                                {renderSectiuneIngrediente()}
+                                                <div className="form-group"><label>Imagine nouă (opțional)</label><input type="file" accept=".jpg,.jpeg,.png" onChange={(e) => setImagineEditare(e.target.files[0])} /></div>
+                                                {formEditare.categorie === 'Torturi' && renderOptiuniDecor(produs)}
+                                                <div className="gp-butoane-editare"><button className="btn-primar" onClick={() => handleSalveazaEditare(produs.id)}>Salvează</button><button className="btn-secundar" onClick={() => setEditareId(-1)}>Anulează</button></div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="gp-produs-vizualizare" style={{ flexWrap: 'wrap' }}>
+                                            <div className="gp-produs-imagine">
+                                                {produs.imagine ? <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                            </div>
+                                            <div className="gp-produs-info">
+                                                <h4>{produs.numeProdus}</h4>
+                                                <p className="produs-descriere">{produs.descriere}</p>
+                                                <div className="gp-produs-meta">
+                                                    <span className="produs-pret">{produs.pret} lei</span>
+                                                    <span className="produs-categorie"><Tag size={14} /> {produs.categorie}</span>
+                                                    <span className="badge-indisponibil"><X size={14} /> INDISPONIBIL</span>
+                                                    <span><Package size={14} /> {produs.stoc} buc</span>
+                                                    {produs.data_expirare && (
+                                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#d32f2f' }}>
+                                                            <Calendar size={14} /> Expiră: {produs.data_expirare}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="gp-produs-actiuni">
+                                                <button className="btn-editare" onClick={() => handleIncepeEditare(produs)}><Pencil size={16} /> Editează</button>
+                                                <button className="btn-stergere" onClick={() => handleSterge(produs.id)}><Trash2 size={16} /> Șterge</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )
+                ) : (
+                    loading ? (
+                        <p className="loading">Se încarcă...</p>
+                    ) : produse.length === 0 ? (
+                        <p className="gol">Nu ai adăugat niciun produs încă.</p>
+                    ) : (
+                        <div className="gp-lista">
+                            {produse.map(produs => (
+                                <div key={produs.id} className="gp-produs-card">
+                                    {editareId === produs.id ? (
+                                        /* MOD EDITARE - la fel ca în original */
+                                        <div className="gp-editare">
+                                            <div className="gp-produs-imagine">
+                                                {produs.imagine ? <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                            </div>
+                                            <div className="gp-form gp-form-editare">
+                                                {/* form editare identic cu cel de mai sus */}
+                                                <div className="form-group"><label>Nume produs</label><input type="text" value={formEditare.numeProdus} onChange={(e) => setFormEditare({ ...formEditare, numeProdus: e.target.value })} /></div>
+                                                <div className="form-group"><label>Descriere</label><input type="text" value={formEditare.descriere} onChange={(e) => setFormEditare({ ...formEditare, descriere: e.target.value })} /></div>
+                                                <div className="gp-form-row">
+                                                    <div className="form-group"><label>Preț (lei)</label><input type="number" value={formEditare.pret} onChange={(e) => setFormEditare({ ...formEditare, pret: e.target.value })} min="0" /></div>
+                                                    <div className="form-group"><label>Stoc (bucăți)</label><input type="number" value={formEditare.stoc} onChange={(e) => setFormEditare({ ...formEditare, stoc: e.target.value })} min="0" /></div>
+                                                    <div className="form-group"><label>Dată expirare</label><input type="date" value={formEditare.data_expirare} onChange={(e) => setFormEditare({ ...formEditare, data_expirare: e.target.value })} /></div>
+                                                    <div className="form-group"><label>Categorie</label><select value={formEditare.categorie} onChange={(e) => setFormEditare({ ...formEditare, categorie: e.target.value })}>{CATEGORII.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+                                                    <div className="form-group"><label>Disponibil</label><select value={formEditare.disponibil} onChange={(e) => setFormEditare({ ...formEditare, disponibil: parseInt(e.target.value) })}><option value={1}>Da</option><option value={0}>Nu</option></select></div>
+                                                    <div className="form-group"><label>Transport recomandat</label><select value={formEditare.transport_recomandat} onChange={(e) => setFormEditare({ ...formEditare, transport_recomandat: e.target.value })}><option value="bicicleta">🚲 Bicicletă / Trotinetă</option><option value="masina">🚗 Mașină Standard</option><option value="frigorific">❄️ Mașină Frigorifică</option></select></div>
+                                                </div>
+                                                {renderSectiuneIngrediente()}
+                                                <div className="form-group"><label>Imagine nouă (opțional)</label><input type="file" accept=".jpg,.jpeg,.png" onChange={(e) => setImagineEditare(e.target.files[0])} /></div>
+                                                {formEditare.categorie === 'Torturi' && renderOptiuniDecor(produs)}
+                                                <div className="gp-butoane-editare"><button className="btn-primar" onClick={() => handleSalveazaEditare(produs.id)}>Salvează</button><button className="btn-secundar" onClick={() => setEditareId(-1)}>Anulează</button></div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="gp-produs-vizualizare" style={{ flexWrap: 'wrap' }}>
+                                            <div className="gp-produs-imagine">
+                                                {produs.imagine ? <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                            </div>
+                                            <div className="gp-produs-info">
+                                                <h4>{produs.numeProdus}</h4>
+                                                <p className="produs-descriere">{produs.descriere}</p>
+                                                {produs.ingrediente && produs.ingrediente.length > 0 && (
+                                                    <div style={{ margin: '8px 0', fontSize: '0.85rem', color: '#7a5230' }}>
+                                                        <strong>Ingrediente:</strong> {produs.ingrediente.map(i => i.nume).join(', ')}
+                                                    </div>
+                                                )}
+                                                <div className="gp-produs-meta">
+                                                    <span className="produs-pret">{produs.pret} lei</span>
+                                                    <span className="produs-categorie"><Tag size={14} /> {produs.categorie}</span>
+                                                    <span className={produs.disponibil ? 'badge-disponibil' : 'badge-indisponibil'}>
+                                                        {produs.disponibil ? <><Check size={14} /> Disponibil</> : <><X size={14} /> Indisponibil</>}
+                                                    </span>
+                                                    <span><Package size={14} /> {produs.stoc} buc</span>
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                        {produs.transport_recomandat === 'bicicleta' && <><Bike size={14} /> Bicicletă</>}
+                                                        {produs.transport_recomandat === 'masina' && <><Car size={14} /> Mașină</>}
+                                                        {produs.transport_recomandat === 'frigorific' && <><Snowflake size={14} /> Frigorific</>}
+                                                    </span>
+                                                    {produs.data_expirare && (
+                                                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#d32f2f' }}>
+                                                            <Calendar size={14} /> Expiră: {produs.data_expirare}
+                                                        </span>
+                                                    )}
+                                                    {produs.este_la_oferta === 1 && (
+                                                        <span className="badge-oferta" style={{margin: '0'}}>La Ofertă (-40%)</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="gp-produs-actiuni">
+                                                <button className="btn-editare" onClick={() => handleIncepeEditare(produs)}><Pencil size={16} /> Editează</button>
+                                                <button className="btn-stergere" onClick={() => handleSterge(produs.id)}><Trash2 size={16} /> Șterge</button>
+                                            </div>
+                                            {produs.categorie === 'Torturi' && renderOptiuniDecor(produs)}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )
                 )}
             </div>
         </div>
