@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Cake, User, Calendar, MapPin, Phone, Palette, StickyNote, Check, ChefHat, Bike, CheckCircle, X } from 'lucide-react'
 import api from '../../services/api'
@@ -33,13 +33,33 @@ const statusUrmatorLabel = {
 function GestionareComenzi() {
     const { utilizator, logout } = useContext(AuthContext)
     const navigate = useNavigate()
+    const location = useLocation()
 
     const [comenzi, setComenzi] = useState([])
     const [loading, setLoading] = useState(true)
     const [eroare, setEroare] = useState('')
     const [succes, setSucces] = useState('')
+
     const [filtruStatus, setFiltruStatus] = useState('toate')
     const [comenziExpandate, setComenziExpandate] = useState({})
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search)
+        const statusParam = params.get('status')
+        if (statusParam && STATUSURI.includes(statusParam)) {
+            setFiltruStatus(statusParam)
+        } else {
+            setFiltruStatus('toate')
+        }
+    }, [location.search])
+    useEffect(() => {
+        const params = new URLSearchParams()
+        if (filtruStatus !== 'toate') {
+            params.set('status', filtruStatus)
+        }
+        const newUrl = `/cofetarie/comenzi${params.toString() ? `?${params.toString()}` : ''}`
+        navigate(newUrl, { replace: true })
+    }, [filtruStatus, navigate])
 
     useEffect(() => {
         fetchComenzi()

@@ -60,7 +60,18 @@ router.get('/indisponibile', verifyToken, verifyRol('cofetarie'), (req, res) => 
         WHERE cofetarie_id = ? AND disponibil = 0
         ORDER BY data_expirare ASC NULLS LAST
     `).all(cofetarie.id)
-    res.json(produseIndisponibile)
+
+    const produseCuIngrediente = produseIndisponibile.map(produs => {
+        const ingrediente = db.prepare(`
+            SELECT i.id, i.nume
+            FROM ingrediente i
+            JOIN compozitieProdus cp ON i.id = cp.ingredient_id
+            WHERE cp.produs_id = ?
+        `).all(produs.id);
+        return { ...produs, ingrediente };
+    })
+
+    res.json(produseCuIngrediente)
 })
 
 // editează produs
@@ -150,6 +161,7 @@ router.get('/alerte-expirare', verifyToken, verifyRol('cofetarie'), (req, res) =
         AND este_la_oferta = 0 
         AND stoc > 0
     `).all(cofetarie.id)
+
     res.json(alerte)
 })
 
@@ -189,7 +201,18 @@ router.get('/expirate', verifyToken, verifyRol('cofetarie'), (req, res) => {
         AND data_expirare <= date('now', 'localtime')
         ORDER BY data_expirare ASC
     `).all(cofetarie.id)
-    res.json(produseExpirate)
+
+    const produseCuIngrediente = produseExpirate.map(produs => {
+        const ingrediente = db.prepare(`
+            SELECT i.id, i.nume
+            FROM ingrediente i
+            JOIN compozitieProdus cp ON i.id = cp.ingredient_id
+            WHERE cp.produs_id = ?
+        `).all(produs.id);
+        return { ...produs, ingrediente }
+    })
+
+    res.json(produseCuIngrediente)
 })
 
 module.exports = router

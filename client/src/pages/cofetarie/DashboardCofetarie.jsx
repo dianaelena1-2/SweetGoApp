@@ -154,7 +154,7 @@ function DashboardCofetarie() {
                                 </button>
                             )}
                             {date.comenziNoi > 0 && (
-                                <button className="db-actiune-btn db-actiune-urgent" onClick={() => navigate('/cofetarie/comenzi')}>
+                                <button className="db-actiune-btn db-actiune-urgent" onClick={() => navigate('/cofetarie/comenzi?status=plasata')}>
                                     🔔 {date.comenziNoi} comenzi noi de confirmat!
                                 </button>
                             )}
