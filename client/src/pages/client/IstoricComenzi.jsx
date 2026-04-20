@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
-import { Cake, ShoppingCart, Store, Calendar, MapPin, Star, MessageSquare, Check, X } from 'lucide-react'
+import { Cake, Store, Calendar, MapPin, Star, MessageSquare, Check, X } from 'lucide-react'
 import NavbarClient from '../../components/NavbarClient';
 
 const STATUSURI = ['toate', 'plasata', 'confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata']
@@ -46,17 +46,12 @@ function IstoricComenzi() {
         fetchComenzi()
     }, [])
 
-    const handleLogout = () => {
-        logout()
-        navigate('/login')
-    }
-
     const toggleExpandare = (comandaId) => {
         setComenziExpandate(prev => ({ ...prev, [comandaId]: !prev[comandaId] }))
     }
 
     const formatData = (data) => {
-        return new Date(data + 'Z').toLocaleDateString('ro-RO', {
+        return new Date(data).toLocaleDateString('ro-RO', {
             day: '2-digit', month: 'long', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
         })
@@ -65,9 +60,9 @@ function IstoricComenzi() {
     const deschideModalRecenzie = (comanda, e) => {
         e.stopPropagation()
         setModalRecenzie({
-            cofetarieId: comanda.cofetarie_id,
-            comandaId: comanda.id,
-            numeCofetarie: comanda.numeCofetarie
+            cofetarieId: comanda.cofetarie_id?._id,
+            comandaId: comanda._id,
+            numeCofetarie: comanda.cofetarie_id?.numeCofetarie
         })
         setRatingSelectat(0)
         setComentariuRecenzie('')
@@ -90,7 +85,7 @@ function IstoricComenzi() {
 
             setComenzi(prevComenzi =>
                  prevComenzi.map(c =>
-                     c.id === modalRecenzie.comandaId
+                     c._id === modalRecenzie.comandaId
                      ? { ...c, are_recenzie: true } 
                      : c
                     )
@@ -109,22 +104,19 @@ function IstoricComenzi() {
     }
 
     const handleAnuleazaComanda = async (comandaId) => {
-    if (!window.confirm('Ești sigur că vrei să anulezi această comandă?')) return;
-
-    try {
-        await api.put(`/comenzi/${comandaId}/anulare-client`);
-
-        setComenzi(prevComenzi => 
-            prevComenzi.map(c => 
-                c.id === comandaId ? { ...c, status: 'anulata' } : c
-            )
-        );
-        
-        alert('Comanda a fost anulată cu succes.');
-    } catch (err) {
-        setEroare(err.response?.data?.mesaj || 'Eroare la anularea comenzii. Probabil a fost deja confirmată.');
-    }
-};
+        if (!window.confirm('Ești sigur că vrei să anulezi această comandă?')) return;
+        try {
+            await api.put(`/comenzi/${comandaId}/anulare-client`);
+            setComenzi(prevComenzi => 
+                prevComenzi.map(c => 
+                    c._id === comandaId ? { ...c, status: 'anulata' } : c
+                )
+            );
+            alert('Comanda a fost anulată cu succes.');
+        } catch (err) {
+            setEroare(err.response?.data?.mesaj || 'Eroare la anularea comenzii. Probabil a fost deja confirmată.');
+        }
+    };
 
     const comenziFiltrate = filtruStatus === 'toate'
         ? comenzi
@@ -135,11 +127,8 @@ function IstoricComenzi() {
     return (
         <div className="acasa-container">
             <NavbarClient 
-                utilizator={utilizator}
-                logout={logout}
-                searchValue=""
-                onSearchChange={() => {}}
-                showSearch={false}
+                utilizator={utilizator} logout={logout}
+                searchValue="" onSearchChange={() => {}} showSearch={false}
             />
 
             <div className="acasa-continut">
@@ -157,30 +146,30 @@ function IstoricComenzi() {
 
                 <div className="ic-lista">
                     {comenziFiltrate.map(comanda => (
-                        <div key={comanda.id} className="ic-comanda-card">
-                            <div className="ic-comanda-header" onClick={() => toggleExpandare(comanda.id)}>
+                        <div key={comanda._id} className="ic-comanda-card">
+                            <div className="ic-comanda-header" onClick={() => toggleExpandare(comanda._id)}>
                                 <div className="ic-comanda-info">
                                     <h4>
-                                        <Store size={18} color="#c97c2e" /> {comanda.numeCofetarie}
+                                        <Store size={18} color="#c97c2e" /> {comanda.cofetarie_id?.numeCofetarie}
                                     </h4>
-                                    <p className="ic-data"><Calendar size={14} /> {formatData(comanda.creat_la)}</p>
+                                    <p className="ic-data"><Calendar size={14} /> {formatData(comanda.createdAt)}</p>
                                     <p className="ic-adresa"><MapPin size={14} /> {comanda.adresa_livrare}</p>
                                 </div>
                                 <div className="ic-comanda-dreapta">
                                     <span className={`ic-status ${statusLabel[comanda.status]?.cls}`}>{statusLabel[comanda.status]?.text}</span>
                                     <p className="ic-total">{comanda.total.toFixed(2)} lei</p>
-                                    <span>{comenziExpandate[comanda.id] ? '▲' : '▼'}</span>
+                                    <span>{comenziExpandate[comanda._id] ? '▲' : '▼'}</span>
                                 </div>
                             </div>
 
-                            {comenziExpandate[comanda.id] && (
+                            {comenziExpandate[comanda._id] && (
                                 <div className="ic-produse">
                                     <h5>Produse comandate:</h5>
-                                    {comanda.produse.map((produs, index) => (
+                                    {comanda.detalii.map((produs, index) => (
                                         <div key={index} className="ic-produs-rand">
                                             <div className="ic-produs-imagine">
-                                                {produs.imagine ? (
-                                                    <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} />
+                                                {produs.produs_id?.imagine ? (
+                                                    <img src={`https://sweetgoapp.onrender.com/${produs.produs_id.imagine}`} alt={produs.numeProdus} />
                                                 ) : <Cake size={32} color="#c97c2e" strokeWidth={1.5} />}
                                             </div>
                                             <div className="ic-produs-info">
@@ -201,21 +190,15 @@ function IstoricComenzi() {
 
                                     {comanda.status === 'plasata' && (
                                         <div className="ic-actiuni-comanda">
-                                            <button 
-                                                className="btn-stergere btn-nav-icon" 
-                                                onClick={(e) => { e.stopPropagation(); handleAnuleazaComanda(comanda.id); }}
-                                            >
+                                            <button className="btn-stergere btn-nav-icon" onClick={(e) => { e.stopPropagation(); handleAnuleazaComanda(comanda._id); }}>
                                                 <X size={16} /> Anulează comanda
                                             </button>
                                         </div>
-                                        
                                     )}
 
                                     {comanda.are_recenzie && (
                                         <div className="ic-mesaj-recenzie">
-                                            <span>
-                                                <Check size={14} /> Recenzie trimisă
-                                            </span>
+                                            <span><Check size={14} /> Recenzie trimisă</span>
                                         </div>
                                     )}
                                 </div>
@@ -238,9 +221,7 @@ function IstoricComenzi() {
                         <div className="modal-rating-selectie">
                             {[1, 2, 3, 4, 5].map(s => (
                                 <Star 
-                                    key={s} 
-                                    size={32} 
-                                    className="star-pointer"
+                                    key={s} size={32} className="star-pointer"
                                     fill={s <= ratingSelectat ? "#c97c2e" : "none"} 
                                     color={s <= ratingSelectat ? "#c97c2e" : "#ccc"}
                                     onClick={() => setRatingSelectat(s)} 
@@ -248,10 +229,8 @@ function IstoricComenzi() {
                             ))}
                         </div>
                         <textarea 
-                            className="modal-textarea" 
-                            placeholder="Spune-ne părerea ta..." 
-                            value={comentariuRecenzie} 
-                            onChange={(e) => setComentariuRecenzie(e.target.value)}
+                            className="modal-textarea" placeholder="Spune-ne părerea ta..." 
+                            value={comentariuRecenzie} onChange={(e) => setComentariuRecenzie(e.target.value)}
                         />
                         <button className="btn-primar modal-btn-trimite" onClick={handleTrimiteRecenzie} disabled={loadingRecenzie || succes}>
                             {loadingRecenzie ? 'Se trimite...' : 'Trimite recenzia'}

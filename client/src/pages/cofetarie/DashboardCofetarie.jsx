@@ -81,7 +81,7 @@ function DashboardCofetarie() {
     }
 
     const formatData = (data) => {
-        return new Date(data + 'Z').toLocaleDateString('ro-RO', {
+        return new Date(data).toLocaleDateString('ro-RO', {
             day: '2-digit', month: 'long', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
         })
@@ -101,7 +101,6 @@ function DashboardCofetarie() {
                     <p className="loading">Se încarcă...</p>
                 ) : (
                     <>
-                        {/* CARDURI STATISTICI */}
                         <div className="db-stats-grid">
                             <div className="db-stat-card db-stat-nou">
                                 <div className="db-stat-icon"><Bell size={32} /></div>
@@ -133,7 +132,6 @@ function DashboardCofetarie() {
                             </div>
                         </div>
 
-                        {/* ACTIUNI RAPIDE */}
                         <div className="db-actiuni">
                             <button className="db-actiune-btn" onClick={() => navigate('/cofetarie/produse')}>
                                 🍰 Gestionează produse
@@ -171,7 +169,7 @@ function DashboardCofetarie() {
                                 
                                 <div className="alerta-expirare-lista">
                                     {alerteExpirare.map(produs => (
-                                        <div key={produs.id} className="alerta-expirare-item">
+                                        <div key={produs._id} className="alerta-expirare-item">
                                             <div className="alerta-expirare-detalii">
                                                 <strong>{produs.numeProdus}</strong> (Stoc: {produs.stoc} buc)
                                                 <span className="alerta-expirare-preturi">
@@ -186,7 +184,7 @@ function DashboardCofetarie() {
                                                     color: esteDupaOra20 ? 'white' : '#9e9e9e'
                                                 }}
                                                 disabled={!esteDupaOra20}
-                                                onClick={() => aplicaOferta(produs.id)}
+                                                onClick={() => aplicaOferta(produs._id)}
                                             >
                                                 {esteDupaOra20 ? 'Aplică ofertă -40%' : '⏳ Așteaptă ora 20:00'}
                                             </button>
@@ -196,7 +194,6 @@ function DashboardCofetarie() {
                             </div>
                         )}
 
-                        {/* ULTIMELE COMENZI */}
                         <h3 className="sectiune-titlu">Ultimele comenzi primite</h3>
                         {date.ultimeleComenzi.length === 0 ? (
                             <p className="gol">Nu ai primit nicio comandă încă.</p>
@@ -204,7 +201,7 @@ function DashboardCofetarie() {
                             <div className="ic-lista">
                                 {date.ultimeleComenzi.map(comanda => (
                                     <div
-                                        key={comanda.id}
+                                        key={comanda._id}
                                         className="ic-comanda-card"
                                         style={{ cursor: 'pointer' }}
                                         onClick={() => navigate('/cofetarie/comenzi')}
@@ -212,7 +209,7 @@ function DashboardCofetarie() {
                                         <div className="ic-comanda-header">
                                             <div className="ic-comanda-info">
                                                 <h4><User size={16} /> {comanda.numeClient}</h4>
-                                                <p className="ic-data"><Calendar size={14} /> {formatData(comanda.creat_la)}</p>
+                                                <p className="ic-data"><Calendar size={14} /> {formatData(comanda.createdAt)}</p>
                                                 <p className="ic-adresa"><MapPin size={14} /> {comanda.adresa_livrare}</p>
                                             </div>
                                             <div className="ic-comanda-dreapta">

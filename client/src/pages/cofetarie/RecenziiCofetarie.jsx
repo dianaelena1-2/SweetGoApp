@@ -30,13 +30,8 @@ function RecenziiCofetarie() {
         fetchRecenzii();
     }, []);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
-
     const formatDate = (dateStr) => {
-        return new Date(dateStr + 'Z').toLocaleDateString('ro-RO', {
+        return new Date(dateStr).toLocaleDateString('ro-RO', {
             day: '2-digit', month: 'long', year: 'numeric'
         });
     };
@@ -57,7 +52,6 @@ function RecenziiCofetarie() {
                 <h2>Recenziile mele</h2>
                 {eroare && <div className="eroare">{eroare}</div>}
 
-                {/* Card statistici */}
                 <div className="db-stats-grid" style={{ marginBottom: '2rem' }}>
                     <div className="db-stat-card" style={{ borderLeft: '4px solid #c97c2e' }}>
                         <div className="db-stat-icon"><Star size={32} /></div>
@@ -75,17 +69,16 @@ function RecenziiCofetarie() {
                     </div>
                 </div>
 
-                {/* Lista recenzii */}
                 {recenzii.length === 0 ? (
                     <p className="gol">Nu ai primit încă nicio recenzie.</p>
                 ) : (
                     <div className="ic-lista">
                         {recenzii.map(recenzie => (
-                            <div key={recenzie.id} className="ic-comanda-card">
+                            <div key={recenzie._id} className="ic-comanda-card">
                                 <div className="ic-comanda-header" style={{ cursor: 'default' }}>
                                     <div className="ic-comanda-info">
-                                        <h4><User size={16} /> {recenzie.numeClient}</h4>
-                                        <p className="ic-data"><Calendar size={14} /> {formatDate(recenzie.creat_la)}</p>
+                                        <h4><User size={16} /> {recenzie.client_id?.nume}</h4>
+                                        <p className="ic-data"><Calendar size={14} /> {formatDate(recenzie.createdAt)}</p>
                                     </div>
                                     <div className="ic-comanda-dreapta">
                                         <div className="rating" style={{ gap: '4px' }}>

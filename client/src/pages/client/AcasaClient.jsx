@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
 import { Cake, ShoppingCart, MapPin, Star, MessageSquare, X, Calendar } from 'lucide-react'
-import NotificationBell from '../../components/NotificationBell';
 import NavbarClient from '../../components/NavbarClient';
 
 function AcasaClient(){
@@ -37,10 +36,10 @@ function AcasaClient(){
     const deschideRecenzii = async (e, cofetarie) => {
         e.stopPropagation();
         setLoadingRecenzii(true);
-        setModalRecenzii({ id: cofetarie.id, nume: cofetarie.numeCofetarie, lista: [] });
+        setModalRecenzii({ _id: cofetarie._id, nume: cofetarie.numeCofetarie, lista: [] });
         
         try {
-            const raspuns = await api.get(`/cofetarii/${cofetarie.id}/toate-recenziile`);
+            const raspuns = await api.get(`/cofetarii/${cofetarie._id}/toate-recenziile`);
             setModalRecenzii(prev => ({ ...prev, lista: raspuns.data }));
         } catch (err) {
             console.error("Eroare la incarcarea recenziilor");
@@ -48,11 +47,6 @@ function AcasaClient(){
             setLoadingRecenzii(false);
         }
     };
-
-    const handleLogout = () => {
-        logout()
-        navigate('/login')
-    }
 
     const renderStele = (rating, size = 14) => {
         const stele = rating ? Math.round(rating) : 0
@@ -84,10 +78,10 @@ function AcasaClient(){
                 ) : cofetariiFiltrate.length > 0 ? (
                     <div className="cofetarii-grid">
                         {cofetariiFiltrate.map(cofetarie => (
-                            <div key={cofetarie.id} className="cofetarie-card" onClick={() => navigate(`/cofetarie/${cofetarie.id}`)}>
+                            <div key={cofetarie._id} className="cofetarie-card" onClick={() => navigate(`/cofetarie/${cofetarie._id}`)}>
                                 <div className="cofetarie-card-imagine">
                                     {cofetarie.imagine_coperta ? (
-                                        <img src={`https://sweetgoapp.onrender.com//${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
+                                        <img src={`https://sweetgoapp.onrender.com/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
                                     ) : (
                                         <Cake size={48} color="#c97c2e" strokeWidth={1.5} />
                                     )}
@@ -135,14 +129,14 @@ function AcasaClient(){
                                 <p className="text-gol">Nu există încă recenzii scrise.</p>
                             ) : (
                                 modalRecenzii.lista.map(r => (
-                                    <div key={r.id} className="recenzie-item">
+                                    <div key={r._id} className="recenzie-item">
                                         <div className="recenzie-header">
-                                            <strong className="recenzie-autor">{r.numeClient}</strong>
+                                            <strong className="recenzie-autor">{r.client_id?.nume || 'Anonim'}</strong>
                                             <div className="recenzie-stele">{renderStele(r.rating, 12)}</div>
                                         </div>
                                         <p className="recenzie-comentariu">"{r.comentariu || 'Fără comentariu'}"</p>
                                         <small className="recenzie-data">
-                                            <Calendar size={12} /> {new Date(r.creat_la + 'Z').toLocaleDateString('ro-RO')}
+                                            <Calendar size={12} /> {new Date(r.createdAt).toLocaleDateString('ro-RO')}
                                         </small>
                                     </div>
                                 ))

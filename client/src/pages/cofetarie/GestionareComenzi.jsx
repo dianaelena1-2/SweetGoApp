@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, User, Calendar, MapPin, Phone, Palette, StickyNote, Check, ChefHat, Bike, CheckCircle, X } from 'lucide-react'
+import { Cake, User, Calendar, MapPin, Phone } from 'lucide-react'
 import api from '../../services/api'
 import NavbarCofetarie from '../../components/NavbarCofetarie';
 
@@ -52,6 +52,7 @@ function GestionareComenzi() {
             setFiltruStatus('toate')
         }
     }, [location.search])
+
     useEffect(() => {
         const params = new URLSearchParams()
         if (filtruStatus !== 'toate') {
@@ -74,11 +75,6 @@ function GestionareComenzi() {
         } finally {
             setLoading(false)
         }
-    }
-
-    const handleLogout = () => {
-        logout()
-        navigate('/login')
     }
 
     const afiseazaSucces = (mesaj) => {
@@ -112,7 +108,7 @@ function GestionareComenzi() {
     }
 
     const formatData = (data) => {
-        return new Date(data + 'Z').toLocaleDateString('ro-RO', {
+        return new Date(data).toLocaleDateString('ro-RO', {
             day: '2-digit', month: 'long', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
         })
@@ -123,7 +119,7 @@ function GestionareComenzi() {
         : comenzi.filter(c => c.status === filtruStatus)
 
     const esteComandaCadou = (comanda) => {
-        return comanda.este_cadou === true || comanda.este_cadou === 1 || comanda.este_cadou === '1' || comanda.este_cadou === 'true'
+        return comanda.este_cadou === true || comanda.este_cadou === 'true'
     }
 
     return (
@@ -136,7 +132,6 @@ function GestionareComenzi() {
                 {eroare && <div className="eroare">{eroare}</div>}
                 {succes && <div className="succes">{succes}</div>}
 
-                {/* FILTRE STATUS */}
                 <div className="ic-filtre">
                     {STATUSURI.map(s => (
                         <button
@@ -156,12 +151,11 @@ function GestionareComenzi() {
                 ) : (
                     <div className="ic-lista">
                         {comenziFiltrate.map(comanda => (
-                            <div key={comanda.id} className="ic-comanda-card">
-                                {/* HEADER COMANDA */}
-                                <div className="ic-comanda-header" onClick={() => toggleExpandare(comanda.id)}>
+                            <div key={comanda._id} className="ic-comanda-card">
+                                <div className="ic-comanda-header" onClick={() => toggleExpandare(comanda._id)}>
                                     <div className="ic-comanda-info">
-                                        <h4><User size={18} color="#c97c2e" /> {comanda.numeClient}</h4>
-                                        <p className="ic-data"><Calendar size={14} /> {formatData(comanda.creat_la)}</p>
+                                        <h4><User size={18} color="#c97c2e" /> {comanda.client_id?.nume}</h4>
+                                        <p className="ic-data"><Calendar size={14} /> {formatData(comanda.createdAt)}</p>
                                         <p className="ic-adresa"><MapPin size={14} /> {comanda.adresa_livrare}</p>
                                         <p className="ic-adresa"><Phone size={14} /> {comanda.telefon}</p>
                                         {comanda.tip_transport && (
@@ -187,15 +181,13 @@ function GestionareComenzi() {
                                         </span>
                                         <p className="ic-total">{comanda.total.toFixed(2)} lei</p>
                                         <span className="ic-expand">
-                                            {comenziExpandate[comanda.id] ? '▲' : '▼'}
+                                            {comenziExpandate[comanda._id] ? '▲' : '▼'}
                                         </span>
                                     </div>
                                 </div>
 
-                                {/* DETALII - vizibile cand e expandat */}
-                                {comenziExpandate[comanda.id] && (
+                                {comenziExpandate[comanda._id] && (
                                     <div className="ic-produse">
-                                        {/* PRODUSE */}
                                         {esteComandaCadou(comanda) ? (
                                             <div className="alerta-cadou">
                                                 <h5 className="alerta-cadou-titlu">
@@ -215,46 +207,45 @@ function GestionareComenzi() {
                                             </div>
                                         ) : null}
                                         <h5>Produse comandate:</h5>
-                                        {comanda.produse.map((produs, index) => (
+                                        {/* Am schimbat "produse" în "detalii" conform MongoDB */}
+                                        {comanda.detalii.map((detaliu, index) => (
                                             <div key={index} className="ic-produs-rand">
                                                 <div className="ic-produs-imagine">
-                                                    {produs.imagine ? (
-                                                        <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} />
+                                                    {detaliu.produs_id?.imagine ? (
+                                                        <img src={`https://sweetgoapp.onrender.com/${detaliu.produs_id.imagine}`} alt={detaliu.numeProdus} />
                                                     ) : <Cake size={32} color="#c97c2e" strokeWidth={1.5} />}
                                                 </div>
                                                 <div className="ic-produs-info">
-                                                    <span className="ic-produs-nume">{produs.numeProdus}</span>
-                                                    <span className="ic-produs-cantitate">x{produs.cantitate}</span>
-                                                    <span className="ic-produs-pret">{(produs.pret_unitar * produs.cantitate).toFixed(2)} lei</span>
+                                                    <span className="ic-produs-nume">{detaliu.numeProdus}</span>
+                                                    <span className="ic-produs-cantitate">x{detaliu.cantitate}</span>
+                                                    <span className="ic-produs-pret">{(detaliu.pret_unitar * detaliu.cantitate).toFixed(2)} lei</span>
                                                 </div>
-                                                {(produs.optiune_decor || produs.observatii) && (
+                                                {(detaliu.optiune_decor || detaliu.observatii) && (
                                                     <div className="ic-produs-detalii">
-                                                        {produs.optiune_decor && <p>🎨 Decor: {produs.optiune_decor}</p>}
-                                                        {produs.observatii && <p>📝 {produs.observatii}</p>}
+                                                        {detaliu.optiune_decor && <p>🎨 Decor: {detaliu.optiune_decor}</p>}
+                                                        {detaliu.observatii && <p>📝 {detaliu.observatii}</p>}
                                                     </div>
                                                 )}
                                             </div>
                                         ))}
 
-                                        {/* OBSERVATII GENERALE */}
                                         {comanda.observatii && (
                                             <div className="ic-observatii-generale">
                                                 <p>📝 Observații generale: {comanda.observatii}</p>
                                             </div>
                                         )}
 
-                                        {/* BUTOANE STATUS */}
                                         {comanda.status !== 'livrata' && comanda.status !== 'anulata' && (
                                             <div className="gc-butoane-status">
                                                 <button
                                                     className="btn-primar"
-                                                    onClick={() => handleSchimbaStatus(comanda.id, statusUrmator[comanda.status])}
+                                                    onClick={() => handleSchimbaStatus(comanda._id, statusUrmator[comanda.status])}
                                                 >
                                                     {statusUrmatorLabel[comanda.status]}
                                                 </button>
                                                 <button
                                                     className="btn-stergere"
-                                                    onClick={() => handleAnuleaza(comanda.id)}
+                                                    onClick={() => handleAnuleaza(comanda._id)}
                                                 >
                                                     ✕ Anulează
                                                 </button>

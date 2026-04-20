@@ -16,7 +16,6 @@ function CosCumparaturi() {
     const navigate = useNavigate()
     const isFirstRender = useRef(true)
 
-    // Inițializare cos din localStorage
     const [cos, setCos] = useState(() => {
         const cosSalvat = localStorage.getItem('cos')
         return cosSalvat ? JSON.parse(cosSalvat) : { cofetarie_id: null, produse: [] }
@@ -38,7 +37,6 @@ function CosCumparaturi() {
     const [simularePlata, setSimularePlata] = useState({ activa: false, status: 'procesare' })
     const [costLivrare, setCostLivrare] = useState(0);
 
-    // Încarcă detaliile cofetăriei dacă există produse în coș
     useEffect(() => {
         if (cos.cofetarie_id) {
             fetchDetalii(cos.cofetarie_id)
@@ -47,7 +45,6 @@ function CosCumparaturi() {
         }
     }, [cos.cofetarie_id])
 
-    // Încarcă adresa și telefonul din profil
     useEffect(() => {
         const fetchDateProfil = async () => {
             try {
@@ -61,7 +58,6 @@ function CosCumparaturi() {
         fetchDateProfil()
     }, [])
 
-    // Salvează cos în localStorage și pe server (după prima randare)
     useEffect(() => {
         localStorage.setItem('cos', JSON.stringify(cos))
         if (!isFirstRender.current) {
@@ -72,7 +68,6 @@ function CosCumparaturi() {
         }
     }, [cos, salveazaCosPeServer])
 
-    // Ascultă evenimentul de actualizare a coșului (din context sau alte tab-uri)
     useEffect(() => {
         const handleCosUpdated = () => {
             const cosSalvat = localStorage.getItem('cos')
@@ -102,7 +97,7 @@ function CosCumparaturi() {
     const obtineMetodaRecomandata = () => {
         if (cos.produse.length === 0 || produseProduse.length === 0) return 'masina'
         const detaliiProduseCos = cos.produse.map(itemCos => 
-            produseProduse.find(p => p.id === itemCos.id)
+            produseProduse.find(p => p._id === (itemCos._id || itemCos.id))
         ).filter(Boolean)
         if (detaliiProduseCos.some(p => p.transport_recomandat === 'frigorific')) return 'frigorific'
         if (detaliiProduseCos.some(p => p.transport_recomandat === 'masina')) return 'masina'
@@ -121,7 +116,7 @@ function CosCumparaturi() {
 
     const scadeInCos = (produsId) => {
         const produseActualizate = [...cos.produse]
-        const index = produseActualizate.findIndex(p => p.id === produsId)
+        const index = produseActualizate.findIndex(p => (p._id || p.id) === produsId)
         if (index >= 0) {
             if (produseActualizate[index].cantitate === 1) {
                 produseActualizate.splice(index, 1)
@@ -137,7 +132,7 @@ function CosCumparaturi() {
 
     const cresteInCos = (produsId, stocRamas) => {
         const produseActualizate = [...cos.produse]
-        const index = produseActualizate.findIndex(p => p.id === produsId)
+        const index = produseActualizate.findIndex(p => (p._id || p.id) === produsId)
         if (index >= 0 && produseActualizate[index].cantitate < stocRamas) {
             produseActualizate[index].cantitate += 1
         }
@@ -145,7 +140,7 @@ function CosCumparaturi() {
     }
 
     const stergeProdusDinCos = (produsId) => {
-        const produseActualizate = cos.produse.filter(p => p.id !== produsId)
+        const produseActualizate = cos.produse.filter(p => (p._id || p.id) !== produsId)
         salveazaCos({
             cofetarie_id: produseActualizate.length > 0 ? cos.cofetarie_id : null,
             produse: produseActualizate
@@ -158,7 +153,7 @@ function CosCumparaturi() {
     }
 
     const stocInsuficient = (produs) => {
-        const stoc = produseProduse.find(p => p.id === produs.id)?.stoc || 0
+        const stoc = produseProduse.find(p => p._id === (produs._id || produs.id))?.stoc || 0
         return produs.cantitate > stoc
     }
 
@@ -175,7 +170,7 @@ function CosCumparaturi() {
     }, [tipTransport])
 
     const totalProduse = cos.produse.reduce((acc, p) => {
-        const produsDB = produseProduse.find(db => db.id === p.id)
+        const produsDB = produseProduse.find(db => db._id === (p._id || p.id))
         return acc + (produsDB?.pret || p.pret) * p.cantitate
     }, 0)
     const total = totalProduse + costLivrare
@@ -196,7 +191,7 @@ function CosCumparaturi() {
                 status_plata: statusPlata,
                 cost_livrare: costLivrare,
                 produse: cos.produse.map(p => ({
-                    id: p.id,
+                    id: p._id || p.id,
                     cantitate: p.cantitate,
                     optiune_decor: p.optiune_decor || null,
                     observatii: p.observatii || null
@@ -236,21 +231,13 @@ function CosCumparaturi() {
         }
     }
 
-    const handleLogout = () => {
-        logout()
-        navigate('/login')
-    }
-
     if (loading) return <p className="loading">Se încarcă...</p>
 
     return (
         <div className="acasa-container">
             <NavbarClient 
-                utilizator={utilizator}
-                logout={logout}
-                searchValue=""
-                onSearchChange={() => {}}
-                showSearch={false}
+                utilizator={utilizator} logout={logout}
+                searchValue="" onSearchChange={() => {}} showSearch={false}
             />
             <div className="acasa-continut">
                 <button className="btn-inapoi" onClick={() => navigate(-1)}>← Înapoi</button>
@@ -275,11 +262,12 @@ function CosCumparaturi() {
                                 </button>
                             </div>
                             {cos.produse.map(produs => {
-                                const produsDB = produseProduse.find(p => p.id === produs.id)
+                                const PID = produs._id || produs.id
+                                const produsDB = produseProduse.find(p => p._id === PID)
                                 const stocRamas = produsDB?.stoc || 0
                                 const depasesteStoc = produs.cantitate > stocRamas
                                 return (
-                                    <div key={produs.id} className={`cos-produs-card ${depasesteStoc ? 'cos-produs-problema' : ''}`}>
+                                    <div key={PID} className={`cos-produs-card ${depasesteStoc ? 'cos-produs-problema' : ''}`}>
                                         <div className="cos-produs-imagine">
                                             {produsDB?.imagine ? (
                                                 <img src={`https://sweetgoapp.onrender.com/${produsDB.imagine}`} alt={produs.numeProdus} />
@@ -294,13 +282,13 @@ function CosCumparaturi() {
                                         </div>
                                         <div className="cos-produs-cantitate">
                                             <div className="cantitate-control">
-                                                <button onClick={() => scadeInCos(produs.id)}>−</button>
+                                                <button onClick={() => scadeInCos(PID)}>−</button>
                                                 <span>{produs.cantitate}</span>
-                                                <button onClick={() => cresteInCos(produs.id, stocRamas)} disabled={produs.cantitate >= stocRamas}>+</button>
+                                                <button onClick={() => cresteInCos(PID, stocRamas)} disabled={produs.cantitate >= stocRamas}>+</button>
                                             </div>
                                             <p className="cos-subtotal">{((produsDB?.pret || produs.pret) * produs.cantitate).toFixed(2)} lei</p>
                                         </div>
-                                        <button className="cos-sterge-produs" onClick={() => stergeProdusDinCos(produs.id)}>✕</button>
+                                        <button className="cos-sterge-produs" onClick={() => stergeProdusDinCos(PID)}>✕</button>
                                     </div>
                                 )
                             })}

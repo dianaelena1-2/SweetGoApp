@@ -54,7 +54,6 @@ function DetaliiCofetarie() {
         fetchDetalii()
     }, [id])
 
-    // Salvează coșul în localStorage și pe server (după prima randare)
     useEffect(() => {
         localStorage.setItem('cos', JSON.stringify(cos))
         if (!isFirstRender.current) {
@@ -65,7 +64,6 @@ function DetaliiCofetarie() {
         }
     }, [cos, salveazaCosPeServer])
 
-    // Ascultă evenimentul de actualizare a coșului (din context sau alte tab-uri)
     useEffect(() => {
         const handleCosUpdated = () => {
             const cosSalvat = localStorage.getItem('cos')
@@ -84,7 +82,7 @@ function DetaliiCofetarie() {
         const checkFavorite = async () => {
             try {
                 const res = await api.get('/client/favorite');
-                setEsteFavorita(res.data.some(fav => fav.id === parseInt(id)));
+                setEsteFavorita(res.data.some(fav => fav._id === id));
             } catch (err) {
                 console.error(err);
             }
@@ -111,13 +109,10 @@ function DetaliiCofetarie() {
 
     const produseFiltrate = produse.filter(produs => {
         const term = cautare.toLowerCase().trim();
-
         const numeMatch = produs.numeProdus.toLowerCase().includes(term);
         const descriereMatch = produs.descriere?.toLowerCase().includes(term);
         const meciuriCautare = numeMatch || descriereMatch;
-
         const meciuriCategorie = categorieActiva === 'Toate' || produs.categorie === categorieActiva;
-
         return meciuriCautare && meciuriCategorie;
     });
 
@@ -130,13 +125,9 @@ function DetaliiCofetarie() {
         setOptiuniDecorModal([])
         setIngredienteExtinse(false)
 
-        if (produs.categorie === 'Torturi') {
-            try {
-                const raspuns = await api.get(`/optiuni-decor/produs/${produs.id}`)
-                setOptiuniDecorModal(raspuns.data)
-            } catch (err) {
-                console.error('Eroare la incarcarea optiunilor', err)
-            }
+        if (produs.categorie === 'Torturi' && produs.optiuni_decor) {
+            // Nu mai facem API call, luam direct din obiect
+            setOptiuniDecorModal(produs.optiuni_decor.map((opt, idx) => ({ id: idx, denumire: opt })))
         }
 
         setModalDeschis(true)
@@ -150,50 +141,29 @@ function DetaliiCofetarie() {
 
     const confirmaAdaugareInCos = () => {
         const produs = produsMmodal
-
-        const optiuneFinala = optiuneSelectata === 'Alta'
-            ? (optiuneCustom.trim() || null)
-            : (optiuneSelectata || null)
-
-        const pretFinal = produs.este_la_oferta === 1 ? produs.pret * 0.6 : produs.pret;
+        const optiuneFinala = optiuneSelectata === 'Alta' ? (optiuneCustom.trim() || null) : (optiuneSelectata || null)
+        const pretFinal = produs.este_la_oferta ? produs.pret * 0.6 : produs.pret;
 
         if (cos.cofetarie_id && cos.cofetarie_id !== id) {
-            const confirmare = window.confirm(
-                'Ai produse din altă cofetărie în coș. Vrei să golești coșul și să adaugi din această cofetărie?'
-            )
-            if (!confirmare) {
-                inchideModal()
-                return
-            }
+            const confirmare = window.confirm('Ai produse din altă cofetărie în coș. Vrei să golești coșul și să adaugi din această cofetărie?')
+            if (!confirmare) { inchideModal(); return }
             setCos({
                 cofetarie_id: id,
-                produse: [{
-                    ...produs,
-                    pret: pretFinal,
-                    cantitate: cantitateModal,
-                    optiune_decor: optiuneFinala,
-                    observatii: observatiiModal || null
-                }]
+                produse: [{ ...produs, _id: produs._id, pret: pretFinal, cantitate: cantitateModal, optiune_decor: optiuneFinala, observatii: observatiiModal || null }]
             })
             inchideModal()
             return
         }
 
         const produseActualizate = [...cos.produse]
-        const indexExistent = produseActualizate.findIndex(p => p.id === produs.id)
+        const indexExistent = produseActualizate.findIndex(p => p._id === produs._id)
 
         if (indexExistent >= 0) {
             produseActualizate[indexExistent].cantitate += cantitateModal
             produseActualizate[indexExistent].optiune_decor = optiuneFinala
             produseActualizate[indexExistent].observatii = observatiiModal || null
         } else {
-            produseActualizate.push({
-                ...produs,
-                pret: pretFinal,
-                cantitate: cantitateModal,
-                optiune_decor: optiuneFinala,
-                observatii: observatiiModal || null
-            })
+            produseActualizate.push({ ...produs, _id: produs._id, pret: pretFinal, cantitate: cantitateModal, optiune_decor: optiuneFinala, observatii: observatiiModal || null })
         }
 
         setCos({ cofetarie_id: id, produse: produseActualizate })
@@ -202,7 +172,7 @@ function DetaliiCofetarie() {
 
     const scadeInCos = (produs) => {
         const produseActualizate = [...cos.produse]
-        const indexExistent = produseActualizate.findIndex(p => p.id === produs.id)
+        const indexExistent = produseActualizate.findIndex(p => p._id === produs._id)
 
         if (indexExistent >= 0) {
             if (produseActualizate[indexExistent].cantitate === 1) {
@@ -219,17 +189,17 @@ function DetaliiCofetarie() {
     }
 
     const cantitateDinCos = (produsId) => {
-        const produs = cos.produse.find(p => p.id === produsId)
+        const produs = cos.produse.find(p => p._id === produsId || p.id === produsId)
         return produs ? produs.cantitate : 0
     }
 
     const deschideRecenzii = async (e, cofetarie) => {
         e.stopPropagation();
         setLoadingRecenzii(true);
-        setModalRecenzii({ id: cofetarie.id, nume: cofetarie.numeCofetarie, lista: [] });
+        setModalRecenzii({ _id: cofetarie._id, nume: cofetarie.numeCofetarie, lista: [] });
         
         try {
-            const raspuns = await api.get(`/cofetarii/${cofetarie.id}/toate-recenziile`);
+            const raspuns = await api.get(`/cofetarii/${cofetarie._id}/toate-recenziile`);
             setModalRecenzii(prev => ({ ...prev, lista: raspuns.data }));
         } catch (err) {
             console.error("Eroare la incarcarea recenziilor");
@@ -238,24 +208,12 @@ function DetaliiCofetarie() {
         }
     };
 
-    const handleLogout = () => {
-        logout()
-        navigate('/login')
-    }
-
     const renderStele = (rating, size = 14) => {
         const stele = rating ? Math.round(rating) : 0
         return [...Array(5)].map((_, i) => (
-            <Star 
-                key={i} 
-                size={size} 
-                fill={i < stele ? "#c97c2e" : "transparent"} 
-                color={i < stele ? "#c97c2e" : "#ccc"} 
-            />
+            <Star key={i} size={size} fill={i < stele ? "#c97c2e" : "transparent"} color={i < stele ? "#c97c2e" : "#ccc"} />
         ))
     }
-
-    const totalCos = cos.produse.reduce((acc, p) => acc + p.cantitate, 0)
 
     if (loading) return <p className="loading">Se încarcă...</p>
     if (!cofetarie) return <p className="gol">Cofetăria nu a fost găsită.</p>
@@ -263,12 +221,9 @@ function DetaliiCofetarie() {
     return (
         <div className="acasa-container">
            <NavbarClient 
-            utilizator={utilizator}
-            logout={logout}
-            searchValue={cautare}
-            onSearchChange={setCautare}
-            showSearch={true}
-            searchPlaceholder="Caută produs..."
+            utilizator={utilizator} logout={logout}
+            searchValue={cautare} onSearchChange={setCautare}
+            showSearch={true} searchPlaceholder="Caută produs..."
         />
 
             <div className="acasa-continut">
@@ -278,9 +233,7 @@ function DetaliiCofetarie() {
                     <div className="cofetarie-detalii-coperta">
                         {cofetarie.imagine_coperta ? (
                             <img src={`https://sweetgoapp.onrender.com/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
-                        ) : (
-                            <Store size={64} color="#c97c2e" strokeWidth={1.5} />
-                        )}
+                        ) : <Store size={64} color="#c97c2e" strokeWidth={1.5} />}
                     </div>
                     <div className="cofetarie-detalii-info">
                         <h2>{cofetarie.numeCofetarie}</h2>
@@ -288,17 +241,13 @@ function DetaliiCofetarie() {
                         <p><Phone size={16} /> {cofetarie.telefon}</p>
                         <div className="rating">
                             <span className="stele">{renderStele(cofetarie.rating_mediu)}</span>
-                            <span className="numar-recenzii numar-recenzii-link" 
-                                onClick={(e) => deschideRecenzii(e, cofetarie)}
-                                >
+                            <span className="numar-recenzii numar-recenzii-link" onClick={(e) => deschideRecenzii(e, cofetarie)}>
                                 {cofetarie.numar_recenzii > 0 ? `(${cofetarie.numar_recenzii} recenzii)` : '(fără recenzii)'}
                             </span>
                         </div>
                         {utilizator?.rol === 'client' && (
                             <button 
-                                onClick={toggleFavorite} 
-                                disabled={loadingFav} 
-                                className="btn-secundar" 
+                                onClick={toggleFavorite} disabled={loadingFav} className="btn-secundar" 
                                 style={{ marginTop: '12px', width: 'auto', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                             >
                                 {esteFavorita ? '❤️ Favorită' : '🤍 Adaugă la favorite'}
@@ -309,22 +258,14 @@ function DetaliiCofetarie() {
                 </div>
 
                 <div className="detalii-layout-container">
-                    
                     <aside className="sidebar-filtrare">
                         <div className="sidebar-sectiune">
-                            <h3 className="sidebar-titlu-filtru">
-                                Filtrează <Filter size={20} color="#c97c2e" strokeWidth={2.5} />
-                            </h3>
-                            
+                            <h3 className="sidebar-titlu-filtru">Filtrează <Filter size={20} color="#c97c2e" strokeWidth={2.5} /></h3>
                             <div className="filtru-grup">
                                 <h4>Categorii</h4>
                                 <div className="categorii-lista-verticala">
                                     {categoriiUnice.map(cat => (
-                                        <button
-                                            key={cat}
-                                            onClick={() => setCategorieActiva(cat)}
-                                            className={`filtru-item ${categorieActiva === cat ? 'activ' : ''}`}
-                                        >
+                                        <button key={cat} onClick={() => setCategorieActiva(cat)} className={`filtru-item ${categorieActiva === cat ? 'activ' : ''}`}>
                                             <span className="filtru-text">{cat}</span>
                                             {categorieActiva === cat && <Check size={14} />}
                                         </button>
@@ -336,9 +277,7 @@ function DetaliiCofetarie() {
 
                     <main className="zona-produse-main">
                         <div className="produse-header-flex">
-                            <h3 className="sectiune-titlu fara-margine">
-                                {categorieActiva === 'Toate' ? 'Toate produsele' : categorieActiva}
-                            </h3>
+                            <h3 className="sectiune-titlu fara-margine">{categorieActiva === 'Toate' ? 'Toate produsele' : categorieActiva}</h3>
                             <span className="numar-rezultate">{produseFiltrate.length} produse</span>
                         </div>
                         
@@ -351,7 +290,7 @@ function DetaliiCofetarie() {
                         ) : (
                             <div className="produse-grid">
                                 {produseFiltrate.map(produs => (
-                                    <div key={produs.id} className={`produs-card ${!produs.disponibil || produs.stoc === 0 ? 'produs-indisponibil' : ''}`}>
+                                    <div key={produs._id} className={`produs-card ${!produs.disponibil || produs.stoc === 0 ? 'produs-indisponibil' : ''}`}>
                                         <div className="produs-card-imagine">
                                             {produs.imagine ? (
                                                 <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} />
@@ -364,16 +303,16 @@ function DetaliiCofetarie() {
                                             {produs.ingrediente && produs.ingrediente.length > 0 && (
                                                 <div className="produs-ingrediente-preview">
                                                     <span className="ingrediente-label">Ingrediente: </span>
-                                                    {produs.ingrediente.slice(0, 3).map(i => i.nume).join(', ')}{produs.ingrediente.length > 3 && '...'}
+                                                    {produs.ingrediente.slice(0, 3).join(', ')}{produs.ingrediente.length > 3 && '...'}
                                                 </div>
                                             )}
-                                            {produs.este_la_oferta === 1 && (
+                                            {produs.este_la_oferta && (
                                                 <div style={{marginTop: '8px', marginBottom: '8px'}}>
                                                     <span className="badge-oferta">🔥 SALVEAZĂ-MĂ! -40%</span>
                                                 </div>
                                             )}
                                             <div className="produs-footer">
-                                                {produs.este_la_oferta === 1 ? (
+                                                {produs.este_la_oferta ? (
                                                     <div className="pret-container-oferta">
                                                         <span className="pret-vechi">{produs.pret} lei</span>
                                                         <span className="pret-nou">{(produs.pret * 0.6).toFixed(2)} lei</span>
@@ -384,13 +323,13 @@ function DetaliiCofetarie() {
 
                                                 {!produs.disponibil || produs.stoc === 0 ? (
                                                     <span className="badge-indisponibil">Indisponibil</span>
-                                                ) : cantitateDinCos(produs.id) === 0 ? (
+                                                ) : cantitateDinCos(produs._id) === 0 ? (
                                                     <button className="btn-adauga-cos" onClick={() => deschideModal(produs)}>+ Adaugă</button>
                                                 ) : (
                                                     <div className="cantitate-control">
                                                         <button onClick={() => scadeInCos(produs)}>−</button>
-                                                        <span>{cantitateDinCos(produs.id)}</span>
-                                                        <button onClick={() => deschideModal(produs)} disabled={cantitateDinCos(produs.id) >= produs.stoc}>+</button>
+                                                        <span>{cantitateDinCos(produs._id)}</span>
+                                                        <button onClick={() => deschideModal(produs)} disabled={cantitateDinCos(produs._id) >= produs.stoc}>+</button>
                                                     </div>
                                                 )}
                                             </div>
@@ -420,20 +359,14 @@ function DetaliiCofetarie() {
 
                         {produsMmodal.ingrediente && produsMmodal.ingrediente.length > 0 && (
                             <div className="modal-sectiune-ingrediente">
-                                <p className="modal-ingrediente-titlu">
-                                    🥣 Ingrediente:
-                                </p>
+                                <p className="modal-ingrediente-titlu">🥣 Ingrediente:</p>
                                 <p className="modal-ingrediente-text">
                                     {ingredienteExtinse 
-                                        ? produsMmodal.ingrediente.map(i => i.nume).join(', ')
-                                        : produsMmodal.ingrediente.slice(0, 5).map(i => i.nume).join(', ') + (produsMmodal.ingrediente.length > 5 ? '...' : '')
+                                        ? produsMmodal.ingrediente.join(', ')
+                                        : produsMmodal.ingrediente.slice(0, 5).join(', ') + (produsMmodal.ingrediente.length > 5 ? '...' : '')
                                     }
-                                    
                                     {produsMmodal.ingrediente.length > 5 && (
-                                        <button 
-                                            onClick={() => setIngredienteExtinse(!ingredienteExtinse)}
-                                            className="btn-vezi-mai-mult"
-                                        >
+                                        <button onClick={() => setIngredienteExtinse(!ingredienteExtinse)} className="btn-vezi-mai-mult">
                                             {ingredienteExtinse ? <><ChevronUp size={14}/> vezi mai puțin</> : <><ChevronDown size={14}/> vezi tot</>}
                                         </button>
                                     )}
@@ -441,7 +374,7 @@ function DetaliiCofetarie() {
                             </div>
                         )}
 
-                        {produsMmodal.este_la_oferta === 1 ? (
+                        {produsMmodal.este_la_oferta ? (
                             <div style={{ marginBottom: '15px' }}>
                                 <span className="badge-oferta" style={{marginBottom: '5px'}}>🔥 SALVEAZĂ-MĂ! -40%</span>
                                 <div className="pret-container-oferta">
@@ -459,11 +392,11 @@ function DetaliiCofetarie() {
                                 <button onClick={() => setCantitateModal(c => Math.max(1, c - 1))}>−</button>
                                 <span>{cantitateModal}</span>
                                 <button
-                                    onClick={() => setCantitateModal(c => Math.min(produsMmodal.stoc - cantitateDinCos(produsMmodal.id), c + 1))}
-                                    disabled={cantitateModal >= produsMmodal.stoc - cantitateDinCos(produsMmodal.id)}
+                                    onClick={() => setCantitateModal(c => Math.min(produsMmodal.stoc - cantitateDinCos(produsMmodal._id), c + 1))}
+                                    disabled={cantitateModal >= produsMmodal.stoc - cantitateDinCos(produsMmodal._id)}
                                 >+</button>
                             </div>
-                            <p className="modal-stoc-info">Stoc disponibil: {produsMmodal.stoc - cantitateDinCos(produsMmodal.id)} buc</p>
+                            <p className="modal-stoc-info">Stoc disponibil: {produsMmodal.stoc - cantitateDinCos(produsMmodal._id)} buc</p>
                         </div>
 
                         {produsMmodal.categorie === 'Torturi' && optiuniDecorModal.length > 0 && (
@@ -491,11 +424,8 @@ function DetaliiCofetarie() {
                                 </div>
                                 {optiuneSelectata === 'Alta' && (
                                     <input
-                                        type="text"
-                                        className="modal-input-alta"
-                                        placeholder="Descrie opțiunea dorită..."
-                                        value={optiuneCustom}
-                                        onChange={(e) => setOptiuneCustom(e.target.value)}
+                                        type="text" className="modal-input-alta" placeholder="Descrie opțiunea dorită..."
+                                        value={optiuneCustom} onChange={(e) => setOptiuneCustom(e.target.value)}
                                     />
                                 )}
                             </div>
@@ -504,20 +434,15 @@ function DetaliiCofetarie() {
                         <div className="modal-sectiune">
                             <label className="modal-label">📝 Observații (opțional)</label>
                             <textarea
-                                className="modal-textarea"
-                                placeholder="ex: Scrie pe tort 'La mulți ani Ana!', fără zahăr..."
-                                value={observatiiModal}
-                                onChange={(e) => setObservatiiModal(e.target.value)}
-                                rows={3}
+                                className="modal-textarea" placeholder="ex: Scrie pe tort 'La mulți ani Ana!', fără zahăr..."
+                                value={observatiiModal} onChange={(e) => setObservatiiModal(e.target.value)} rows={3}
                             />
                         </div>
 
                         <div className="modal-total">
                             <span>Total</span>
                             <span className="modal-total-pret">
-                                {(
-                                    (produsMmodal.este_la_oferta === 1 ? produsMmodal.pret * 0.6 : produsMmodal.pret) * cantitateModal
-                                ).toFixed(2)} lei
+                                {((produsMmodal.este_la_oferta ? produsMmodal.pret * 0.6 : produsMmodal.pret) * cantitateModal).toFixed(2)} lei
                             </span>
                         </div>
 
@@ -544,14 +469,14 @@ function DetaliiCofetarie() {
                                 <p className="text-gol">Nu există încă recenzii scrise.</p>
                             ) : (
                                 modalRecenzii.lista.map(r => (
-                                    <div key={r.id} className="recenzie-item">
+                                    <div key={r._id} className="recenzie-item">
                                         <div className="recenzie-header">
-                                            <strong className="recenzie-autor">{r.numeClient}</strong>
+                                            <strong className="recenzie-autor">{r.client_id?.nume || 'Anonim'}</strong>
                                             <div className="recenzie-stele">{renderStele(r.rating, 12)}</div>
                                         </div>
                                         <p className="recenzie-comentariu">"{r.comentariu || 'Fără comentariu'}"</p>
                                         <small className="recenzie-data">
-                                            <Calendar size={12} /> {new Date(r.creat_la + 'Z').toLocaleDateString('ro-RO')}
+                                            <Calendar size={12} /> {new Date(r.createdAt).toLocaleDateString('ro-RO')}
                                         </small>
                                     </div>
                                 ))
@@ -560,7 +485,6 @@ function DetaliiCofetarie() {
                     </div>
                 </div>
             )}
-
         </div>
     )
 }

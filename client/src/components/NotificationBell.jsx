@@ -48,7 +48,7 @@ function NotificationBell(){
     const handleMarkAsRead = async (id) => {
         try {
             await api.put(`/client/notificari/${id}/citita`);
-            setNotificari(prev => prev.map(n => n.id === id ? { ...n, citita: 1 } : n));
+            setNotificari(prev => prev.map(n => n._id === id ? { ...n, citita: true } : n));
             setNecititeCount(prev => Math.max(0, prev - 1));
         } catch (err) {
             console.error(err);
@@ -56,13 +56,13 @@ function NotificationBell(){
     };
 
     const handleNotificationClick = (notif) => {
-        if (!notif.citita) handleMarkAsRead(notif.id);
+        if (!notif.citita) handleMarkAsRead(notif._id);
         if (notif.link) navigate(notif.link);
         setOpen(false);
     };
 
     const formatDate = (dateStr) => {
-        const date = new Date(dateStr + 'Z');
+        const date = new Date(dateStr); // MongoDB trimite deja in format valid
         const now = new Date();
         const diffMs = now - date;
         const diffMins = Math.floor(diffMs / 60000);
@@ -98,14 +98,14 @@ function NotificationBell(){
                     ) : (
                         notificari.map(notif => (
                             <div 
-                                key={notif.id} 
+                                key={notif._id} 
                                 onClick={() => handleNotificationClick(notif)}
                                 className={`notification-item ${notif.citita ? 'notification-item-read' : 'notification-item-unread'}`}
                             >
                                 <div className="notification-content">
                                     <div className="notification-message">
                                         <p>{notif.mesaj}</p>
-                                        <small className="notification-date">{formatDate(notif.data_creare)}</small>
+                                        <small className="notification-date">{formatDate(notif.createdAt)}</small>
                                     </div>
                                     {!notif.citita && (
                                         <Circle size={10} fill="#c97c2e" color="#c97c2e" className="notification-unread-dot" />

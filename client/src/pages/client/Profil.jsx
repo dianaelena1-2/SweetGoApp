@@ -18,7 +18,6 @@ function Profile(){
     const [parolaNoua, setParolaNoua] = useState('');
     const [confirmParola, setConfirmParola] = useState('');
     
-
     const [favorite, setFavorite] = useState([]);
     const [loadingFavorite, setLoadingFavorite] = useState(false);
 
@@ -188,8 +187,8 @@ function Profile(){
                         ) : (
                             <div className="favorite-lista">
                                 {favorite.map(cof => (
-                                    <div key={cof.id} className="favorite-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f5d5a8' }}>
-                                        <div onClick={() => navigate(`/cofetarie/${cof.id}`)} style={{ cursor: 'pointer', flex: 1 }}>
+                                    <div key={cof._id} className="favorite-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f5d5a8' }}>
+                                        <div onClick={() => navigate(`/cofetarie/${cof._id}`)} style={{ cursor: 'pointer', flex: 1 }}>
                                             <strong>{cof.numeCofetarie}</strong>
                                             <p className="text-muted" style={{ fontSize: '0.8rem' }}>{cof.adresa}</p>
                                             <div className="rating">
@@ -199,7 +198,7 @@ function Profile(){
                                                 <span style={{ fontSize: '0.7rem' }}>({cof.rating_mediu ? cof.rating_mediu.toFixed(1) : '0'})</span>
                                             </div>
                                         </div>
-                                        <button className="btn-stergere" onClick={() => handleToggleFavorite(cof.id, true)}>Șterge</button>
+                                        <button className="btn-stergere" onClick={() => handleToggleFavorite(cof._id, true)}>Șterge</button>
                                     </div>
                                 ))}
                             </div>

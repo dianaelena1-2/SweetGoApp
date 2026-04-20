@@ -167,7 +167,7 @@ function DashboardAdmin() {
                         ) : (
                             <div className="admin-lista">
                                 {date.cofetariiInAsteptare.map(cofetarie => (
-                                    <div key={cofetarie.id} className="admin-card">
+                                    <div key={cofetarie._id} className="admin-card">
                                         <div className="admin-card-info">
                                             <h4><Store size={18} color="#c97c2e" /> {cofetarie.numeCofetarie}</h4>
                                             <p><User size={14} /> {cofetarie.nume} — {cofetarie.email}</p>
@@ -199,13 +199,13 @@ function DashboardAdmin() {
                                         <div className="admin-card-actiuni">
                                             <button
                                                 className="btn-primar"
-                                                onClick={() => handleAproba(cofetarie.id)}
+                                                onClick={() => handleAproba(cofetarie._id)}
                                             >
                                                 <Check size={16} /> Aprobă
                                             </button>
                                             <button
                                                 className="btn-stergere"
-                                                onClick={() => handleRespinge(cofetarie.id)}
+                                                onClick={() => handleRespinge(cofetarie._id)}
                                             >
                                                 <X size={16} /> Respinge
                                             </button>
@@ -232,7 +232,7 @@ function DashboardAdmin() {
                             </thead>
                             <tbody>
                                 {utilizatori.map(u => (
-                                    <tr key={u.id}>
+                                    <tr key={u._id}>
                                         <td>{u.nume}</td>
                                         <td>{u.email}</td>
                                         <td>
@@ -240,11 +240,11 @@ function DashboardAdmin() {
                                                 {u.rol}
                                             </span>
                                         </td>
-                                        <td>{new Date(u.creat_la + 'Z').toLocaleDateString('ro-RO')}</td>
+                                        <td>{new Date(u.createdAt).toLocaleDateString('ro-RO')}</td>
                                         <td>
                                             <button 
                                                 className="btn-stergere" 
-                                                onClick={() => handleStergeUtilizator(u.id, u.nume)}
+                                                onClick={() => handleStergeUtilizator(u._id, u.nume)}
                                                 style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}
                                             >
                                                 🗑️ Șterge
