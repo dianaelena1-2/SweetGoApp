@@ -176,7 +176,7 @@ function DashboardAdmin() {
                                             <div className="admin-documente">
                                                 {cofetarie.certificat_inregistrare && (
                                                     <a
-                                                        href={`http://localhost:7000/${cofetarie.certificat_inregistrare}`}
+                                                        href={`https://sweetgoapp.onrender.com/${cofetarie.certificat_inregistrare}`}
                                                         target="_blank"
                                                         rel="noreferrer"
                                                         className="admin-doc-link"
@@ -186,7 +186,7 @@ function DashboardAdmin() {
                                                 )}
                                                 {cofetarie.certificat_sanitar && (
                                                     <a
-                                                        href={`http://localhost:7000/${cofetarie.certificat_sanitar}`}
+                                                        href={`https://sweetgoapp.onrender.com/${cofetarie.certificat_sanitar}`}
                                                         target="_blank"
                                                         rel="noreferrer"
                                                         className="admin-doc-link"

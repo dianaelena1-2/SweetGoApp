@@ -282,7 +282,7 @@ function CosCumparaturi() {
                                     <div key={produs.id} className={`cos-produs-card ${depasesteStoc ? 'cos-produs-problema' : ''}`}>
                                         <div className="cos-produs-imagine">
                                             {produsDB?.imagine ? (
-                                                <img src={`http://localhost:7000/${produsDB.imagine}`} alt={produs.numeProdus} />
+                                                <img src={`https://sweetgoapp.onrender.com/${produsDB.imagine}`} alt={produs.numeProdus} />
                                             ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                         </div>
                                         <div className="cos-produs-info">

@@ -219,7 +219,7 @@ function GestionareComenzi() {
                                             <div key={index} className="ic-produs-rand">
                                                 <div className="ic-produs-imagine">
                                                     {produs.imagine ? (
-                                                        <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
+                                                        <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} />
                                                     ) : <Cake size={32} color="#c97c2e" strokeWidth={1.5} />}
                                                 </div>
                                                 <div className="ic-produs-info">

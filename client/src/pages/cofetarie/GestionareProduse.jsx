@@ -588,7 +588,7 @@ function GestionareProduse() {
                                         <div className="gp-editare">
                                             <div className="gp-produs-imagine">
                                                 {produs.imagine ? (
-                                                    <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
+                                                    <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} />
                                                 ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                             </div>
                                             <div className="gp-form gp-form-editare">
@@ -686,7 +686,7 @@ function GestionareProduse() {
                                         <div className="gp-produs-vizualizare" style={{ flexWrap: 'wrap' }}>
                                             <div className="gp-produs-imagine">
                                                 {produs.imagine ? (
-                                                    <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} />
+                                                    <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} />
                                                 ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                             </div>
                                             <div className="gp-produs-info">
@@ -727,7 +727,7 @@ function GestionareProduse() {
                                         /* Același mod editare ca mai sus */
                                         <div className="gp-editare">
                                             <div className="gp-produs-imagine">
-                                                {produs.imagine ? <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                                {produs.imagine ? <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                             </div>
                                             <div className="gp-form gp-form-editare">
                                                 <div className="form-group">
@@ -755,7 +755,7 @@ function GestionareProduse() {
                                     ) : (
                                         <div className="gp-produs-vizualizare" style={{ flexWrap: 'wrap' }}>
                                             <div className="gp-produs-imagine">
-                                                {produs.imagine ? <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                                {produs.imagine ? <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                             </div>
                                             <div className="gp-produs-info">
                                                 <h4>{produs.numeProdus}</h4>
@@ -795,7 +795,7 @@ function GestionareProduse() {
                                         /* MOD EDITARE - la fel ca în original */
                                         <div className="gp-editare">
                                             <div className="gp-produs-imagine">
-                                                {produs.imagine ? <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                                {produs.imagine ? <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                             </div>
                                             <div className="gp-form gp-form-editare">
                                                 {/* form editare identic cu cel de mai sus */}
@@ -818,7 +818,7 @@ function GestionareProduse() {
                                     ) : (
                                         <div className="gp-produs-vizualizare" style={{ flexWrap: 'wrap' }}>
                                             <div className="gp-produs-imagine">
-                                                {produs.imagine ? <img src={`http://localhost:7000/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
+                                                {produs.imagine ? <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                             </div>
                                             <div className="gp-produs-info">
                                                 <h4>{produs.numeProdus}</h4>
