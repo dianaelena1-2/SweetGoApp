@@ -46,4 +46,29 @@ router.get('/utilizatori',verifyToken,verifyRol('admin'),(req,res) => {
     res.json(utilizatori)
 })
 
+//stergere utilizator
+router.delete('/utilizatori/:id', verifyToken, verifyRol('admin'), (req, res) => {
+    const { id } = req.params;
+    
+    const user = db.prepare('SELECT id, rol FROM utilizatori WHERE id = ?').get(id);
+    if (!user) {
+        return res.status(404).json({ mesaj: 'Utilizatorul nu a fost găsit.' });
+    }
+    if (user.rol === 'admin') {
+        return res.status(403).json({ mesaj: 'Nu poți șterge un administrator.' });
+    }
+    
+    try {
+        if (user.rol === 'cofetarie') {
+            db.prepare('DELETE FROM cofetarii WHERE utilizator_id = ?').run(id);
+        }
+        db.prepare('DELETE FROM utilizatori WHERE id = ?').run(id);
+        
+        res.json({ mesaj: 'Utilizator șters cu succes.' });
+    } catch (err) {
+        console.error('Eroare la ștergerea utilizatorului:', err);
+        res.status(500).json({ mesaj: 'Eroare internă la ștergere.' });
+    }
+});
+
 module.exports = router

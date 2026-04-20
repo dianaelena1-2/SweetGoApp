@@ -70,6 +70,20 @@ function DashboardAdmin() {
         }
     }
 
+    const handleStergeUtilizator = async (id, nume) => {
+        if (!window.confirm(`Ești sigur că vrei să ștergi utilizatorul "${nume}"? Această acțiune este ireversibilă și va șterge toate datele asociate (comenzi, recenzii, favorite etc.).`)) return;
+        try {
+            await api.delete(`/admin/utilizatori/${id}`);
+            fetchUtilizatori();
+            fetchDate();
+            setSucces('Utilizator șters cu succes.');
+            setTimeout(() => setSucces(''), 3000);
+        } catch (err) {
+            setEroare(err.response?.data?.mesaj || 'Eroare la ștergerea utilizatorului.');
+            setTimeout(() => setEroare(''), 3000);
+        }
+    }
+
     const getRolBadgeClass = (rol) => {
         if (rol === 'client') return 'badge-client'
         if (rol === 'cofetarie') return 'badge-cofetarie'
@@ -213,6 +227,7 @@ function DashboardAdmin() {
                                     <th>Email</th>
                                     <th>Rol</th>
                                     <th>Data înregistrării</th>
+                                    <th>Acțiuni</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -226,6 +241,15 @@ function DashboardAdmin() {
                                             </span>
                                         </td>
                                         <td>{new Date(u.creat_la + 'Z').toLocaleDateString('ro-RO')}</td>
+                                        <td>
+                                            <button 
+                                                className="btn-stergere" 
+                                                onClick={() => handleStergeUtilizator(u.id, u.nume)}
+                                                style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}
+                                            >
+                                                🗑️ Șterge
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

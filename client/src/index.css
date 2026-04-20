@@ -2342,6 +2342,58 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+/* ================= PAGINA DE SUCCES INREGISTRARE COFETARIE ==================*/
+.register-success-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fff8f0, #fdecd8);
+}
+.register-success-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(210, 140, 60, 0.15);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+.register-success-card h1 {
+    font-size: 2rem;
+    color: #c97c2e;
+    margin-bottom: 0.3rem;
+}
+.register-success-icon {
+    font-size: 4rem;
+    margin: 1rem 0;
+}
+.register-success-card h2 {
+    color: #c97c2e;
+    margin-bottom: 0.5rem;
+}
+.register-success-card h3 {
+    color: #7a5230;
+    margin-bottom: 1.5rem;
+}
+.register-success-card p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+.register-success-card .text-muted {
+    color: #9a7a5a;
+    margin: 0.5rem 0 1.5rem;
+}
+.register-success-card .italic {
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+.btn-link {
+    display: inline-block;
+    text-decoration: none;
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 900px) {
     .detalii-layout-container {

@@ -27,7 +27,11 @@ function Login() {
             else if (rol === 'admin') navigate('/admin/dashboard')
 
         } catch (err) {
-            setEroare(err.response?.data?.mesaj || 'A aparut o eroare')
+            if (err.response?.status === 403) {
+                setEroare(err.response?.data?.mesaj || 'Contul nu a fost încă aprobat.')
+            } else {
+                setEroare(err.response?.data?.mesaj || 'A apărut o eroare')
+            }
         } finally {
             setLoading(false)
         }

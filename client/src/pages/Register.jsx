@@ -24,7 +24,6 @@ function Register() {
     }
 
     const handleSubmit = async (e) => {
-        console.log('SUBMIT APASAT')
         e.preventDefault()
         setEroare('')
         if (formData.rol === 'cofetarie') {
@@ -33,11 +32,9 @@ function Register() {
             return
         }
         }
-        console.log('INAINTE DE API CALL')
         setLoading(true)
 
         try {
-            console.log('IN TRY')
             const data = new FormData()
             data.append('nume', formData.nume)
             data.append('email', formData.email)
@@ -58,8 +55,12 @@ function Register() {
            await api.post('/auth/register', data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
-            console.log('RASPUNS OK')
-            navigate('/login')
+
+            if (formData.rol === 'cofetarie') {
+                navigate('/register-success')
+            } else {
+                navigate('/login')
+            }
 
         } catch (err) {
             console.log('EROARE:', err)

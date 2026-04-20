@@ -19,7 +19,15 @@ router.post('/register', upload.fields([
 
     const utilizatorExistent = db.prepare('SELECT * FROM utilizatori WHERE email = ?').get(email)
     if(utilizatorExistent){
-        return res.status(400).json({ mesaj: 'Email-ul este deja folosit'})
+        if (utilizatorExistent.rol === 'cofetarie') {
+            const cofetarie = db.prepare('SELECT status FROM cofetarii WHERE utilizator_id = ?').get(utilizatorExistent.id)
+            if (cofetarie && cofetarie.status === 'in_asteptare') {
+                return res.status(400).json({ mesaj: 'Un cont cu acest email este deja înregistrat și așteaptă aprobarea administratorului.' })
+            } else if (cofetarie && cofetarie.status === 'aprobata') {
+                return res.status(400).json({ mesaj: 'Există deja un cont de cofetărie aprobat cu acest email. Te rugăm să te autentifici.' })
+            }
+        }
+        return res.status(400).json({ mesaj: 'Există deja un cont creat cu acest email. Încearcă să te autentifici sau folosește alt email.' })
     }
 
     const parolaHash = bcrypt.hashSync(parola, 10)
@@ -65,6 +73,13 @@ router.post('/login', (req,res) => {
     const parolaCorecta = bcrypt.compareSync(parola, utilizator.parola)
     if (!parolaCorecta) {
         return res.status(401).json({ mesaj: 'Email sau parola incorecte' })
+    }
+
+    if (utilizator.rol === 'cofetarie') {
+        const cofetarie = db.prepare('SELECT status FROM cofetarii WHERE utilizator_id = ?').get(utilizator.id)
+        if (!cofetarie || cofetarie.status !== 'aprobata') {
+            return res.status(403).json({ mesaj: 'Contul tău nu a fost încă aprobat de administrator. Te rugăm să aștepți confirmarea.' })
+        }
     }
 
     //generare token

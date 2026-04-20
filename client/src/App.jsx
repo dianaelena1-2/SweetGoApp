@@ -5,6 +5,7 @@ import { AuthContext } from './context/AuthContext'
 //pages
 import Login from './pages/Login'
 import Register from './pages/Register'
+import RegisterSucces from './pages/RegisterSucces'
 
 //client pages
 import AcasaClient from './pages/client/AcasaClient'
@@ -39,6 +40,7 @@ function App(){
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/register-success" element={<RegisterSucces />} />
 
         {/*client*/}
         <Route path="/" element={<ProtectedRoute rol="client"><AcasaClient /></ProtectedRoute>} />
