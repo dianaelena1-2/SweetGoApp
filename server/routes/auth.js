@@ -2,102 +2,115 @@ const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const db = require('../db')
-const { upload, uploadImaginiCofetarii } = require('../middleware/upload_documents')
+const { upload } = require('../middleware/upload_documents')
+const User = require('../models/User')
+const Cofetarie = require('../models/Cofetarie')
 
-//INREGISTRARE
+// INREGISTRARE
 router.post('/register', upload.fields([
     { name: 'certificat_inregistrare', maxCount: 1 },
     { name: 'certificat_sanitar', maxCount: 1 },
     { name: 'imagine_coperta', maxCount: 1 }
-]), (req, res) => {
-    const { nume, email, parola, rol, numeCofetarie, adresa, telefon } = req.body
+]), async (req, res) => {
+    try {
+        const { nume, email, parola, rol, numeCofetarie, adresa, telefon } = req.body
 
-    if(!nume || !email || !parola || !rol){
-        return res.status(400).json({ mesaj: 'Toate campurile sunt obligatorii' })
-    }
+        if(!nume || !email || !parola || !rol){
+            return res.status(400).json({ mesaj: 'Toate campurile sunt obligatorii' })
+        }
 
-    const utilizatorExistent = db.prepare('SELECT * FROM utilizatori WHERE email = ?').get(email)
-    if(utilizatorExistent){
-        if (utilizatorExistent.rol === 'cofetarie') {
-            const cofetarie = db.prepare('SELECT status FROM cofetarii WHERE utilizator_id = ?').get(utilizatorExistent.id)
-            if (cofetarie && cofetarie.status === 'in_asteptare') {
-                return res.status(400).json({ mesaj: 'Un cont cu acest email este deja înregistrat și așteaptă aprobarea administratorului.' })
-            } else if (cofetarie && cofetarie.status === 'aprobata') {
-                return res.status(400).json({ mesaj: 'Există deja un cont de cofetărie aprobat cu acest email. Te rugăm să te autentifici.' })
+        const utilizatorExistent = await User.findOne({ email })
+        
+        if(utilizatorExistent){
+            if (utilizatorExistent.rol === 'cofetarie') {
+                const cofetarie = await Cofetarie.findOne({ utilizator_id: utilizatorExistent._id })
+                if (cofetarie && cofetarie.status === 'in_asteptare') {
+                    return res.status(400).json({ mesaj: 'Un cont cu acest email este deja înregistrat și așteaptă aprobarea.' })
+                } else if (cofetarie && cofetarie.status === 'aprobata') {
+                    return res.status(400).json({ mesaj: 'Există deja un cont de cofetărie aprobat cu acest email.' })
+                }
             }
-        }
-        return res.status(400).json({ mesaj: 'Există deja un cont creat cu acest email. Încearcă să te autentifici sau folosește alt email.' })
-    }
-
-    const parolaHash = bcrypt.hashSync(parola, 10)
-
-    const rezultat = db.prepare(
-        'INSERT INTO utilizatori (nume, email, parola, rol) VALUES (?, ?, ?, ?)'
-    ).run(nume, email, parolaHash, rol)
-
-    const utilizatorId = rezultat.lastInsertRowid
-
-    if(rol === 'cofetarie')
-    {
-        if(!req.files || !req.files['certificat_inregistrare'] || !req.files['certificat_sanitar']){
-            return res.status(400).json({ mesaj: 'Documentele sunt obligatorii pentru cofetarii' })
+            return res.status(400).json({ mesaj: 'Există deja un cont creat cu acest email.' })
         }
 
-        const certifInregistrare = req.files['certificat_inregistrare'][0].path
-        const certifSanitar = req.files['certificat_sanitar'][0].path
-        const imagineCoperta = req.files['imagine_coperta'] ? req.files['imagine_coperta'][0].path : null
+        const parolaHash = await bcrypt.hash(parola, 10)
 
-        db.prepare(`
-            INSERT INTO cofetarii (utilizator_id, numeCofetarie, adresa, telefon, certificat_inregistrare, certificat_sanitar, imagine_coperta)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(utilizatorId, numeCofetarie, adresa, telefon, certifInregistrare, certifSanitar, imagineCoperta)
+        // Creare User
+        const newUser = await User.create({
+            nume, email, parola: parolaHash, rol
+        })
+
+        if(rol === 'cofetarie') {
+            if(!req.files || !req.files['certificat_inregistrare'] || !req.files['certificat_sanitar']){
+                // Daca nu are fisiere, stergem userul abia creat ca sa nu ramana "in aer"
+                await User.findByIdAndDelete(newUser._id)
+                return res.status(400).json({ mesaj: 'Documentele sunt obligatorii pentru cofetarii' })
+            }
+
+            const certifInregistrare = req.files['certificat_inregistrare'][0].path
+            const certifSanitar = req.files['certificat_sanitar'][0].path
+            const imagineCoperta = req.files['imagine_coperta'] ? req.files['imagine_coperta'][0].path : null
+
+            await Cofetarie.create({
+                utilizator_id: newUser._id,
+                numeCofetarie, adresa, telefon, 
+                certificat_inregistrare: certifInregistrare, 
+                certificat_sanitar: certifSanitar, 
+                imagine_coperta: imagineCoperta
+            })
+        }
+
+        res.status(201).json({ mesaj: 'Cont creat cu succes', id: newUser._id })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ mesaj: 'Eroare la inregistrare' })
     }
-
-    res.status(201).json({ mesaj: 'Cont creat cu succes', id: utilizatorId })
 })
 
-//AUTENTIFICARE
-router.post('/login', (req,res) => {
-    const { email, parola } = req.body
+// AUTENTIFICARE
+router.post('/login', async (req,res) => {
+    try {
+        const { email, parola } = req.body
 
-    if (!email || !parola) {
-        return res.status(400).json({ mesaj: 'Email si parola sunt obligatorii' })
-    }
-
-    const utilizator = db.prepare('SELECT * FROM utilizatori WHERE email = ?').get(email)
-    if (!utilizator) {
-        return res.status(401).json({ mesaj: 'Email sau parola incorecte' })
-    }
-
-    const parolaCorecta = bcrypt.compareSync(parola, utilizator.parola)
-    if (!parolaCorecta) {
-        return res.status(401).json({ mesaj: 'Email sau parola incorecte' })
-    }
-
-    if (utilizator.rol === 'cofetarie') {
-        const cofetarie = db.prepare('SELECT status FROM cofetarii WHERE utilizator_id = ?').get(utilizator.id)
-        if (!cofetarie || cofetarie.status !== 'aprobata') {
-            return res.status(403).json({ mesaj: 'Contul tău nu a fost încă aprobat de administrator. Te rugăm să aștepți confirmarea.' })
+        if (!email || !parola) {
+            return res.status(400).json({ mesaj: 'Email si parola sunt obligatorii' })
         }
-    }
 
-    //generare token
-    const token = jwt.sign(
-        { id: utilizator.id, rol: utilizator.rol },
-        process.env.JWT_SECRET,
-        { expiresIn: '24h' }
-    )
-
-    res.json({
-        token,
-        utilizator: {
-            id: utilizator.id,
-            nume: utilizator.nume,
-            email: utilizator.email,
-            rol: utilizator.rol
+        const utilizator = await User.findOne({ email })
+        if (!utilizator) {
+            return res.status(401).json({ mesaj: 'Email sau parola incorecte' })
         }
-    })
+
+        const parolaCorecta = await bcrypt.compare(parola, utilizator.parola)
+        if (!parolaCorecta) {
+            return res.status(401).json({ mesaj: 'Email sau parola incorecte' })
+        }
+
+        if (utilizator.rol === 'cofetarie') {
+            const cofetarie = await Cofetarie.findOne({ utilizator_id: utilizator._id })
+            if (!cofetarie || cofetarie.status !== 'aprobata') {
+                return res.status(403).json({ mesaj: 'Contul tău nu a fost încă aprobat de administrator.' })
+            }
+        }
+
+        const token = jwt.sign(
+            { id: utilizator._id, rol: utilizator.rol },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        )
+
+        res.json({
+            token,
+            utilizator: {
+                id: utilizator._id,
+                nume: utilizator.nume,
+                email: utilizator.email,
+                rol: utilizator.rol
+            }
+        })
+    } catch (err) {
+        res.status(500).json({ mesaj: 'Eroare la autentificare' })
+    }
 })
 
 module.exports = router

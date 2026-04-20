@@ -1,74 +1,64 @@
 const express = require('express')
 const router = express.Router()
-const db = require('../db')
 const { verifyToken, verifyRol } = require('../middleware/auth')
+const User = require('../models/User')
+const Cofetarie = require('../models/Cofetarie')
 
-//verifica cofetariile in asteptare
-router.get('/cofetarii/in-asteptare',verifyToken, verifyRol('admin'), (req,res) => {
-    const cofetarii = db.prepare(`
-        SELECT c.*, u.nume, u.email
-        FROM cofetarii c
-        JOIN utilizatori u ON c.utilizator_id = u.id
-        WHERE c.status = 'in_asteptare'
-    `).all()
-
-    res.json(cofetarii)
-})
-
-//aprobare cofetarie
-router.put('/cofetarii/:id/aprobare',verifyToken, verifyRol('admin'), (req,res) => {
-    const { id } = req.params
-
-    db.prepare(`
-        UPDATE cofetarii SET status = 'aprobata' WHERE id = ?
-    `).run(id)
-
-    res.json({ mesaj: 'Cofetaria a fost aprobata' })
-})
-
-//respingere cofetarie
-router.put('/cofetarii/:id/respingere',verifyToken,verifyRol('admin'),(req,res) => {
-    const { id } = req.params
-
-    db.prepare(`
-        UPDATE cofetarii SET status = 'respinsa' WHERE id = ?
-    `).run(id)
-
-    res.json({ mesaj: 'Cofetaria a fost respinsa' })
-})
-
-//afisare utilizatori
-router.get('/utilizatori',verifyToken,verifyRol('admin'),(req,res) => {
-    const utilizatori = db.prepare(`
-        SELECT id, nume, email, rol, creat_la FROM utilizatori
-    `).all()
-
-    res.json(utilizatori)
-})
-
-//stergere utilizator
-router.delete('/utilizatori/:id', verifyToken, verifyRol('admin'), (req, res) => {
-    const { id } = req.params;
-    
-    const user = db.prepare('SELECT id, rol FROM utilizatori WHERE id = ?').get(id);
-    if (!user) {
-        return res.status(404).json({ mesaj: 'Utilizatorul nu a fost găsit.' });
-    }
-    if (user.rol === 'admin') {
-        return res.status(403).json({ mesaj: 'Nu poți șterge un administrator.' });
-    }
-    
+// verifica cofetariile in asteptare
+router.get('/cofetarii/in-asteptare', verifyToken, verifyRol('admin'), async (req,res) => {
     try {
-        if (user.rol === 'cofetarie') {
-            db.prepare('DELETE FROM cofetarii WHERE utilizator_id = ?').run(id);
-        }
-        db.prepare('DELETE FROM utilizatori WHERE id = ?').run(id);
+        // populate extrage 'nume' si 'email' direct din colectia User
+        const cofetarii = await Cofetarie.find({ status: 'in_asteptare' }).populate('utilizator_id', 'nume email')
         
-        res.json({ mesaj: 'Utilizator șters cu succes.' });
-    } catch (err) {
-        console.error('Eroare la ștergerea utilizatorului:', err);
-        res.status(500).json({ mesaj: 'Eroare internă la ștergere.' });
-    }
-});
+        // Formatăm un pic raspunsul ca sa se potriveasca cu frontend-ul tau vechi
+        const response = cofetarii.map(c => ({
+            ...c._doc,
+            nume: c.utilizator_id.nume,
+            email: c.utilizator_id.email
+        }))
+        res.json(response)
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
+})
+
+// aprobare cofetarie
+router.put('/cofetarii/:id/aprobare', verifyToken, verifyRol('admin'), async (req,res) => {
+    try {
+        await Cofetarie.findByIdAndUpdate(req.params.id, { status: 'aprobata' })
+        res.json({ mesaj: 'Cofetaria a fost aprobata' })
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
+})
+
+// respingere cofetarie
+router.put('/cofetarii/:id/respingere', verifyToken, verifyRol('admin'), async (req,res) => {
+    try {
+        await Cofetarie.findByIdAndUpdate(req.params.id, { status: 'respinsa' })
+        res.json({ mesaj: 'Cofetaria a fost respinsa' })
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
+})
+
+// afisare utilizatori
+router.get('/utilizatori', verifyToken, verifyRol('admin'), async (req,res) => {
+    try {
+        // -parola exclude parola din rezultate
+        const utilizatori = await User.find().select('-parola')
+        res.json(utilizatori)
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
+})
+
+// stergere utilizator
+router.delete('/utilizatori/:id', verifyToken, verifyRol('admin'), async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+        if (!user) return res.status(404).json({ mesaj: 'Utilizatorul nu a fost găsit.' })
+        if (user.rol === 'admin') return res.status(403).json({ mesaj: 'Nu poți șterge un administrator.' })
+        
+        if (user.rol === 'cofetarie') {
+            await Cofetarie.findOneAndDelete({ utilizator_id: user._id })
+        }
+        await User.findByIdAndDelete(user._id)
+        
+        res.json({ mesaj: 'Utilizator șters cu succes.' })
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare internă la ștergere.' }) }
+})
 
 module.exports = router

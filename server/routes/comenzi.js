@@ -1,146 +1,111 @@
 const express = require('express')
 const router = express.Router()
-const db = require('../db')
 const { verifyToken, verifyRol } = require('../middleware/auth')
+const Comanda = require('../models/Comanda')
+const Produs = require('../models/Produs')
+const Cofetarie = require('../models/Cofetarie')
 
 // plasare comandă
-router.post('/', verifyToken, verifyRol('client'), (req, res) => {
-    const { cofetarie_id, adresa_livrare, telefon, observatii, produse, este_cadou, mesaj_cadou, tip_transport, metoda_plata, status_plata, cost_livrare } = req.body
-
-    if (!cofetarie_id || !adresa_livrare || !telefon || !produse || produse.length === 0) {
-        return res.status(400).json({ mesaj: 'Toate campurile sunt obligatorii' })
-    }
-
-    let total = 0
-    for (const produs of produse) {
-        const produsDb = db.prepare('SELECT * FROM produse WHERE id = ?').get(produs.id)
-        if (!produsDb) return res.status(404).json({ mesaj: `Produsul cu id ${produs.id} nu exista` })
-        if (produsDb.stoc < produs.cantitate) return res.status(400).json({ mesaj: `Stoc insuficient pentru ${produsDb.numeProdus}` })
-        const pretFinal = produsDb.este_la_oferta ? (produsDb.pret * 0.6) : produsDb.pret
-        total += pretFinal * produs.cantitate
-    }
-
-    const esteCadouFormatat = este_cadou ? 1 : 0
-    const mesajCadouFormatat = mesaj_cadou ? mesaj_cadou : null
-    const totalComanda = total + (cost_livrare || 0)
-
+router.post('/', verifyToken, verifyRol('client'), async (req, res) => {
     try {
-        const comanda = db.prepare(`
-            INSERT INTO comenzi (client_id, cofetarie_id, adresa_livrare, telefon, observatii, total, este_cadou, mesaj_cadou, tip_transport, metoda_plata, status_plata, cost_livrare)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `).run(
-            req.utilizator.id,
-            cofetarie_id,
-            adresa_livrare,
-            telefon,
-            observatii || '',
-            totalComanda,
-            esteCadouFormatat,
-            mesajCadouFormatat,
-            tip_transport || 'masina',
-            metoda_plata || 'numerar',
-            status_plata || 'in_asteptare',
-            cost_livrare || 0
-        )
+        const { cofetarie_id, adresa_livrare, telefon, observatii, produse, este_cadou, mesaj_cadou, tip_transport, metoda_plata, status_plata, cost_livrare } = req.body
 
-        const comandaId = comanda.lastInsertRowid
-
-        for (const produs of produse) {
-            const produsDb = db.prepare('SELECT * FROM produse WHERE id = ?').get(produs.id)
-            db.prepare(`
-                INSERT INTO detalii_comanda (comanda_id, produs_id, cantitate, pret_unitar, optiune_decor, observatii)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `).run(comandaId, produs.id, produs.cantitate, produsDb.pret, produs.optiune_decor || null, produs.observatii || null)
-            db.prepare('UPDATE produse SET stoc = stoc - ? WHERE id = ?').run(produs.cantitate, produs.id)
+        if (!cofetarie_id || !adresa_livrare || !telefon || !produse || produse.length === 0) {
+            return res.status(400).json({ mesaj: 'Toate campurile sunt obligatorii' })
         }
-        db.actualizeazaDisponibilitateProduse()
-        res.status(201).json({ mesaj: 'Comanda plasata cu succes', id: comandaId })
-    } catch (err) {
-        console.error('Eroare la plasarea comenzii:', err)
-        res.status(500).json({ mesaj: 'Eroare interna la plasarea comenzii: ' + err.message })
-    }
+
+        let total = 0
+        let detaliiComanda = []
+
+        // Verificam stocurile si calculam totalul
+        for (const p of produse) {
+            const produsDb = await Produs.findById(p.id);
+            if (!produsDb) return res.status(404).json({ mesaj: `Produs invalid` });
+            if (produsDb.stoc < p.cantitate) return res.status(400).json({ mesaj: `Stoc insuficient pentru ${produsDb.numeProdus}` });
+            
+            const pretFinal = produsDb.este_la_oferta ? (produsDb.pret * 0.6) : produsDb.pret;
+            total += pretFinal * p.cantitate;
+
+            detaliiComanda.push({
+                produs_id: produsDb._id,
+                numeProdus: produsDb.numeProdus,
+                cantitate: p.cantitate,
+                pret_unitar: pretFinal,
+                optiune_decor: p.optiune_decor,
+                observatii: p.observatii
+            });
+        }
+
+        const totalComanda = total + (cost_livrare || 0);
+
+        const comandaNoua = await Comanda.create({
+            client_id: req.utilizator.id,
+            cofetarie_id, adresa_livrare, telefon, observatii, 
+            total: totalComanda, cost_livrare, este_cadou, mesaj_cadou, 
+            tip_transport, metoda_plata, status_plata,
+            detalii: detaliiComanda // Detaliile intra direct in documentul comenzii!
+        });
+
+        // Scadem stocurile
+        for (const p of produse) {
+            await Produs.findByIdAndUpdate(p.id, { $inc: { stoc: -p.cantitate } });
+        }
+
+        res.status(201).json({ mesaj: 'Comanda plasata cu succes', id: comandaNoua._id });
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare interna la plasarea comenzii' }); }
 })
 
 // istoric comenzi client
-router.get('/istoricul-meu', verifyToken, verifyRol('client'), (req, res) => {
-    const comenzi = db.prepare(`
-        SELECT c.*, co.numeCofetarie, 
-        (SELECT 1 FROM recenzii WHERE comanda_id = c.id LIMIT 1) as are_recenzie 
-        FROM comenzi c
-        JOIN cofetarii co ON c.cofetarie_id = co.id
-        WHERE c.client_id = ?
-        ORDER BY c.creat_la DESC
-    `).all(req.utilizator.id)
-
-    const comenziCuProduse = comenzi.map(comanda => {
-        const produse = db.prepare(`
-            SELECT dc.cantitate, dc.pret_unitar, dc.optiune_decor, dc.observatii, p.numeProdus, p.imagine
-            FROM detalii_comanda dc
-            JOIN produse p ON dc.produs_id = p.id
-            WHERE dc.comanda_id = ?
-        `).all(comanda.id)
-        return { ...comanda, produse }
-    })
-    res.json(comenziCuProduse)
+router.get('/istoricul-meu', verifyToken, verifyRol('client'), async (req, res) => {
+    try {
+        const comenzi = await Comanda.find({ client_id: req.utilizator.id })
+            .populate('cofetarie_id', 'numeCofetarie')
+            .populate('detalii.produs_id', 'imagine numeProdus')
+            .sort({ createdAt: -1 });
+        res.json(comenzi);
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
 })
 
 // comenzile unei cofetării
-router.get('/cofetarie', verifyToken, verifyRol('cofetarie'), (req, res) => {
-    const cofetarie = db.prepare('SELECT id FROM cofetarii WHERE utilizator_id = ?').get(req.utilizator.id)
-    if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetaria nu a fost gasita' })
-
-    const comenzi = db.prepare(`
-        SELECT c.*, u.nume as numeClient
-        FROM comenzi c
-        JOIN utilizatori u ON c.client_id = u.id
-        WHERE c.cofetarie_id = ?
-        ORDER BY c.creat_la DESC
-    `).all(cofetarie.id)
-
-    const comenziCuProduse = comenzi.map(comanda => {
-        const produse = db.prepare(`
-            SELECT dc.cantitate, dc.pret_unitar, dc.optiune_decor, dc.observatii, p.numeProdus, p.imagine
-            FROM detalii_comanda dc
-            JOIN produse p ON dc.produs_id = p.id
-            WHERE dc.comanda_id = ?
-        `).all(comanda.id)
-        return { ...comanda, produse }
-    })
-    res.json(comenziCuProduse)
-})
-
-// actualizare status comandă (cofetărie)
-router.put('/:id/status', verifyToken, verifyRol('cofetarie'), (req, res) => {
-    const { id } = req.params
-    const { status } = req.body
-    const statusValide = ['confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata']
-    if (!statusValide.includes(status)) return res.status(400).json({ mesaj: 'Status invalid' })
-
-    db.prepare('UPDATE comenzi SET status = ? WHERE id = ?').run(status, id)
-    res.json({ mesaj: 'Status actualizat' })
-})
-
-// anulare comandă de către client
-router.put('/:id/anulare-client', verifyToken, verifyRol('client'), (req, res) => {
-    const comandaId = req.params.id
-    const clientId = req.utilizator.id
-
+router.get('/cofetarie', verifyToken, verifyRol('cofetarie'), async (req, res) => {
     try {
-        const comanda = db.prepare('SELECT status FROM comenzi WHERE id = ? AND client_id = ?').get(comandaId, clientId)
-        if (!comanda) return res.status(404).json({ mesaj: 'Comanda nu a fost găsită.' })
-        if (comanda.status !== 'plasata') return res.status(400).json({ mesaj: 'Comanda nu mai poate fi anulată deoarece a fost deja preluată de cofetărie.' })
-
-        const produseComanda = db.prepare('SELECT produs_id, cantitate FROM detalii_comanda WHERE comanda_id = ?').all(comandaId)
-        for (const p of produseComanda) {
-            db.prepare('UPDATE produse SET stoc = stoc + ? WHERE id = ?').run(p.cantitate, p.produs_id)
-        }
-        db.prepare("UPDATE comenzi SET status = 'anulata' WHERE id = ?").run(comandaId)
-        db.actualizeazaDisponibilitateProduse()
-        res.json({ mesaj: 'Comanda a fost anulată.' })
-    } catch (err) {
-        console.error("Eroare la anulare client:", err)
-        res.status(500).json({ mesaj: 'Eroare la server la anularea comenzii.' })
-    }
+        const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
+        const comenzi = await Comanda.find({ cofetarie_id: cofetarie._id })
+            .populate('client_id', 'nume')
+            .populate('detalii.produs_id', 'imagine numeProdus')
+            .sort({ createdAt: -1 });
+        res.json(comenzi);
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
 })
 
-module.exports = router
+// actualizare status comandă
+router.put('/:id/status', verifyToken, verifyRol('cofetarie'), async (req, res) => {
+    try {
+        const statusValide = ['confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata'];
+        if (!statusValide.includes(req.body.status)) return res.status(400).json({ mesaj: 'Status invalid' });
+
+        await Comanda.findByIdAndUpdate(req.params.id, { status: req.body.status });
+        res.json({ mesaj: 'Status actualizat' });
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
+})
+
+// anulare comandă client
+router.put('/:id/anulare-client', verifyToken, verifyRol('client'), async (req, res) => {
+    try {
+        const comanda = await Comanda.findOne({ _id: req.params.id, client_id: req.utilizator.id });
+        if (!comanda) return res.status(404).json({ mesaj: 'Comanda nu a fost găsită.' });
+        if (comanda.status !== 'plasata') return res.status(400).json({ mesaj: 'Comanda nu mai poate fi anulată.' });
+
+        // Punem la loc stocurile
+        for (const detaliu of comanda.detalii) {
+            await Produs.findByIdAndUpdate(detaliu.produs_id, { $inc: { stoc: detaliu.cantitate } });
+        }
+
+        comanda.status = 'anulata';
+        await comanda.save();
+
+        res.json({ mesaj: 'Comanda a fost anulată.' });
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
+})
+
+module.exports = router;

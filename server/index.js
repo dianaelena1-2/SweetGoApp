@@ -6,14 +6,13 @@ const adminRoutes = require('./routes/admin')
 const produseRoutes = require('./routes/produse')
 const comenziRoutes = require('./routes/comenzi')
 const cofetariiRoutes = require('./routes/cofetarii')
-const optiuniDecorRoutes = require('./routes/optiuniDecor')
 const dashboardRoutes = require('./routes/dashboard')
-const ingredienteRoutes = require('./routes/ingrediente')
 const clientRoutes = require('./routes/client');
 
 dotenv.config()
-const db = require('./db')
-db.actualizeazaDisponibilitateProduse();
+const connectDB = require('./db')
+//db.actualizeazaDisponibilitateProduse()
+connectDB()
 
 const app = express()
 
@@ -33,9 +32,7 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/produse',produseRoutes)
 app.use('/api/comenzi', comenziRoutes)
 app.use('/api/cofetarii', cofetariiRoutes)
-app.use('/api/optiuni-decor', optiuniDecorRoutes)
 app.use('/api/dashboard', dashboardRoutes)
-app.use('/api/ingrediente', ingredienteRoutes)
 app.use('/api/client', clientRoutes);
 
 app.get('/', (req,res) => {
