@@ -169,7 +169,12 @@ function IstoricComenzi() {
                                         <div key={index} className="ic-produs-rand">
                                             <div className="ic-produs-imagine">
                                                 {produs.produs_id?.imagine ? (
-                                                    <img src={`https://sweetgoapp.onrender.com/${produs.produs_id.imagine}`} alt={produs.numeProdus} />
+                                                    <img 
+                                                        src={produs.produs_id.imagine && produs.produs_id.imagine.startsWith('http') 
+                                                            ? produs.produs_id.imagine 
+                                                            : `https://sweetgoapp.onrender.com/${produs.produs_id.imagine}`} 
+                                                        alt={produs.numeProdus} 
+                                                    />
                                                 ) : <Cake size={32} color="#c97c2e" strokeWidth={1.5} />}
                                             </div>
                                             <div className="ic-produs-info">

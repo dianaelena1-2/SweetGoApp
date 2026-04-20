@@ -377,7 +377,13 @@ function GestionareProduse() {
                             ) : (
                                 <div className="gp-produs-vizualizare" style={{ flexWrap: 'wrap' }}>
                                     <div className="gp-produs-imagine">
-                                        {produs.imagine ? <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} /> : <Cake size={48} color="#c97c2e" />}
+                                        {produs.imagine ? 
+                                            <img 
+                                                src={produs.imagine && produs.imagine.startsWith('http') 
+                                                    ? produs.imagine 
+                                                    : `https://sweetgoapp.onrender.com/${produs.imagine}`} 
+                                                alt={produs.numeProdus} 
+                                            /> : <Cake size={48} color="#c97c2e" />}
                                     </div>
                                     <div className="gp-produs-info">
                                         <h4>{produs.numeProdus}</h4>

@@ -1,77 +1,76 @@
-const multer = require('multer')
-const path = require('path')
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const path = require('path');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        if(file.fieldname === 'certificat_inregistrare'){
-            cb(null, 'partner_documents/registration_certificates/')
-        }
-        else if(file.fieldname === 'certificat_sanitar'){
-            cb(null, 'partner_documents/sanitary_certificates/')
-        }
-        else if(file.fieldname === 'imagine_coperta'){
-            cb(null, 'partner_documents/cover_images/')
-        }
-    },
-    //previne suprascrierea fisierelor, creeaza un nume unic pentru fiecare
-    filename: (req, file, cb) => {
-        const nume_cofetarie = req.body.numeCofetarie
-            ? req.body.numeCofetarie.replace(/\s+/g,'_').toLowerCase()
-            : 'cofetarie'
-        const uniqueSuffix = Date.now()
-        cb(null, `${nume_cofetarie}-${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`)
-    }
-})
+// 1. Configurare Cloudinary cu datele din .env
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
+// 2. Filtru pentru tipurile de fișiere acceptate
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = ['.pdf', '.jpg', '.jpeg', '.png']
-    const ext = path.extname(file.originalname).toLowerCase()
+    const allowedTypes = ['.pdf', '.jpg', '.jpeg', '.png'];
+    const ext = path.extname(file.originalname).toLowerCase();
     if(allowedTypes.includes(ext)){
-        cb(null, true)
+        cb(null, true);
     } else {
-        cb(new Error('Se accepta doar fisiere pdf, jpg si png', false))
+        cb(new Error('Se accepta doar fisiere pdf, jpg si png', false));
     }
-}
+};
 
-const upload = multer ({
-    storage,
+// 3. Storage pentru Documente și Coperți Cofetării (general)
+const storageDocumente = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: async (req, file) => {
+        let folderPath = 'sweetgo/documente';
+        if (file.fieldname === 'imagine_coperta') {
+            folderPath = 'sweetgo/coperte';
+        }
+        return {
+            folder: folderPath,
+            allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+            resource_type: 'auto' // Esențial pentru a permite și fișiere PDF!
+        };
+    }
+});
+
+const upload = multer({
+    storage: storageDocumente,
     fileFilter,
     limits: { fileSize: 15 * 1024 * 1024 }
-})
+});
 
-const storageImaginiProduse = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'partner_documents/product_images/')
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now()
-        cb(null, `produs-${uniqueSuffix}${path.extname(file.originalname)}`)
+// 4. Storage pentru Imagini Produse
+const storageImaginiProduse = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'sweetgo/produse',
+        allowed_formats: ['jpg', 'jpeg', 'png'],
     }
-})
+});
 
 const uploadImaginiProduse = multer({
     storage: storageImaginiProduse,
     fileFilter,
     limits: { fileSize: 5 * 1024 * 1024 }
-})
+});
 
-const storageImaginiCofetarii = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'partner_documents/cover_images/')
-    },
-    filename: (req, file, cb) => {
-        const numeCofetarie = req.body.numeCofetarie
-            ? req.body.numeCofetarie.replace(/\s+/g, '_').toLowerCase()
-            : 'cofetarie'
-        const uniqueSuffix = Date.now()
-        cb(null, `${numeCofetarie}-coperta-${uniqueSuffix}${path.extname(file.originalname)}`)
+// 5. Storage dedicat doar pentru Coperți Cofetării
+const storageImaginiCofetarii = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'sweetgo/coperte',
+        allowed_formats: ['jpg', 'jpeg', 'png'],
     }
-})
+});
 
 const uploadImaginiCofetarii = multer({
     storage: storageImaginiCofetarii,
     fileFilter,
     limits: { fileSize: 5 * 1024 * 1024 }
-})
+});
 
-module.exports = { upload, uploadImaginiProduse, uploadImaginiCofetarii }
+module.exports = { upload, uploadImaginiProduse, uploadImaginiCofetarii };

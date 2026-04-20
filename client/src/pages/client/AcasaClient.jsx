@@ -81,7 +81,12 @@ function AcasaClient(){
                             <div key={cofetarie._id} className="cofetarie-card" onClick={() => navigate(`/cofetarie/${cofetarie._id}`)}>
                                 <div className="cofetarie-card-imagine">
                                     {cofetarie.imagine_coperta ? (
-                                        <img src={`https://sweetgoapp.onrender.com/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
+                                        <img 
+                                            src={cofetarie.imagine_coperta && cofetarie.imagine_coperta.startsWith('http') 
+                                                ? cofetarie.imagine_coperta 
+                                                : `https://sweetgoapp.onrender.com/${cofetarie.imagine_coperta}`} 
+                                            alt={cofetarie.numeCofetarie}
+                                        />
                                     ) : (
                                         <Cake size={48} color="#c97c2e" strokeWidth={1.5} />
                                     )}

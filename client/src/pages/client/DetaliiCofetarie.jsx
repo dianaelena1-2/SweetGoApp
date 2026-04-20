@@ -232,7 +232,12 @@ function DetaliiCofetarie() {
                 <div className="cofetarie-detalii-header">
                     <div className="cofetarie-detalii-coperta">
                         {cofetarie.imagine_coperta ? (
-                            <img src={`https://sweetgoapp.onrender.com/${cofetarie.imagine_coperta}`} alt={cofetarie.numeCofetarie} />
+                            <img 
+                                src={cofetarie.imagine_coperta && cofetarie.imagine_coperta.startsWith('http') 
+                                    ? cofetarie.imagine_coperta 
+                                    : `https://sweetgoapp.onrender.com/${cofetarie.imagine_coperta}`} 
+                                alt={cofetarie.numeCofetarie}
+                            />
                         ) : <Store size={64} color="#c97c2e" strokeWidth={1.5} />}
                     </div>
                     <div className="cofetarie-detalii-info">
@@ -293,7 +298,12 @@ function DetaliiCofetarie() {
                                     <div key={produs._id} className={`produs-card ${!produs.disponibil || produs.stoc === 0 ? 'produs-indisponibil' : ''}`}>
                                         <div className="produs-card-imagine">
                                             {produs.imagine ? (
-                                                <img src={`https://sweetgoapp.onrender.com/${produs.imagine}`} alt={produs.numeProdus} />
+                                                <img 
+                                                    src={produs.imagine && produs.imagine.startsWith('http') 
+                                                        ? produs.imagine 
+                                                        : `https://sweetgoapp.onrender.com/${produs.imagine}`} 
+                                                    alt={produs.numeProdus}
+                                                />
                                             ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                         </div>
                                         <div className="produs-card-info">
@@ -350,7 +360,12 @@ function DetaliiCofetarie() {
 
                         <div className="modal-produs-imagine">
                             {produsMmodal.imagine ? (
-                                <img src={`https://sweetgoapp.onrender.com/${produsMmodal.imagine}`} alt={produsMmodal.numeProdus} />
+                                <img 
+                                    src={produsMmodal.imagine && produsMmodal.imagine.startsWith('http') 
+                                        ? produsMmodal.imagine 
+                                        : `https://sweetgoapp.onrender.com/${produsMmodal.imagine}`} 
+                                    alt={produsMmodal.numeProdus}
+                                />
                             ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                         </div>
 

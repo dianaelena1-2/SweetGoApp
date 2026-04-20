@@ -270,7 +270,12 @@ function CosCumparaturi() {
                                     <div key={PID} className={`cos-produs-card ${depasesteStoc ? 'cos-produs-problema' : ''}`}>
                                         <div className="cos-produs-imagine">
                                             {produsDB?.imagine ? (
-                                                <img src={`https://sweetgoapp.onrender.com/${produsDB.imagine}`} alt={produs.numeProdus} />
+                                                <img 
+                                                    src={produsDB.imagine && produsDB.imagine.startsWith('http') 
+                                                        ? produsDB.imagine 
+                                                        : `https://sweetgoapp.onrender.com/${produsDB.imagine}`} 
+                                                    alt={produs.numeProdus}
+                                                />
                                             ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
                                         </div>
                                         <div className="cos-produs-info">
