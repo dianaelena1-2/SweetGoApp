@@ -7,7 +7,6 @@ const Cofetarie = require('../models/Cofetarie')
 const User = require('../models/User')
 const Notificare = require('../models/Notificare')
 
-// Funcție pentru a actualiza stocurile și expirarea
 const verificaDisponibilitate = async () => {
     const azi = new Date();
     // Produse expirate
@@ -20,6 +19,16 @@ const verificaDisponibilitate = async () => {
         { stoc: { $lte: 0 } },
         { disponibil: false, este_la_oferta: false }
     );
+};
+
+const parseArrayFromBody = (value) => {
+    if (!value) return [];
+    try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [value];
+    } catch {
+        return [value];
+    }
 };
 
 // toate produsele din cofetărie
@@ -45,13 +54,7 @@ router.post('/', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.singl
             return res.status(403).json({ mesaj: 'Contul tau nu este aprobat sau nu exista' });
         }
 
-        // Combinam ingredientele venite de la frontend intr-un array de string-uri
-        let listaIngrediente = [];
-        if (req.body.ingredienteAlese) {
-            try {
-                listaIngrediente = JSON.parse(req.body.ingredienteAlese);
-            } catch(e) { listaIngrediente = [req.body.ingredienteAlese]; }
-        }
+        let listaIngrediente = parseArrayFromBody(req.body.ingredienteAlese);
         if (req.body.ingredientNou) listaIngrediente.push(req.body.ingredientNou);
 
         const produsNou = await Produs.create({
@@ -60,7 +63,7 @@ router.post('/', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.singl
             stoc: stoc || 0, imagine, 
             transport_recomandat: transport_recomandat || 'masina', 
             data_expirare,
-            ingrediente: [...new Set(listaIngrediente)] // scoatem duplicatele automat!
+            ingrediente: [...new Set(listaIngrediente)] 
         });
 
         res.status(201).json({ mesaj: 'Produs adaugat', id: produsNou._id });
@@ -84,11 +87,7 @@ router.put('/:id', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.sin
         const produsExistent = await Produs.findById(req.params.id);
         const imagine = req.file ? req.file.path : produsExistent.imagine;
 
-        let listaIngrediente = [];
-        if (req.body.ingredienteAlese) {
-            try { listaIngrediente = JSON.parse(req.body.ingredienteAlese); } 
-            catch(e) { listaIngrediente = [req.body.ingredienteAlese]; }
-        }
+        let listaIngrediente = parseArrayFromBody(req.body.ingredienteAlese);
         if (req.body.ingredientNou) listaIngrediente.push(req.body.ingredientNou);
 
         await Produs.findByIdAndUpdate(req.params.id, {
@@ -117,7 +116,7 @@ router.get('/alerte-expirare', verifyToken, verifyRol('cofetarie'), async (req, 
         
         const maine = new Date();
         maine.setDate(maine.getDate() + 1);
-        maine.setHours(23, 59, 59, 999); // Sfarsitul zilei de maine
+        maine.setHours(23, 59, 59, 999); 
 
         const alerte = await Produs.find({
             cofetarie_id: cofetarie._id,

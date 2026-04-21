@@ -3,14 +3,14 @@ const router = express.Router()
 const { verifyToken, verifyRol } = require('../middleware/auth')
 const User = require('../models/User')
 const Cofetarie = require('../models/Cofetarie')
+const Produs = require('../models/Produs')
+const Comanda = require('../models/Comanda')
 
 // verifica cofetariile in asteptare
 router.get('/cofetarii/in-asteptare', verifyToken, verifyRol('admin'), async (req,res) => {
     try {
-        // populate extrage 'nume' si 'email' direct din colectia User
         const cofetarii = await Cofetarie.find({ status: 'in_asteptare' }).populate('utilizator_id', 'nume email')
         
-        // Formatăm un pic raspunsul ca sa se potriveasca cu frontend-ul tau vechi
         const response = cofetarii.map(c => ({
             ...c._doc,
             nume: c.utilizator_id.nume,
@@ -38,8 +38,7 @@ router.put('/cofetarii/:id/respingere', verifyToken, verifyRol('admin'), async (
 
 // afisare utilizatori
 router.get('/utilizatori', verifyToken, verifyRol('admin'), async (req,res) => {
-    try {
-        // -parola exclude parola din rezultate
+    try {   
         const utilizatori = await User.find().select('-parola')
         res.json(utilizatori)
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
@@ -53,8 +52,19 @@ router.delete('/utilizatori/:id', verifyToken, verifyRol('admin'), async (req, r
         if (user.rol === 'admin') return res.status(403).json({ mesaj: 'Nu poți șterge un administrator.' })
         
         if (user.rol === 'cofetarie') {
-            await Cofetarie.findOneAndDelete({ utilizator_id: user._id })
+            const cofetarie = await Cofetarie.findOne({ utilizator_id: user._id })
+            if(cofetarie){
+                await Produs.deleteMany({ cofetarie_id: cofetarie._id })
+                await Comanda.deleteMany({ cofetarie_id: cofetarie._id })
+                await Cofetarie.findByIdAndDelete(cofetarie._id)
+            }
+            
         }
+
+        if (user.rol === 'client') {
+            await Comanda.deleteMany({ client_id: user._id })
+        }
+
         await User.findByIdAndDelete(user._id)
         
         res.json({ mesaj: 'Utilizator șters cu succes.' })

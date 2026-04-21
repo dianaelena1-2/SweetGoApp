@@ -3,14 +3,12 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const path = require('path');
 
-// 1. Configurare Cloudinary cu datele din .env
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// 2. Filtru pentru tipurile de fișiere acceptate
 const fileFilter = (req, file, cb) => {
     const allowedTypes = ['.pdf', '.jpg', '.jpeg', '.png'];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -21,7 +19,6 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// 3. Storage pentru Documente și Coperți Cofetării (general)
 const storageDocumente = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
@@ -32,7 +29,7 @@ const storageDocumente = new CloudinaryStorage({
         return {
             folder: folderPath,
             allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
-            resource_type: 'auto' // Esențial pentru a permite și fișiere PDF!
+            resource_type: 'auto' 
         };
     }
 });
@@ -43,7 +40,6 @@ const upload = multer({
     limits: { fileSize: 15 * 1024 * 1024 }
 });
 
-// 4. Storage pentru Imagini Produse
 const storageImaginiProduse = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
@@ -58,7 +54,6 @@ const uploadImaginiProduse = multer({
     limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-// 5. Storage dedicat doar pentru Coperți Cofetării
 const storageImaginiCofetarii = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {

@@ -42,7 +42,6 @@ router.post('/register', upload.fields([
 
         if(rol === 'cofetarie') {
             if(!req.files || !req.files['certificat_inregistrare'] || !req.files['certificat_sanitar']){
-                // Daca nu are fisiere, stergem userul abia creat ca sa nu ramana "in aer"
                 await User.findByIdAndDelete(newUser._id)
                 return res.status(400).json({ mesaj: 'Documentele sunt obligatorii pentru cofetarii' })
             }

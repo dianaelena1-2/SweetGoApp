@@ -5,6 +5,7 @@ const Comanda = require('../models/Comanda')
 const Produs = require('../models/Produs')
 const Cofetarie = require('../models/Cofetarie')
 
+const PROCENT_OFERTA = 0.6
 // plasare comandă
 router.post('/', verifyToken, verifyRol('client'), async (req, res) => {
     try {
@@ -23,7 +24,7 @@ router.post('/', verifyToken, verifyRol('client'), async (req, res) => {
             if (!produsDb) return res.status(404).json({ mesaj: `Produs invalid` });
             if (produsDb.stoc < p.cantitate) return res.status(400).json({ mesaj: `Stoc insuficient pentru ${produsDb.numeProdus}` });
             
-            const pretFinal = produsDb.este_la_oferta ? (produsDb.pret * 0.6) : produsDb.pret;
+            const pretFinal = produsDb.este_la_oferta ? (produsDb.pret * PROCENT_OFERTA) : produsDb.pret;
             total += pretFinal * p.cantitate;
 
             detaliiComanda.push({
@@ -43,10 +44,10 @@ router.post('/', verifyToken, verifyRol('client'), async (req, res) => {
             cofetarie_id, adresa_livrare, telefon, observatii, 
             total: totalComanda, cost_livrare, este_cadou, mesaj_cadou, 
             tip_transport, metoda_plata, status_plata,
-            detalii: detaliiComanda // Detaliile intra direct in documentul comenzii!
+            detalii: detaliiComanda 
         });
 
-        // Scadem stocurile
+        // Stocul scade
         for (const p of produse) {
             await Produs.findByIdAndUpdate(p.id, { $inc: { stoc: -p.cantitate } });
         }

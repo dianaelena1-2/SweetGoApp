@@ -12,8 +12,8 @@ const produsSchema = new mongoose.Schema({
     data_expirare: Date,
     este_la_oferta: { type: Boolean, default: false },
     transport_recomandat: { type: String, default: 'masina' },
-    ingrediente: [String], // Am simplificat tabelele de ingrediente aici (Denormalizare)
-    optiuni_decor: [String] // Am mutat aici tabela optiuni_decor
+    ingrediente: [String], 
+    optiuni_decor: [String] 
 }, { timestamps: true });
 
 module.exports = mongoose.model('Produs', produsSchema);

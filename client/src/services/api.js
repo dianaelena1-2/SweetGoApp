@@ -1,6 +1,5 @@
 import axios from 'axios'
 
-//frontedn-ul comunica cu backend-ul in acest fisier
 const api = axios.create({
     baseURL: 'https://sweetgoapp.onrender.com/api'
 })

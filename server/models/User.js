@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     adresa_default: String,
     telefon: String,
     rol: { type: String, enum: ['client', 'cofetarie', 'admin'], required: true },
-    favorite: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cofetarie' }] // Am mutat aici cofetarii_favorite
+    favorite: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cofetarie' }] 
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

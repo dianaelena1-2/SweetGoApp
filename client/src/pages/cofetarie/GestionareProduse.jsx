@@ -34,7 +34,6 @@ function GestionareProduse() {
     const [formEditare, setFormEditare] = useState(produsGol)
     const [imagineEditare, setImagineEditare] = useState(null)
 
-    // Ingredientele sunt acum doar o lista de cuvinte
     const [ingredienteAlese, setIngredienteAlese] = useState([])
     const [numeIngredientNou, setNumeIngredientNou] = useState('')
 
@@ -122,6 +121,17 @@ function GestionareProduse() {
 
     const stergeIngredient = (nume) => {
         setIngredienteAlese(ingredienteAlese.filter(ing => ing !== nume));
+    }
+
+    const aplicaOferta = async (produsId) => {
+        try {
+            await api.put(`/produse/${produsId}/aplica-oferta`);
+            afiseazaSucces('Ofertă aplicată cu succes!');
+            fetchAlerte();
+            fetchProduse();
+        } catch (err) {
+            setEroare(err.response?.data?.mesaj || 'Eroare la aplicarea ofertei');
+        }
     }
 
     const handleAdauga = async () => {

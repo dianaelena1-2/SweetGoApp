@@ -13,7 +13,6 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.6.2",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
