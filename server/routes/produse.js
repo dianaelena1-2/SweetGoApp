@@ -152,7 +152,13 @@ router.get('/alerte-expirare', verifyToken, verifyRol('cofetarie'), async (req, 
 // activare ofertă anti-risipă
 router.put('/:id/aplica-oferta', verifyToken, verifyRol('cofetarie'), async (req, res) => {
     try {
-        const oraCurenta = new Date().getHours();
+        const oraRomania = new Date().toLocaleString('en-US', { 
+            timeZone: 'Europe/Bucharest', 
+            hour: 'numeric', 
+            hour12: false 
+        });
+        const oraCurenta = parseInt(oraRomania, 10);
+        
         if (oraCurenta < 20) {
             return res.status(400).json({ mesaj: 'Ofertele anti-risipă pot fi activate doar după ora 20:00!' });
         }
