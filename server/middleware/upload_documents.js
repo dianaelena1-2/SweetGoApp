@@ -29,7 +29,8 @@ const storageDocumente = new CloudinaryStorage({
         return {
             folder: folderPath,
             allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
-            resource_type: 'auto' 
+            resource_type: 'auto',
+            type: 'upload',
         };
     }
 });
@@ -45,6 +46,7 @@ const storageImaginiProduse = new CloudinaryStorage({
     params: {
         folder: 'sweetgo/produse',
         allowed_formats: ['jpg', 'jpeg', 'png'],
+        type: 'upload',
     }
 });
 
@@ -59,6 +61,7 @@ const storageImaginiCofetarii = new CloudinaryStorage({
     params: {
         folder: 'sweetgo/coperte',
         allowed_formats: ['jpg', 'jpeg', 'png'],
+        type: 'upload',
     }
 });
 
