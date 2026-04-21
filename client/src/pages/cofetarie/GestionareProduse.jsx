@@ -69,6 +69,15 @@ function GestionareProduse() {
         return () => clearInterval(interval)
     }, [])
 
+    useEffect(() => {
+        if (editareId === -1) {
+            setIngredienteSelectate([])
+            setOptiuniDecor([])
+            setFormNou(produsGol)
+            setImagineNoua(null)
+        }
+    }, [editareId])
+
     const fetchIngredienteGlobale = async () => {
         try {
             const res = await api.get('/ingrediente');
@@ -160,6 +169,13 @@ function GestionareProduse() {
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la aplicarea ofertei');
         }
+    }
+
+    const resetFormularAdaugare = () => {
+        setFormNou(produsGol)
+        setImagineNoua(null)
+        setIngredienteSelectate([])
+        setOptiuniDecor([])
     }
 
     const handleAdauga = async () => {
@@ -472,7 +488,7 @@ function GestionareProduse() {
                                         {formEditare.categorie === 'Torturi' && renderSectiuneOptiuni()}
                                         <div className="gp-butoane-editare">
                                             <button className="btn-primar" onClick={() => handleSalveazaEditare(produs._id)}>Salvează</button>
-                                            <button className="btn-secundar" onClick={() => setEditareId(-1)}>Anulează</button>
+                                            <button className="btn-secundar" onClick={() => { setEditareId(-1); resetFormularAdaugare()}}>Anulează</button>
                                         </div>
                                     </div>
                                 </div>
