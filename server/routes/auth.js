@@ -28,6 +28,10 @@ router.post('/register', upload.fields([
                     return res.status(400).json({ mesaj: 'Un cont cu acest email este deja înregistrat și așteaptă aprobarea.' })
                 } else if (cofetarie && cofetarie.status === 'aprobata') {
                     return res.status(400).json({ mesaj: 'Există deja un cont de cofetărie aprobat cu acest email.' })
+                } else if (cofetarie && cofetarie.status === 'respinsa') {
+                    await Cofetarie.findByIdAndDelete(cofetarie._id);
+                    await User.findByIdAndDelete(utilizatorExistent._id);
+                    utilizatorExistent = null;
                 }
             }
             return res.status(400).json({ mesaj: 'Există deja un cont creat cu acest email.' })
