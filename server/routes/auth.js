@@ -19,7 +19,7 @@ router.post('/register', upload.fields([
             return res.status(400).json({ mesaj: 'Toate campurile sunt obligatorii' })
         }
 
-        const utilizatorExistent = await User.findOne({ email })
+        let utilizatorExistent = await User.findOne({ email })
         
         if(utilizatorExistent){
             if (utilizatorExistent.rol === 'cofetarie') {
