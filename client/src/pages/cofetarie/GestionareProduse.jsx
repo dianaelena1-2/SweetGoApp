@@ -516,6 +516,11 @@ function GestionareProduse() {
                                             <span className="produs-pret">{produs.pret} lei</span>
                                             <span><Package size={14} /> {produs.stoc} buc</span>
                                         </div>
+                                        {produs.este_la_oferta && (
+                                            <div style={{ marginBottom: '8px' }}>
+                                                <span className="badge-oferta">🔥 OFERTĂ -40%</span>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="gp-produs-actiuni">
                                         <button className="btn-editare" onClick={() => handleIncepeEditare(produs)}><Pencil size={16} /> Editează</button>
