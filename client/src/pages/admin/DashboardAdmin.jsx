@@ -183,22 +183,24 @@ function DashboardAdmin() {
                                             <p><Phone size={14} /> {cofetarie.telefon}</p>
                                             <div className="admin-documente">
                                                 {cofetarie.certificat_inregistrare && (
-                                                    <button
-                                                        onClick={() => openDocument(cofetarie.certificat_inregistrare)}
+                                                   <a
+                                                        href={cofetarie.certificat_inregistrare}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
                                                         className="admin-doc-link"
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                                                    >
+                                                        >
                                                         📄 Certificat înregistrare
-                                                    </button>
+                                                    </a>
                                                 )}
                                                 {cofetarie.certificat_sanitar && (
-                                                    <button
-                                                        onClick={() => openDocument(cofetarie.certificat_sanitar)}
+                                                    <a
+                                                        href={cofetarie.certificat_sanitar}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
                                                         className="admin-doc-link"
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                                                    >
+                                                        >
                                                         📄 Certificat sanitar
-                                                    </button>
+                                                    </a>
                                                 )}
                                             </div>
                                         </div>

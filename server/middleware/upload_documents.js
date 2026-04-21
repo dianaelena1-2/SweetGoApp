@@ -10,65 +10,49 @@ cloudinary.config({
 });
 
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = ['.pdf', '.jpg', '.jpeg', '.png'];
+    const allowedTypes = ['.jpg', '.jpeg', '.png'];
     const ext = path.extname(file.originalname).toLowerCase();
     if(allowedTypes.includes(ext)){
         cb(null, true);
     } else {
-        cb(new Error('Se accepta doar fisiere pdf, jpg si png', false));
+        cb(new Error('Se accepta doar fisiere jpg si png', false));
     }
 };
 
-const storageDocumente = new CloudinaryStorage({
+const storageImagini= new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
         let folderPath = 'sweetgo/documente';
         if (file.fieldname === 'imagine_coperta') {
-            folderPath = 'sweetgo/coperte';
+            folderPath = 'sweetgo/coperte'
+        } else if (file.fieldname === 'imagine'){
+            folderPath = 'sweetgo/produse'
         }
         return {
             folder: folderPath,
-            allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
-            resource_type: 'auto',
+            allowed_formats: ['jpg', 'jpeg', 'png'],
+            resource_type: 'image',
             type: 'upload',
         };
     }
 });
 
 const upload = multer({
-    storage: storageDocumente,
+    storage: storageImagini,
     fileFilter,
     limits: { fileSize: 15 * 1024 * 1024 }
 });
 
-const storageImaginiProduse = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'sweetgo/produse',
-        allowed_formats: ['jpg', 'jpeg', 'png'],
-        type: 'upload',
-    }
-});
-
 const uploadImaginiProduse = multer({
-    storage: storageImaginiProduse,
+    storage: storageImagini,
     fileFilter,
     limits: { fileSize: 5 * 1024 * 1024 }
-});
-
-const storageImaginiCofetarii = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'sweetgo/coperte',
-        allowed_formats: ['jpg', 'jpeg', 'png'],
-        type: 'upload',
-    }
 });
 
 const uploadImaginiCofetarii = multer({
-    storage: storageImaginiCofetarii,
+    storage: storageImagini,
     fileFilter,
     limits: { fileSize: 5 * 1024 * 1024 }
-});
+})
 
 module.exports = { upload, uploadImaginiProduse, uploadImaginiCofetarii };
