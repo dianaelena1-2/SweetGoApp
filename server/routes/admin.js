@@ -31,9 +31,23 @@ router.put('/cofetarii/:id/aprobare', verifyToken, verifyRol('admin'), async (re
 // respingere cofetarie
 router.put('/cofetarii/:id/respingere', verifyToken, verifyRol('admin'), async (req,res) => {
     try {
-        await Cofetarie.findByIdAndUpdate(req.params.id, { status: 'respinsa' })
-        res.json({ mesaj: 'Cofetaria a fost respinsa' })
-    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
+         const cofetarie = await Cofetarie.findById(req.params.id);
+        if (!cofetarie) {
+            return res.status(404).json({ mesaj: 'Cofetăria nu a fost găsită.' });
+        }
+
+        const utilizator = await User.findById(cofetarie.utilizator_id);
+
+        // Ștergem cofetăria
+        await Cofetarie.findByIdAndDelete(cofetarie._id);
+
+        // Ștergem utilizatorul (dacă există)
+        if (utilizator) {
+            await User.findByIdAndDelete(utilizator._id);
+        }
+
+        res.json({ mesaj: 'Cofetăria a fost respinsă și toate datele asociate au fost șterse.' });
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare la respingerea cofetariei' }) }
 })
 
 // afisare utilizatori
