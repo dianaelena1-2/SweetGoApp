@@ -170,9 +170,12 @@ function CosCumparaturi() {
     }, [tipTransport])
 
     const totalProduse = cos.produse.reduce((acc, p) => {
-        const produsDB = produseProduse.find(db => db._id === (p._id || p.id))
-        return acc + (produsDB?.pret || p.pret) * p.cantitate
-    }, 0)
+        const produsDB = produseProduse.find(db => db._id === (p._id || p.id));
+        const pretUnitar = produsDB?.este_la_oferta 
+            ? (produsDB.pret * 0.6) 
+            : (produsDB?.pret || p.pret);
+        return acc + pretUnitar * p.cantitate;
+    }, 0);
     const total = totalProduse + costLivrare
 
     const areProbleme = cos.produse.some(p => stocInsuficient(p))
@@ -266,6 +269,9 @@ function CosCumparaturi() {
                                 const produsDB = produseProduse.find(p => p._id === PID)
                                 const stocRamas = produsDB?.stoc || 0
                                 const depasesteStoc = produs.cantitate > stocRamas
+                                const pretUnitar = produsDB?.este_la_oferta 
+                                    ? (produsDB.pret * 0.6) 
+                                    : (produsDB?.pret || produs.pret)
                                 return (
                                     <div key={PID} className={`cos-produs-card ${depasesteStoc ? 'cos-produs-problema' : ''}`}>
                                         <div className="cos-produs-imagine">
@@ -280,7 +286,14 @@ function CosCumparaturi() {
                                         </div>
                                         <div className="cos-produs-info">
                                             <h4>{produs.numeProdus}</h4>
-                                            <p className="cos-produs-pret">{produsDB?.pret || produs.pret} lei / buc</p>
+                                            <p className="cos-produs-pret">
+                                                <span>{pretUnitar.toFixed(2)} lei / buc</span>
+                                                {produsDB?.este_la_oferta && (
+                                                    <span style={{ textDecoration: 'line-through', marginLeft: '8px', color: '#9a7a5a', fontSize: '0.9rem' }}>
+                                                        {produsDB.pret.toFixed(2)} lei
+                                                    </span>
+                                                )}
+                                            </p>
                                             {produs.optiune_decor && <p className="cos-produs-detaliu">🎨 Decor: {produs.optiune_decor}</p>}
                                             {produs.observatii && <p className="cos-produs-detaliu">📝 {produs.observatii}</p>}
                                             {depasesteStoc && <p className="cos-avertisment"><AlertTriangle size={14} /> Stoc disponibil: doar {stocRamas} buc</p>}
@@ -291,7 +304,7 @@ function CosCumparaturi() {
                                                 <span>{produs.cantitate}</span>
                                                 <button onClick={() => cresteInCos(PID, stocRamas)} disabled={produs.cantitate >= stocRamas}>+</button>
                                             </div>
-                                            <p className="cos-subtotal">{((produsDB?.pret || produs.pret) * produs.cantitate).toFixed(2)} lei</p>
+                                            <p className="cos-subtotal">{(pretUnitar * produs.cantitate).toFixed(2)} lei</p>
                                         </div>
                                         <button className="cos-sterge-produs" onClick={() => stergeProdusDinCos(PID)}>✕</button>
                                     </div>
