@@ -32,9 +32,13 @@ router.post('/register', upload.fields([
                     await Cofetarie.findByIdAndDelete(cofetarie._id);
                     await User.findByIdAndDelete(utilizatorExistent._id);
                     utilizatorExistent = null;
+                } else {
+                    return res.status(400).json({ mesaj: 'Există deja un cont creat cu acest email.' })
                 }
+            } else {
+                return res.status(400).json({ mesaj: 'Există deja un cont creat cu acest email.' })
             }
-            return res.status(400).json({ mesaj: 'Există deja un cont creat cu acest email.' })
+            
         }
 
         const parolaHash = await bcrypt.hash(parola, 10)
