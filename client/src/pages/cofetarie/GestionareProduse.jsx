@@ -44,6 +44,8 @@ function GestionareProduse() {
     const [alerteExpirare, setAlerteExpirare] = useState([])
     const [esteDupaOra20, setEsteDupaOra20] = useState(false)
 
+    const [fileInputKey, setFileInputKey] = useState(Date.now());
+
     const [showExpired, setShowExpired] = useState(false)
     const [showUnavailable, setShowUnavailable] = useState(false)
     const [produseExpirate, setProduseExpirate] = useState([])
@@ -172,10 +174,13 @@ function GestionareProduse() {
     }
 
     const resetFormularAdaugare = () => {
-        setFormNou(produsGol)
-        setImagineNoua(null)
-        setIngredienteSelectate([])
-        setOptiuniDecor([])
+        setFormNou(produsGol);
+        setImagineNoua(null);
+        setIngredienteSelectate([]);
+        setOptiuniDecor([]);
+        setNumeIngredientNou('');
+        setNumeOptiuneNoua('');
+        setFileInputKey(Date.now());
     }
 
     const handleAdauga = async () => {
@@ -201,11 +206,7 @@ function GestionareProduse() {
             
             if (imagineNoua) data.append('imagine', imagineNoua)
             await api.post('/produse', data, { headers: { 'Content-Type': 'multipart/form-data' } })
-
-            setFormNou(produsGol)
-            setImagineNoua(null)
-            setIngredienteSelectate([])
-            setOptiuniDecor([])
+            resetFormularAdaugare()
             afiseazaSucces('Produs adăugat cu succes!')
             fetchProduse()
             fetchIngredienteGlobale()
@@ -431,7 +432,7 @@ function GestionareProduse() {
 
                         <div className="form-group">
                             <label>Imagine produs (opțional)</label>
-                            <input type="file" accept=".jpg,.jpeg,.png" onChange={(e) => setImagineNoua(e.target.files[0])} />
+                            <input type="file" accept=".jpg,.jpeg,.png" onChange={(e) => setImagineNoua(e.target.files[0])} key={fileInputKey} />
                         </div>
                         <button className="btn-primar" onClick={handleAdauga}>Adaugă produs</button>
                     </div>
