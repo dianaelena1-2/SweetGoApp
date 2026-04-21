@@ -24,28 +24,26 @@ router.post('/register', upload.fields([
         if(utilizatorExistent){
             if (utilizatorExistent.rol === 'cofetarie') {
                 const cofetarie = await Cofetarie.findOne({ utilizator_id: utilizatorExistent._id })
-                if (cofetarie && cofetarie.status === 'in_asteptare') {
+                
+                if (!cofetarie) {
+                    await User.findByIdAndDelete(utilizatorExistent._id);
+                    utilizatorExistent = null;
+                } else if (cofetarie.status === 'in_asteptare') {
                     return res.status(400).json({ mesaj: 'Un cont cu acest email este deja înregistrat și așteaptă aprobarea.' })
-                } else if (cofetarie && cofetarie.status === 'aprobata') {
+                } else if (cofetarie.status === 'aprobata') {
                     return res.status(400).json({ mesaj: 'Există deja un cont de cofetărie aprobat cu acest email.' })
-                } else if (cofetarie && cofetarie.status === 'respinsa') {
-                    console.log('Încerc să șterg cofetăria respinsă...');
+                } else {
                     await Cofetarie.findByIdAndDelete(cofetarie._id);
                     await User.findByIdAndDelete(utilizatorExistent._id);
-                    console.log('Ștergere efectuată.');
                     utilizatorExistent = null;
-                } else {
-                    return res.status(400).json({ mesaj: 'Există deja un cont creat cu acest email.' })
                 }
             } else {
                 return res.status(400).json({ mesaj: 'Există deja un cont creat cu acest email.' })
             }
-            
         }
 
         const parolaHash = await bcrypt.hash(parola, 10)
 
-        // Creare User
         const newUser = await User.create({
             nume, email, parola: parolaHash, rol
         })
