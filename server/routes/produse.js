@@ -6,6 +6,7 @@ const Produs = require('../models/Produs')
 const Cofetarie = require('../models/Cofetarie')
 const User = require('../models/User')
 const Notificare = require('../models/Notificare')
+const Ingredient = require('../models/Ingredient')
 
 const verificaDisponibilitate = async () => {
     const azi = new Date();
@@ -29,6 +30,18 @@ const parseArrayFromBody = (value) => {
     } catch {
         return [value];
     }
+};
+
+const salveazaIngredienteInListaGlobala = async (ingredienteArray) => {
+    if (!ingredienteArray || ingredienteArray.length === 0) return;
+    const operatii = ingredienteArray.map(nume =>
+        Ingredient.findOneAndUpdate(
+            { nume: nume.trim().toLowerCase() },
+            { nume: nume.trim().toLowerCase() },
+            { upsert: true }
+        )
+    );
+    await Promise.all(operatii);
 };
 
 // toate produsele din cofetărie
@@ -68,6 +81,8 @@ router.post('/', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.singl
             optiuni_decor: [...new Set(optiuniDecor)]
         });
 
+        await salveazaIngredienteInListaGlobala(listaIngrediente);
+
         res.status(201).json({ mesaj: 'Produs adaugat', id: produsNou._id });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare la adaugarea produsului' }); }
 });
@@ -99,6 +114,7 @@ router.put('/:id', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.sin
             optiuni_decor: [...new Set(optiuniDecor)]
         });
 
+        await salveazaIngredienteInListaGlobala(listaIngrediente);
         await verificaDisponibilitate();
         res.json({ mesaj: 'Produs actualizat' });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }

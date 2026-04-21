@@ -34,7 +34,8 @@ function GestionareProduse() {
     const [formEditare, setFormEditare] = useState(produsGol)
     const [imagineEditare, setImagineEditare] = useState(null)
 
-    const [ingredienteAlese, setIngredienteAlese] = useState([])
+    const [ingredienteSelectate, setIngredienteSelectate] = useState([])
+    const [toateIngredientele, setToateIngredientele] = useState([])
     const [numeIngredientNou, setNumeIngredientNou] = useState('')
 
     const [optiuniDecor, setOptiuniDecor] = useState([])
@@ -55,6 +56,7 @@ function GestionareProduse() {
         fetchAlerte()
         fetchProduseExpirate()
         fetchProduseIndisponibile()
+        fetchIngredienteGlobale()
     }, [])
 
     useEffect(() => {
@@ -66,6 +68,16 @@ function GestionareProduse() {
         const interval = setInterval(checkOra, 60000)
         return () => clearInterval(interval)
     }, [])
+
+    const fetchIngredienteGlobale = async () => {
+        try {
+            const res = await api.get('/ingrediente');
+            const ingrediente = res.data.map(ing => ing.nume);
+            setToateIngredientele(ingrediente);
+        } catch (err) {
+            console.error('Eroare la încărcarea ingredientelor globale', err);
+        }
+    }
 
     const fetchProduse = async () => {
         try {
@@ -116,14 +128,15 @@ function GestionareProduse() {
 
     const handleAdaugaIngredient = () => {
         const nume = numeIngredientNou.trim().toLowerCase()
-        if (nume && !ingredienteAlese.includes(nume)) {
-            setIngredienteAlese([...ingredienteAlese, nume])
+        if (nume) {
+            if (!ingredienteSelectate.includes(nume)) {
+                setIngredienteSelectate([...ingredienteSelectate, nume])
+            }
+            if (!toateIngredientele.includes(nume)) {
+                setToateIngredientele(prev => [...prev, nume].sort())
+            }
         }
         setNumeIngredientNou('')
-    }
-
-    const stergeIngredient = (nume) => {
-        setIngredienteAlese(ingredienteAlese.filter(ing => ing !== nume))
     }
 
     const adaugaOptiune = () => {
@@ -167,7 +180,7 @@ function GestionareProduse() {
             if (formNou.data_expirare) {
                 data.append('data_expirare', formNou.data_expirare)
             }
-            data.append('ingredienteAlese', JSON.stringify(ingredienteAlese))
+            data.append('ingredienteAlese', JSON.stringify(ingredienteSelectate))
             data.append('optiuni_decor', JSON.stringify(optiuniDecor));
             
             if (imagineNoua) data.append('imagine', imagineNoua)
@@ -175,10 +188,11 @@ function GestionareProduse() {
 
             setFormNou(produsGol)
             setImagineNoua(null)
-            setIngredienteAlese([])
+            setIngredienteSelectate([])
             setOptiuniDecor([])
             afiseazaSucces('Produs adăugat cu succes!')
             fetchProduse()
+            fetchIngredienteGlobale()
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la adăugarea produsului')
         }
@@ -197,7 +211,7 @@ function GestionareProduse() {
             data_expirare: produs.data_expirare ? produs.data_expirare.split('T')[0] : ''
         })
         setImagineEditare(null)
-        setIngredienteAlese(produs.ingrediente || [])
+        setIngredienteSelectate(produs.ingrediente || [])
         setOptiuniDecor(produs.optiuni_decor || [])
         setNumeIngredientNou('')
     }
@@ -220,19 +234,20 @@ function GestionareProduse() {
             if (formEditare.data_expirare) {
                 data.append('data_expirare', formEditare.data_expirare)
             }
-            data.append('ingredienteAlese', JSON.stringify(ingredienteAlese))
+            data.append('ingredienteAlese', JSON.stringify(ingredienteSelectate))
             data.append('optiuni_decor', JSON.stringify(optiuniDecor));
 
             if (imagineEditare) data.append('imagine', imagineEditare)
             await api.put(`/produse/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
             
             setEditareId(-1)
-            setIngredienteAlese([])
+            setIngredienteSelectate([])
             setOptiuniDecor([])
             afiseazaSucces('Produs actualizat cu succes!')
             fetchProduse()
             fetchProduseExpirate()
             fetchProduseIndisponibile()
+            fetchIngredienteGlobale()
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la actualizarea produsului')
         }
@@ -251,46 +266,60 @@ function GestionareProduse() {
         }
     }
 
-    const renderSectiuneIngrediente = () => (
-        <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: '10px'}}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#7a5230' }}>
-                <ListChecks size={18} /> Ingrediente produs
-            </label>
+     const renderSectiuneIngrediente = () => {
+        const toateOptiunile = [...new Set([...toateIngredientele, ...ingredienteSelectate])].sort();
 
-            {ingredienteAlese.length > 0 && (
-                <div className="ingrediente-selector-container">
-                    {ingredienteAlese.map((ing, idx) => (
-                        <div 
-                            key={idx} 
-                            className="ing-tag activ"
-                            onClick={() => stergeIngredient(ing)}
-                        >
-                            {ing} ✕
-                        </div>
-                    ))}
+        return (
+            <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: '10px'}}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#7a5230' }}>
+                    <ListChecks size={18} /> Ingrediente produs
+                </label>
+
+                {toateOptiunile.length > 0 && (
+                    <div className="ingrediente-selector-container" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                        {toateOptiunile.map((ing, idx) => {
+                            const isSelected = ingredienteSelectate.includes(ing);
+                            return (
+                                <div 
+                                    key={idx} 
+                                    className={`ing-tag ${isSelected ? 'activ' : ''}`}
+                                    onClick={() => {
+                                        if (isSelected) {
+                                            setIngredienteSelectate(ingredienteSelectate.filter(i => i !== ing));
+                                        } else {
+                                            setIngredienteSelectate([...ingredienteSelectate, ing]);
+                                        }
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    {ing}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+                    <input 
+                        type="text" 
+                        placeholder="Adaugă ingredient nou" 
+                        value={numeIngredientNou}
+                        onChange={(e) => setNumeIngredientNou(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault(); 
+                                handleAdaugaIngredient();
+                            }
+                        }}
+                        style={{ flex: 1 }}
+                    />
+                    <button type="button" className="btn-ingredient-nou" onClick={handleAdaugaIngredient}>
+                        ➕ Adaugă
+                    </button>
                 </div>
-            )}
-
-            <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
-                <input 
-                    type="text" 
-                    placeholder="Adaugă ingredient (ex: făină)" 
-                    value={numeIngredientNou}
-                    onChange={(e) => setNumeIngredientNou(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault(); 
-                            handleAdaugaIngredient();
-                        }
-                    }}
-                    style={{ flex: 1 }}
-                />
-                <button type="button" className="btn-ingredient-nou" onClick={handleAdaugaIngredient}>
-                    ➕ Adaugă
-                </button>
             </div>
-        </div>
-    )
+        );
+    }
 
     const renderSectiuneOptiuni = () => (
         <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: '10px'}}>

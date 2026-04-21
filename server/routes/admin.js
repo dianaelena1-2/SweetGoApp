@@ -38,10 +38,8 @@ router.put('/cofetarii/:id/respingere', verifyToken, verifyRol('admin'), async (
 
         const utilizator = await User.findById(cofetarie.utilizator_id);
 
-        // Ștergem cofetăria
         await Cofetarie.findByIdAndDelete(cofetarie._id);
 
-        // Ștergem utilizatorul (dacă există)
         if (utilizator) {
             await User.findByIdAndDelete(utilizator._id);
         }
