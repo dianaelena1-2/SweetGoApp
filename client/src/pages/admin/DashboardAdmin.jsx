@@ -90,6 +90,14 @@ function DashboardAdmin() {
         return 'badge-admin'
     }
 
+    const openDocument = (fileUrl) => {
+        const url = fileUrl?.startsWith('http') 
+            ? fileUrl 
+            : `https://sweetgoapp.onrender.com/${fileUrl}`;
+        const downloadUrl = url.replace('/upload/', '/upload/fl_attachment/');
+        window.open(downloadUrl, '_blank', 'noopener,noreferrer');
+    };
+
     if (loading) return <p className="loading">Se încarcă...</p>
 
     return (
@@ -175,34 +183,22 @@ function DashboardAdmin() {
                                             <p><Phone size={14} /> {cofetarie.telefon}</p>
                                             <div className="admin-documente">
                                                 {cofetarie.certificat_inregistrare && (
-                                                    <a
-                                                        href={(() => {
-                                                            const url = cofetarie.certificat_inregistrare?.startsWith('http') 
-                                                            ? cofetarie.certificat_inregistrare 
-                                                            : `https://sweetgoapp.onrender.com/${cofetarie.certificat_inregistrare}`;
-                                                            return url.replace('/upload/', '/upload/fl_attachment/');
-                                                        })()}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
+                                                    <button
+                                                        onClick={() => openDocument(cofetarie.certificat_inregistrare)}
                                                         className="admin-doc-link"
+                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                                                     >
                                                         📄 Certificat înregistrare
-                                                    </a>
+                                                    </button>
                                                 )}
                                                 {cofetarie.certificat_sanitar && (
-                                                    <a
-                                                        href={(() => {
-                                                            const url = cofetarie.certificat_sanitar?.startsWith('http') 
-                                                            ? cofetarie.certificat_sanitar 
-                                                            : `https://sweetgoapp.onrender.com/${cofetarie.certificat_sanitar}`;
-                                                            return url.replace('/upload/', '/upload/fl_attachment/');
-                                                        })()}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
+                                                    <button
+                                                        onClick={() => openDocument(cofetarie.certificat_sanitar)}
                                                         className="admin-doc-link"
+                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                                                     >
                                                         📄 Certificat sanitar
-                                                    </a>
+                                                    </button>
                                                 )}
                                             </div>
                                         </div>
