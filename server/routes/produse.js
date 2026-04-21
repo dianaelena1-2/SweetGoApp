@@ -54,8 +54,9 @@ router.post('/', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.singl
             return res.status(403).json({ mesaj: 'Contul tau nu este aprobat sau nu exista' });
         }
 
-        let listaIngrediente = parseArrayFromBody(req.body.ingredienteAlese);
-        if (req.body.ingredientNou) listaIngrediente.push(req.body.ingredientNou);
+        let listaIngrediente = parseArrayFromBody(req.body.ingredienteAlese)
+        if (req.body.ingredientNou) listaIngrediente.push(req.body.ingredientNou)
+        let optiuniDecor = parseArrayFromBody(req.body.optiuni_decor);
 
         const produsNou = await Produs.create({
             cofetarie_id: cofetarie._id,
@@ -63,7 +64,8 @@ router.post('/', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.singl
             stoc: stoc || 0, imagine, 
             transport_recomandat: transport_recomandat || 'masina', 
             data_expirare,
-            ingrediente: [...new Set(listaIngrediente)] 
+            ingrediente: [...new Set(listaIngrediente)],
+            optiuni_decor: [...new Set(optiuniDecor)]
         });
 
         res.status(201).json({ mesaj: 'Produs adaugat', id: produsNou._id });
@@ -84,15 +86,17 @@ router.put('/:id', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.sin
     try {
         const { numeProdus, descriere, pret, categorie, disponibil, stoc, transport_recomandat, data_expirare } = req.body;
         
-        const produsExistent = await Produs.findById(req.params.id);
-        const imagine = req.file ? req.file.path : produsExistent.imagine;
+        const produsExistent = await Produs.findById(req.params.id)
+        const imagine = req.file ? req.file.path : produsExistent.imagine
 
-        let listaIngrediente = parseArrayFromBody(req.body.ingredienteAlese);
-        if (req.body.ingredientNou) listaIngrediente.push(req.body.ingredientNou);
+        let listaIngrediente = parseArrayFromBody(req.body.ingredienteAlese)
+        if (req.body.ingredientNou) listaIngrediente.push(req.body.ingredientNou)
+        let optiuniDecor = parseArrayFromBody(req.body.optiuni_decor);
 
         await Produs.findByIdAndUpdate(req.params.id, {
             numeProdus, descriere, pret, categorie, disponibil, stoc, imagine, transport_recomandat, data_expirare,
-            ingrediente: [...new Set(listaIngrediente)]
+            ingrediente: [...new Set(listaIngrediente)],
+            optiuni_decor: [...new Set(optiuniDecor)]
         });
 
         await verificaDisponibilitate();

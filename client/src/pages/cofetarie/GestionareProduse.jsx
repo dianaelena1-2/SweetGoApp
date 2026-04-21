@@ -37,6 +37,9 @@ function GestionareProduse() {
     const [ingredienteAlese, setIngredienteAlese] = useState([])
     const [numeIngredientNou, setNumeIngredientNou] = useState('')
 
+    const [optiuniDecor, setOptiuniDecor] = useState([])
+    const [numeOptiuneNoua, setNumeOptiuneNoua] = useState('')
+
     const [alerteExpirare, setAlerteExpirare] = useState([])
     const [esteDupaOra20, setEsteDupaOra20] = useState(false)
 
@@ -112,15 +115,27 @@ function GestionareProduse() {
     }
 
     const handleAdaugaIngredient = () => {
-        const nume = numeIngredientNou.trim().toLowerCase();
+        const nume = numeIngredientNou.trim().toLowerCase()
         if (nume && !ingredienteAlese.includes(nume)) {
-            setIngredienteAlese([...ingredienteAlese, nume]);
+            setIngredienteAlese([...ingredienteAlese, nume])
         }
-        setNumeIngredientNou('');
+        setNumeIngredientNou('')
     }
 
     const stergeIngredient = (nume) => {
-        setIngredienteAlese(ingredienteAlese.filter(ing => ing !== nume));
+        setIngredienteAlese(ingredienteAlese.filter(ing => ing !== nume))
+    }
+
+    const adaugaOptiune = () => {
+        const nume = numeOptiuneNoua.trim()
+        if (nume && !optiuniDecor.includes(nume)) {
+            setOptiuniDecor([...optiuniDecor, nume])
+        }
+        setNumeOptiuneNoua('')
+    }
+
+    const stergeOptiune = (nume) => {
+        setOptiuniDecor(optiuniDecor.filter(opt => opt !== nume))
     }
 
     const aplicaOferta = async (produsId) => {
@@ -153,6 +168,7 @@ function GestionareProduse() {
                 data.append('data_expirare', formNou.data_expirare)
             }
             data.append('ingredienteAlese', JSON.stringify(ingredienteAlese))
+            data.append('optiuni_decor', JSON.stringify(optiuniDecor));
             
             if (imagineNoua) data.append('imagine', imagineNoua)
             await api.post('/produse', data, { headers: { 'Content-Type': 'multipart/form-data' } })
@@ -160,6 +176,7 @@ function GestionareProduse() {
             setFormNou(produsGol)
             setImagineNoua(null)
             setIngredienteAlese([])
+            setOptiuniDecor([])
             afiseazaSucces('Produs adăugat cu succes!')
             fetchProduse()
         } catch (err) {
@@ -181,6 +198,7 @@ function GestionareProduse() {
         })
         setImagineEditare(null)
         setIngredienteAlese(produs.ingrediente || [])
+        setOptiuniDecor(produs.optiuni_decor || [])
         setNumeIngredientNou('')
     }
 
@@ -203,12 +221,14 @@ function GestionareProduse() {
                 data.append('data_expirare', formEditare.data_expirare)
             }
             data.append('ingredienteAlese', JSON.stringify(ingredienteAlese))
+            data.append('optiuni_decor', JSON.stringify(optiuniDecor));
 
             if (imagineEditare) data.append('imagine', imagineEditare)
             await api.put(`/produse/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
             
             setEditareId(-1)
             setIngredienteAlese([])
+            setOptiuniDecor([])
             afiseazaSucces('Produs actualizat cu succes!')
             fetchProduse()
             fetchProduseExpirate()
@@ -272,6 +292,47 @@ function GestionareProduse() {
         </div>
     )
 
+    const renderSectiuneOptiuni = () => (
+        <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: '10px'}}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#7a5230' }}>
+                <Palette size={18} /> Opțiuni decor (disponibile pentru clienți)
+            </label>
+
+            {optiuniDecor.length > 0 && (
+                <div className="ingrediente-selector-container">
+                    {optiuniDecor.map((opt, idx) => (
+                        <div 
+                            key={idx} 
+                            className="ing-tag activ"
+                            onClick={() => stergeOptiune(opt)}
+                        >
+                            {opt} ✕
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
+                <input 
+                    type="text" 
+                    placeholder="Adaugă opțiune (ex: Scris personalizat)" 
+                    value={numeOptiuneNoua}
+                    onChange={(e) => setNumeOptiuneNoua(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault(); 
+                            adaugaOptiune();
+                        }
+                    }}
+                    style={{ flex: 1 }}
+                />
+                <button type="button" className="btn-ingredient-nou" onClick={adaugaOptiune}>
+                    ➕ Adaugă
+                </button>
+            </div>
+        </div>
+    )
+
     return (
         <div className="acasa-container">
             <NavbarCofetarie />
@@ -321,6 +382,7 @@ function GestionareProduse() {
                         </div>
 
                         {renderSectiuneIngrediente()}
+                        {formNou.categorie === 'Torturi' && renderSectiuneOptiuni()}
 
                         <div className="form-group">
                             <label>Imagine produs (opțional)</label>
@@ -378,6 +440,7 @@ function GestionareProduse() {
                                             <div className="form-group"><label>Dată expirare</label><input type="date" value={formEditare.data_expirare} onChange={(e) => setFormEditare({ ...formEditare, data_expirare: e.target.value })} /></div>
                                         </div>
                                         {renderSectiuneIngrediente()}
+                                        {formEditare.categorie === 'Torturi' && renderSectiuneOptiuni()}
                                         <div className="gp-butoane-editare">
                                             <button className="btn-primar" onClick={() => handleSalveazaEditare(produs._id)}>Salvează</button>
                                             <button className="btn-secundar" onClick={() => setEditareId(-1)}>Anulează</button>
