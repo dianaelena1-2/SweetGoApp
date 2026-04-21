@@ -175,34 +175,34 @@ function DashboardAdmin() {
                                             <p><Phone size={14} /> {cofetarie.telefon}</p>
                                             <div className="admin-documente">
                                                 {cofetarie.certificat_inregistrare && (
-                                                    <button
-                                                        onClick={() => {
-                                                            const url = cofetarie.certificat_inregistrare?.startsWith('http')
-                                                            ? cofetarie.certificat_inregistrare
+                                                    <a
+                                                        href={(() => {
+                                                            const url = cofetarie.certificat_inregistrare?.startsWith('http') 
+                                                            ? cofetarie.certificat_inregistrare 
                                                             : `https://sweetgoapp.onrender.com/${cofetarie.certificat_inregistrare}`;
-                                                            const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}`;
-                                                            window.open(viewerUrl, '_blank', 'noopener,noreferrer');
-                                                        }}
+                                                            return url.replace('/upload/', '/upload/fl_attachment/');
+                                                        })()}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
                                                         className="admin-doc-link"
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                                                        >
+                                                    >
                                                         📄 Certificat înregistrare
-                                                    </button>
+                                                    </a>
                                                 )}
                                                 {cofetarie.certificat_sanitar && (
-                                                    <button
-                                                        onClick={() => {
-                                                            const url = cofetarie.certificat_sanitar?.startsWith('http')
-                                                            ? cofetarie.certificat_sanitar
+                                                    <a
+                                                        href={(() => {
+                                                            const url = cofetarie.certificat_sanitar?.startsWith('http') 
+                                                            ? cofetarie.certificat_sanitar 
                                                             : `https://sweetgoapp.onrender.com/${cofetarie.certificat_sanitar}`;
-                                                            const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}`;
-                                                            window.open(viewerUrl, '_blank', 'noopener,noreferrer');
-                                                        }}
+                                                            return url.replace('/upload/', '/upload/fl_attachment/');
+                                                        })()}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
                                                         className="admin-doc-link"
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                                                        >
+                                                    >
                                                         📄 Certificat sanitar
-                                                    </button>
+                                                    </a>
                                                 )}
                                             </div>
                                         </div>
