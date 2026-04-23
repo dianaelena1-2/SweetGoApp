@@ -3178,3 +3178,424 @@ body {
     }
     .ir-actiuni { justify-content: flex-start; margin-top: 10px; }
 }
+
+/* ================= PROFIL CLIENT MODERN ================= */
+.profil-page-wrapper {
+    background-color: #fffaf5;
+    min-height: 100vh;
+}
+
+.profil-layout-modern {
+    display: flex;
+    gap: 2.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    align-items: flex-start;
+}
+
+/* --- SIDEBAR --- */
+.profil-sidebar {
+    width: 280px;
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profil-user-widget {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f5eadd;
+}
+
+.profil-avatar-text {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c97c2e, #a8621e);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 16px rgba(201, 124, 46, 0.2);
+}
+
+.profil-user-widget h3 {
+    font-size: 1.2rem;
+    color: #3d2c1e;
+    margin-bottom: 0.2rem;
+}
+
+.profil-user-widget span {
+    font-size: 0.85rem;
+    color: #9a7a5a;
+}
+
+.profil-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.profil-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.8rem 1.2rem;
+    border-radius: 12px;
+    color: #7a5230;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+.profil-nav-item:hover {
+    background: white;
+    color: #c97c2e;
+}
+
+.profil-nav-item.active {
+    background: #fdecd8;
+    color: #c97c2e;
+}
+
+.profil-btn-logout {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 1rem;
+    color: #9a7a5a;
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    text-align: left;
+}
+
+.profil-btn-logout:hover {
+    color: #e74c3c;
+}
+
+/* --- CONȚINUT PRINCIPAL --- */
+.profil-content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    min-width: 0;
+}
+
+.profil-sectiune-card {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(180, 120, 40, 0.05);
+    border: 1px solid #fffaf5;
+}
+
+.profil-sectiune-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.profil-sectiune-titlu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    color: #3d2c1e;
+    font-weight: 600;
+}
+
+.profil-sectiune-titlu svg {
+    color: #c97c2e;
+}
+
+.profil-sectiune-desc {
+    color: #9a7a5a;
+    font-size: 0.9rem;
+    margin-top: -10px;
+    margin-bottom: 1.5rem;
+}
+
+/* Formulare specifice profilului */
+.profil-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.profil-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.profil-input-group label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #9a7a5a;
+    letter-spacing: 0.5px;
+}
+
+.profil-input {
+    background: #fffaf5;
+    border: 1.5px solid #f5d5a8;
+    padding: 0.9rem 1.2rem;
+    border-radius: 12px;
+    color: #3d2c1e;
+    font-size: 0.95rem;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.profil-input:focus {
+    background: white;
+    border-color: #c97c2e;
+    box-shadow: 0 0 0 3px rgba(201, 124, 46, 0.1);
+}
+
+.profil-btn-salvare {
+    background: #c97c2e;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    float: right;
+    box-shadow: 0 4px 12px rgba(201, 124, 46, 0.2);
+}
+
+.profil-btn-salvare:hover {
+    background: #a8621e;
+    transform: translateY(-2px);
+}
+
+/* Adrese Livrare */
+.btn-adauga-noua {
+    color: #c97c2e;
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.adresa-card-modern {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.2rem;
+    border: 1px solid #f5eadd;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s;
+}
+
+.adresa-card-modern:hover {
+    border-color: #f5d5a8;
+}
+
+.adresa-icon-bg {
+    background: #fdecd8;
+    color: #c97c2e;
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.adresa-info-text {
+    flex: 1;
+}
+
+.adresa-info-text h4 {
+    margin: 0 0 4px 0;
+    color: #3d2c1e;
+    font-size: 1rem;
+}
+
+.adresa-info-text p {
+    margin: 0;
+    color: #9a7a5a;
+    font-size: 0.85rem;
+}
+
+.adresa-actiuni {
+    display: flex;
+    gap: 10px;
+    color: #9a7a5a;
+}
+
+.adresa-actiuni svg {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.adresa-actiuni svg:hover {
+    color: #c97c2e;
+}
+
+/* Favorite Grid Modern */
+.favorite-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.fav-card-nou {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #f5eadd;
+    transition: transform 0.2s;
+}
+
+.fav-card-nou:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(180, 120, 40, 0.08);
+}
+
+.fav-card-nou-img-container {
+    position: relative;
+    height: 160px;
+    background: #fdfaf6;
+}
+
+.fav-card-nou-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.fav-card-nou-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 50%);
+}
+
+.fav-card-nou-nume {
+    position: absolute;
+    bottom: 10px;
+    left: 15px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fav-card-nou-logo {
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.fav-heart-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(4px);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.2s;
+}
+
+.fav-heart-btn:hover {
+    background: rgba(225, 29, 72, 0.8);
+}
+
+.fav-card-nou-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.2rem;
+}
+
+.fav-card-nou-rating {
+    font-size: 0.85rem;
+    color: #9a7a5a;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.fav-card-nou-link {
+    color: #c97c2e;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+@media (max-width: 900px) {
+    .profil-layout-modern {
+        flex-direction: column;
+    }
+    .profil-sidebar {
+        width: 100%;
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .profil-user-widget {
+        width: 100%;
+        border-bottom: none;
+    }
+    .profil-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        width: 100%;
+        padding-bottom: 10px;
+    }
+    .profil-nav-item {
+        white-space: nowrap;
+    }
+    .profil-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
