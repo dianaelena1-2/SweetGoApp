@@ -14,6 +14,7 @@ const comandaSchema = new mongoose.Schema({
     tip_transport: { type: String, default: 'masina' },
     metoda_plata: { type: String, default: 'numerar' },
     status_plata: { type: String, default: 'in_asteptare' },
+    are_recenzie: { type: Boolean, default: false },
     detalii: [{ 
         produs_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Produs' },
         cantitate: Number,

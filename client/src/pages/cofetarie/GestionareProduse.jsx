@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { parsePath, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Cake, PlusCircle, Tag, Check, X, Package, Pencil, Trash2, Palette, Bike, Car, Snowflake, ListChecks, AlertTriangle, Calendar } from 'lucide-react'
 import api from '../../services/api'
@@ -482,8 +482,36 @@ function GestionareProduse() {
                                         <div className="form-group"><label>Descriere</label><input type="text" value={formEditare.descriere} onChange={(e) => setFormEditare({ ...formEditare, descriere: e.target.value })} /></div>
                                         <div className="gp-form-row">
                                             <div className="form-group"><label>Preț</label><input type="number" value={formEditare.pret} onChange={(e) => setFormEditare({ ...formEditare, pret: e.target.value })} /></div>
-                                            <div className="form-group"><label>Stoc</label><input type="number" value={formEditare.stoc} onChange={(e) => setFormEditare({ ...formEditare, stoc: e.target.value })} /></div>
+                                            <div className="form-group"><label>Stoc</label><input type="number" value={formEditare.stoc} onChange={(e) => {
+                                                const newStoc = parseInt(e.target.value) || 0;
+                                                setFormEditare({ 
+                                                    ...formEditare,
+                                                    stoc: e.target.value,
+                                                    disponibil: newStoc > 0 ? 1 : formEditare.disponibil
+                                                 })}
+                                            } /></div>
                                             <div className="form-group"><label>Dată expirare</label><input type="date" value={formEditare.data_expirare} onChange={(e) => setFormEditare({ ...formEditare, data_expirare: e.target.value })} /></div>
+                                            <div className="form-group">
+                                                <label>Categorie</label>
+                                                <select value={formEditare.categorie} onChange={(e) => setFormEditare({ ...formEditare, categorie: e.target.value })}>
+                                                    {CATEGORII.map(c => <option key={c} value={c}>{c}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Disponibil</label>
+                                                <select value={formEditare.disponibil} onChange={(e) => setFormEditare({ ...formEditare, disponibil: parseInt(e.target.value) })}>
+                                                    <option value={1}>Da</option>
+                                                    <option value={0}>Nu</option>
+                                                </select>
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Transport</label>
+                                                <select value={formEditare.transport_recomandat} onChange={(e) => setFormEditare({ ...formEditare, transport_recomandat: e.target.value })}>
+                                                    <option value="bicicleta">🚲 Bicicletă / Trotinetă</option>
+                                                    <option value="masina">🚗 Mașină Standard</option>
+                                                    <option value="frigorific">❄️ Mașină Frigorifică</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         {renderSectiuneIngrediente()}
                                         {formEditare.categorie === 'Torturi' && renderSectiuneOptiuni()}

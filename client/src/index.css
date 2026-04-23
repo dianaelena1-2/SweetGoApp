@@ -35,69 +35,195 @@ body {
 }
 
 /* ================= AUTENTIFICARE ================= */
-.auth-container {
+.auth-split-layout {
+    display: flex;
     min-height: 100vh;
+    background-color: #fffaf5; 
+}
+
+.auth-form-side {
+    flex: 1;
+    max-width: none;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-form-side > form,
+.auth-form-side > div,
+.auth-form-side > h1,
+.auth-form-side > h2,
+.auth-form-side > p {
+    width: 100%;
+    max-width: 320px; 
+}
+
+.auth-image-side {
+    flex: 0 0 45%; 
+    background-image: url('https://i.pinimg.com/1200x/82/5c/ba/825cba126ec88a95ba2634a2d3e60faa.jpg');
+    background-position: center; 
+    background-size: cover; /* 'cover' arată mai bine când avem margini rotunjite */
+    background-repeat: no-repeat;
+    
+    /* MAGIC: Aici rotunjim marginile și adăugăm spațiu */
+    border-radius: 40px; /* Rotunjește colțurile. Poți face numărul mai mare sau mai mic */
+    margin: 20px 20px 20px 0; /* Lasă spațiu: sus, dreapta, jos, stânga (0 ca să stea mai aproape de formular) */
+    
+    /* Opțional: o umbră subtilă pentru efect 3D */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
+    
+    display: none;
+}
+
+/* Badge-ul de pe imagine ("Status Comanda") */
+.auth-image-badge {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.8rem 1.2rem;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+}
+.badge-icon {
+    background: #2ecc71;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #fff8f0, #fdecd8);
+    font-size: 0.8rem;
 }
-.auth-card {
-    background: white;
-    padding: 2.5rem;
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(210, 140, 60, 0.15);
-    width: 100%;
-    max-width: 420px;
-}
-.auth-card h1 {
-    font-size: 2rem;
-    color: #c97c2e;
-    margin-bottom: 0.3rem;
-    text-align: center;
-}
-.auth-card h2 {
-    font-size: 1.3rem;
-    color: #7a5230;
-    margin-bottom: 1.8rem;
-    font-weight: 500;
-    text-align: center;
-}
-.auth-card button {
-    width: 100%;
-    padding: 0.85rem;
-    background: #c97c2e;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    transition: background 0.2s;
-}
-.auth-card button:hover {
-    background: #a8621e;
-}
-.auth-card button:disabled {
-    background: #e8c49a;
-    cursor: not-allowed;
-}
-.auth-card p {
-    text-align: center;
-    margin-top: 1.2rem;
-    color: #7a5230;
-    font-size: 0.95rem;
-}
-.auth-card p a {
-    color: #c97c2e;
-    font-weight: 600;
-    text-decoration: none;
-}
-.auth-card p a:hover {
-    text-decoration: underline;
+.badge-text { display: flex; flex-direction: column; }
+.badge-text small { font-size: 0.65rem; opacity: 0.8; }
+.badge-text span { font-size: 0.85rem; font-weight: bold; }
+
+/* Tab-uri: Autentificare / Inregistrare */
+.auth-nav-tabs {
+    display: flex;
+    border-bottom: 2px solid #f5eadd;
+    margin-bottom: 1.5rem;
+    margin-top: 2rem;
 }
 
+.auth-nav-tab {
+    flex: 1;
+    padding: 0.8rem;
+    text-align: center;
+    color: #9a7a5a;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.auth-nav-tab:hover {
+    color: #c97c2e;
+}
+
+.auth-nav-tab.active {
+    color: #c97c2e;
+    border-bottom: 3px solid #c97c2e;
+    margin-bottom: -2px;
+}
+
+/* Toggle pentru roluri (Cumpărător / Cofetărie) similar cu poza */
+.role-toggle-container {
+    display: flex;
+    background: #fffaf5;
+    border-radius: 30px;
+    padding: 4px;
+    margin-bottom: 2rem;
+    border: 1px solid #f5eadd;
+}
+
+.role-toggle-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #9a7a5a;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.role-toggle-btn.active {
+    background: white;
+    color: #c97c2e;
+    box-shadow: 0 2px 8px rgba(201, 124, 46, 0.15);
+}
+
+.input-icon-wrapper {
+    display: flex;
+    align-items: center;
+    background: #fffaf5;
+    border: 1.5px solid #f5d5a8;
+    border-radius: 20px; /* Rotunjire ajustată pentru dimensiunea nouă */
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+/* Iconița din interior */
+.input-icon {
+    padding: 0 0 0 0.8rem; /* Spațiu puțin mai mic în stânga iconiței */
+    font-size: 1rem; /* Iconiță ușor mai mică */
+    color: #c97c2e;
+}
+
+/* Input-ul în sine */
+.input-field {
+    width: 100%;
+    padding: 0.5rem 0.5rem; /* Redus de la 0.7rem pentru a face câmpul mai subțire */
+    border: none; 
+    background: transparent;
+    font-size: 0.85rem; /* Text puțin mai mic */
+    outline: none;
+    color: #3d2c1e;
+}
+
+/* Butonul de Login */
+.auth-btn {
+    width: 100%;
+    padding: 0.6rem 1rem; /* Subțiat considerabil (înainte era 0.9rem) */
+    background: #c97c2e;
+    border: none;
+    border-radius: 25px; /* Rotunjire adaptată proporțional */
+    font-size: 0.9rem; /* Text ușor mai mic */
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.8rem;
+    box-shadow: 0 4px 10px rgba(201, 124, 46, 0.2);
+}
+
+.auth-btn:hover {
+    background: #a8621e;
+    transform: translateY(-2px);
+}
+
+@media (min-width: 900px) {
+    .auth-image-side {
+        display: block;
+    }
+}
+@media (max-width: 600px) {
+    .auth-form-side {
+        padding: 2rem;
+    }
+}
 /* ================= FORMULARE GENERALE ================= */
 .form-group {
     margin-bottom: 1.2rem;
@@ -141,6 +267,186 @@ body {
     margin-bottom: 1rem;
     font-size: 0.9rem;
     border: 1px solid #a8d5a8;
+}
+
+/* ================= HEADER & FILTRE ACASĂ ================= */
+.acasa-hero {
+    margin-bottom: 2rem;
+}
+.acasa-hero h2 {
+    font-size: 2rem;
+    color: #3d2c1e;
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+}
+.acasa-hero p {
+    color: #9a7a5a;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.acasa-filtre-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-wrapper-mare {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1.5px solid #f5eadd;
+    border-radius: 30px;
+    padding: 0.6rem 1.2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+.search-wrapper-mare input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    padding-left: 10px;
+    font-size: 0.95rem;
+    color: #3d2c1e;
+}
+.search-wrapper-mare input::placeholder {
+    color: #9a7a5a;
+}
+
+.filtre-butoane {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+.filtru-pill {
+    background: white;
+    border: 1.5px solid #f5eadd;
+    border-radius: 30px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #7a5230;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    transition: all 0.2s;
+}
+.filtru-pill:hover {
+    border-color: #c97c2e;
+    color: #c97c2e;
+}
+.filtru-pill.activ {
+    background: #c97c2e;
+    border-color: #c97c2e;
+    color: white;
+}
+
+/* ================= CARDURI COFETĂRII NOU ================= */
+.cofetarie-card {
+    background: white;
+    border-radius: 24px; /* Rotunjire mai mare, ca in poza */
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid #fffaf5;
+}
+.cofetarie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(201, 124, 46, 0.15);
+}
+
+.cofetarie-card-imagine {
+    position: relative; /* Important pentru badge-uri absolute */
+    height: 180px;
+    background: #fdfaf6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Badge-urile de pe poza */
+.badge-status-poza {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #2ecc71;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.badge-status-poza.inchis {
+    background: #e74c3c;
+}
+.badge-rating-poza {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: white;
+    color: #3d2c1e;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.cofetarie-card-info {
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Ca sa impinga butonul jos */
+}
+.cofetarie-card-info h3 {
+    font-size: 1.15rem;
+    color: #3d2c1e;
+    margin-bottom: 0.2rem;
+    font-weight: 700;
+}
+.cofetarie-categorii-text {
+    font-size: 0.85rem;
+    color: #9a7a5a;
+    margin-bottom: 0.8rem;
+}
+.cofetarie-locatie {
+    font-size: 0.85rem;
+    color: #7a5230;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+}
+
+/* Butonul de la baza cardului */
+.btn-vezi-meniu {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 20px;
+    border: none;
+    background: #c97c2e;
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-top: auto; /* Il impinge mereu jos de tot */
+    transition: background 0.2s;
+}
+.btn-vezi-meniu:hover {
+    background: #a8621e;
 }
 
 /* ================= NAVBAR (CLIENT + COLECTIV) ================= */
@@ -1223,11 +1529,224 @@ body {
 .cos-btn-comanda {
     width: 100%;
     padding: 1rem;
-    font-size: 1rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: 30px !important; 
+    box-shadow: 0 8px 20px rgba(201, 124, 46, 0.35); 
+    transition: all 0.3s ease; 
 }
+
+.cos-btn-comanda:hover:not(:disabled) {
+    background: #a8621e;
+    transform: translateY(-3px); 
+    box-shadow: 0 12px 25px rgba(201, 124, 46, 0.45); 
+}
+
 .cos-btn-comanda:disabled {
     background: #e8c49a;
+    box-shadow: none;
+    transform: translateY(0);
     cursor: not-allowed;
+}
+/* ================= CHECKOUT BREADCRUMB ================= */
+.checkout-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f5eadd;
+}
+.breadcrumb-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #9a7a5a;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.breadcrumb-step.active {
+    color: #c97c2e;
+}
+.breadcrumb-step.completed {
+    color: #3d2c1e;
+}
+.breadcrumb-step.completed:hover {
+    color: #c97c2e;
+}
+.breadcrumb-separator {
+    color: #d1c4b7;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* ================= LAYOUT SUMAR COMANDĂ FIX (DREAPTA) ================= */
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+    align-items: start;
+}
+.checkout-main-content {
+    background: transparent;
+}
+.checkout-sumar-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    padding: 1.5rem;
+    position: sticky;
+    top: 80px;
+    border: 1px solid #fffaf5;
+}
+.checkout-sumar-card h3 {
+    font-size: 1.15rem;
+    color: #3d2c1e;
+    margin-bottom: 1.2rem;
+}
+.sumar-mini-produs {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed #f5eadd;
+}
+.sumar-mini-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.sumar-mini-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #fdfaf6;
+}
+.sumar-mini-text h4 {
+    font-size: 0.9rem;
+    color: #3d2c1e;
+    margin: 0 0 2px 0;
+}
+.sumar-mini-text p {
+    font-size: 0.75rem;
+    color: #9a7a5a;
+    margin: 0;
+}
+.sumar-mini-pret {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #3d2c1e;
+}
+
+/* Layout Formular Pasul 2 (Livrare) */
+.checkout-form-section {
+    background: white;
+    border-radius: 24px;
+    padding: 1.8rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    margin-bottom: 1.5rem;
+}
+.checkout-form-section h2 {
+    font-size: 1.4rem;
+    color: #3d2c1e;
+    margin-bottom: 0.5rem;
+}
+.checkout-form-section > p {
+    color: #9a7a5a;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #f5d5a8;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+    background: #fffaf5;
+    font-family: inherit;
+    color: #3d2c1e;
+    resize: vertical; /* Permite redimensionarea doar pe înălțime */
+    min-height: 80px;
+    margin-top: 4px;
+}
+
+.form-group textarea::placeholder {
+    color: #9a7a5a;
+}
+
+.form-group textarea:focus {
+    border-color: #c97c2e;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(201, 124, 46, 0.1);
+}
+
+/* ================= SECȚIUNE CADOU MODERNĂ ================= */
+.cadou-sectiune-moderna {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1.5px solid #fffaf5;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    margin-top: 2rem;
+}
+.cadou-mesaj-textarea {
+    width: 100%;
+    background: #fdfaf6;
+    border: 1.5px solid #f5eadd;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 0.95rem;
+    outline: none;
+    resize: vertical;
+    transition: all 0.2s;
+    font-family: inherit;
+    color: #3d2c1e;
+    margin-bottom: 1.5rem;
+}
+.cadou-mesaj-textarea:focus {
+    border-color: #c97c2e;
+    background: white;
+}
+.cadou-checkbox-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    background: #fffaf5;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #f5eadd;
+    transition: all 0.2s;
+}
+.cadou-checkbox-wrapper:hover {
+    border-color: #c97c2e;
+}
+.cadou-checkbox-wrapper input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #c97c2e;
+    margin-top: 2px;
+    cursor: pointer;
+}
+.cadou-checkbox-info {
+    display: flex;
+    flex-direction: column;
+}
+.cadou-checkbox-info .cadou-titlu {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #3d2c1e;
+}
+.cadou-checkbox-info .cadou-desc {
+    font-size: 0.85rem;
+    color: #9a7a5a;
+    margin-top: 2px;
 }
 
 /* ================= OPȚIUNI DECOR ================= */
@@ -2417,4 +2936,245 @@ body {
     .cos-layout {
         grid-template-columns: 1fr;
     }
+}
+
+/* ================= DASHBOARD ISTORIC COMENZI ================= */
+.istoric-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.istoric-header-top h2 {
+    font-size: 1.8rem;
+    color: #3d2c1e;
+    margin-bottom: 0.3rem;
+}
+.istoric-header-top p {
+    color: #9a7a5a;
+    font-size: 0.95rem;
+}
+
+/* Statistici Sus */
+.istoric-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+.istoric-stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    border: 1px solid #fffaf5;
+}
+.istoric-stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.istoric-stat-info {
+    display: flex;
+    flex-direction: column;
+}
+.istoric-stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #9a7a5a;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.3rem;
+}
+.istoric-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #3d2c1e;
+}
+
+/* Container Tabel Comenzi */
+.istoric-table-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+}
+.istoric-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f5eadd;
+}
+.istoric-table-header h3 {
+    font-size: 1.2rem;
+    color: #3d2c1e;
+}
+
+/* Rânduri tip Tabel */
+.istoric-row-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1.5fr 1fr 1fr 1.5fr;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #9a7a5a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.istoric-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1.5fr 1fr 1fr 1.5fr;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid #f5eadd;
+    transition: background 0.2s;
+}
+.istoric-row:hover {
+    background: #fffaf5;
+}
+.istoric-row:last-child {
+    border-bottom: none;
+}
+.ir-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.ir-id { font-weight: 600; color: #3d2c1e; font-size: 0.9rem; }
+.ir-nume-cofetarie { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #3d2c1e; font-size: 0.95rem; }
+.ir-data { color: #7a5230; font-size: 0.9rem; }
+.ir-data small { color: #9a7a5a; font-size: 0.8rem; display: block;}
+.ir-suma { font-weight: 700; color: #c97c2e; font-size: 1rem; }
+.ir-actiuni { display: flex; align-items: center; gap: 10px; justify-content: flex-end;}
+
+.btn-repeta {
+    background: transparent;
+    border: none;
+    color: #c97c2e;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.btn-repeta:hover { color: #a8621e; text-decoration: underline; }
+.btn-vezi {
+    background: #fffaf5;
+    border: 1px solid #f5d5a8;
+    color: #9a7a5a;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-vezi:hover { background: #fdecd8; color: #c97c2e; border-color: #c97c2e; }
+
+/* Favorite Grid */
+.istoric-fav-header {
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+    color: #3d2c1e;
+}
+.istoric-fav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+.fav-card-modern {
+    position: relative;
+    height: 200px;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.fav-card-modern:hover {
+    transform: translateY(-5px);
+}
+.fav-card-img {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+.fav-card-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 100%);
+    z-index: 2;
+}
+.fav-card-content {
+    position: relative;
+    z-index: 3;
+    padding: 1.2rem;
+    color: white;
+}
+.fav-cofetarie {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #fdecd8;
+    margin-bottom: 0.2rem;
+    font-weight: 700;
+}
+.fav-nume {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.fav-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.fav-pret {
+    color: #f5d5a8;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+.btn-fav-add {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    width: 35px; height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: background 0.2s;
+}
+.btn-fav-add:hover { background: #c97c2e; }
+
+@media (max-width: 900px) {
+    .istoric-row-header { display: none; }
+    .istoric-row { 
+        grid-template-columns: 1fr; 
+        gap: 0.5rem; 
+        padding: 1.5rem 1rem;
+    }
+    .ir-actiuni { justify-content: flex-start; margin-top: 10px; }
 }

@@ -7,7 +7,7 @@ function Register() {
         nume: '',
         email: '',
         parola: '',
-        rol: 'client',
+        rol: 'client', 
         numeCofetarie: '',
         adresa: '',
         telefon: ''
@@ -23,14 +23,19 @@ function Register() {
         setFormData({ ...formData, [e.target.name]: e.target.value })
     }
 
+    // Funcție pentru a schimba rolul din butoanele toggle
+    const handleRoleChange = (role) => {
+        setFormData({ ...formData, rol: role })
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setEroare('')
         if (formData.rol === 'cofetarie') {
-        if (!certificatInregistrare || !certificatSanitar) {
-            setEroare('Documentele sunt obligatorii pentru cofetarii')
-            return
-        }
+            if (!certificatInregistrare || !certificatSanitar) {
+                setEroare('Documentele sunt obligatorii pentru cofetării')
+                return
+            }
         }
         setLoading(true)
 
@@ -52,7 +57,7 @@ function Register() {
                 }
             }
 
-           await api.post('/auth/register', data, {
+            await api.post('/auth/register', data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
 
@@ -64,138 +69,150 @@ function Register() {
 
         } catch (err) {
             console.log('EROARE:', err)
-            setEroare(err.response?.data?.mesaj || 'A aparut o eroare')
+            setEroare(err.response?.data?.mesaj || 'A apărut o eroare')
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <h1>SweetGo 🍰</h1>
-                <h2>Creează cont</h2>
+        <div className="auth-split-layout">
+            {/* Partea stângă - Formular */}
+            <div className="auth-form-side">
+                <h1 className="auth-logo">SweetGo 🍰</h1>
+                
+                <div style={{ marginTop: '2rem' }}>
+                    <h2 className="auth-welcome">Creează cont!</h2>
+                    <p className="auth-subtitle">Alătură-te comunității și bucură-te de dulciuri.</p>
+                </div>
+
+                <div className="auth-nav-tabs">
+                    <Link to="/login" className="auth-nav-tab">Autentificare</Link>
+                    <Link to="/register" className="auth-nav-tab active">Înregistrare</Link>
+                </div>
+
+                {/* Toggle Butoane pentru Roluri */}
+                <div className="role-toggle-container">
+                    <button 
+                        type="button" 
+                        className={`role-toggle-btn ${formData.rol === 'client' ? 'active' : ''}`}
+                        onClick={() => handleRoleChange('client')}
+                    >
+                        Cumpărător
+                    </button>
+                    <button 
+                        type="button" 
+                        className={`role-toggle-btn ${formData.rol === 'cofetarie' ? 'active' : ''}`}
+                        onClick={() => handleRoleChange('cofetarie')}
+                    >
+                        Cofetărie
+                    </button>
+                </div>
 
                 {eroare && <div className="eroare">{eroare}</div>}
 
                 <form onSubmit={handleSubmit}>
+                    {/* Câmp Nume Complet */}
                     <div className="form-group">
-                        <label>Nume</label>
-                        <input
-                            type="text"
-                            name="nume"
-                            value={formData.nume}
-                            onChange={handleChange}
-                            placeholder="Numele tău"
-                            required
-                        />
+                        <label className="form-group-label">Nume Complet</label>
+                        <div className="input-icon-wrapper">
+                            <input
+                                type="text"
+                                name="nume"
+                                className="form-group-input"
+                                value={formData.nume}
+                                onChange={handleChange}
+                                placeholder="Popescu Ion"
+                                required
+                            />
+                        </div>
                     </div>
 
+                    {/* Câmp Email */}
                     <div className="form-group">
-                        <label>Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="email@exemplu.com"
-                            required
-                        />
+                        <label className="form-group-label">Email</label>
+                        <div className="input-icon-wrapper">
+                            <input
+                                type="email"
+                                name="email"
+                                className="form-group-input"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="nume@exemplu.com"
+                                required
+                            />
+                        </div>
                     </div>
 
+                    {/* Câmp Parolă */}
                     <div className="form-group">
-                        <label>Parolă</label>
-                        <input
-                            type="password"
-                            name="parola"
-                            value={formData.parola}
-                            onChange={handleChange}
-                            placeholder="••••••••"
-                            required
-                        />
+                        <label className="form-group-label">Parolă</label>
+                        <div className="input-icon-wrapper">
+                            <input
+                                type="password"
+                                name="parola"
+                                className="form-group-input"
+                                value={formData.parola}
+                                onChange={handleChange}
+                                placeholder="••••••••"
+                                required
+                            />
+                        </div>
                     </div>
 
-                    <div className="form-group">
-                        <label>Tip cont</label>
-                        <select name="rol" value={formData.rol} onChange={handleChange}>
-                            <option value="client">Client</option>
-                            <option value="cofetarie">Cofetărie</option>
-                        </select>
-                    </div>
-
+                    {/* Secțiune extra pentru Cofetărie */}
                     {formData.rol === 'cofetarie' && (
-                        <>
+                        <div style={{ padding: '1rem', background: '#fffaf5', borderRadius: '16px', marginBottom: '1.5rem', border: '1px solid #f5eadd' }}>
+                            <h4 style={{ color: '#c97c2e', marginBottom: '1rem', fontSize: '0.9rem' }}>Detalii Cofetărie</h4>
+                            
                             <div className="form-group">
-                                <label>Nume Cofetărie</label>
-                                <input
-                                    type="text"
-                                    name="numeCofetarie"
-                                    value={formData.numeCofetarie}
-                                    onChange={handleChange}
-                                    placeholder="Numele cofetăriei"
-                                    required
-                                />
+                                <label className="form-group-label">Nume Cofetărie</label>
+                                <div className="input-icon-wrapper">
+                                    <input type="text" name="numeCofetarie" className="form-group-input" value={formData.numeCofetarie} onChange={handleChange} placeholder="Numele cofetăriei" required />
+                                </div>
                             </div>
 
                             <div className="form-group">
-                                <label>Adresă</label>
-                                <input
-                                    type="text"
-                                    name="adresa"
-                                    value={formData.adresa}
-                                    onChange={handleChange}
-                                    placeholder="Adresa cofetăriei"
-                                    required
-                                />
+                                <label className="form-group-label">Adresă</label>
+                                <div className="input-icon-wrapper">
+                                    <input type="text" name="adresa" className="form-group-input" value={formData.adresa} onChange={handleChange} placeholder="Adresa cofetăriei" required />
+                                </div>
                             </div>
 
                             <div className="form-group">
-                                <label>Telefon</label>
-                                <input
-                                    type="text"
-                                    name="telefon"
-                                    value={formData.telefon}
-                                    onChange={handleChange}
-                                    placeholder="07xxxxxxxx"
-                                    required
-                                />
+                                <label className="form-group-label">Telefon</label>
+                                <div className="input-icon-wrapper">
+                                    <input type="text" name="telefon" className="form-group-input" value={formData.telefon} onChange={handleChange} placeholder="07xxxxxxxx" required />
+                                </div>
                             </div>
 
-                            <div className="form-group">
-                                <label>Certificat de înregistrare</label>
-                                <input
-                                    type="file"
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    onChange={(e) => setCertificatInregistrare(e.target.files[0])}
-                                />
+                            <div className="form-group pt-margin">
+                                <label className="form-group-label">Certificat de înregistrare</label>
+                                <input type="file" className="file-input" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setCertificatInregistrare(e.target.files[0])} />
                             </div>
 
-                            <div className="form-group">
-                                <label>Certificat sanitar</label>
-                                <input
-                                    type="file"
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    onChange={(e) => setCertificatSanitar(e.target.files[0])}
-                                />
+                            <div className="form-group pt-margin">
+                                <label className="form-group-label">Certificat sanitar</label>
+                                <input type="file" className="file-input" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setCertificatSanitar(e.target.files[0])} />
                             </div>
 
-                            <div className="form-group">
-                                <label>Poză copertă cofetărie (opțional)</label>
-                                <input
-                                    type="file"
-                                    accept=".jpg,.jpeg,.png"
-                                    onChange={(e) => setImagineCoperta(e.target.files[0])}
-                                />
+                            <div className="form-group pt-margin">
+                                <label className="form-group-label">Poză copertă cofetărie (opțional)</label>
+                                <input type="file" className="file-input" accept=".jpg,.jpeg,.png" onChange={(e) => setImagineCoperta(e.target.files[0])} />
                             </div>
-                        </>
+                        </div>
                     )}
 
-                    <button type="button" onClick={handleSubmit} disabled={loading}>
+                    <button type="submit" className="auth-btn" disabled={loading}>
                         {loading ? 'Se creează contul...' : 'Creează cont'}
                     </button>
                 </form>
+            </div>
 
-                <p>Ai deja cont? <Link to="/login">Conectează-te</Link></p>
+            {/* Partea dreaptă */}
+            <div className="auth-image-side">
+                <div className="auth-image-badge">
+                </div>
             </div>
         </div>
     )

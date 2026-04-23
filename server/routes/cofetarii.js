@@ -4,6 +4,7 @@ const { verifyToken, verifyRol } = require('../middleware/auth')
 const Cofetarie = require('../models/Cofetarie')
 const Recenzie = require('../models/Recenzie')
 const Produs = require('../models/Produs')
+const Comanda = require('../models/Comanda')
 
 // afisare cofetarii publice (cu calcul rating)
 router.get('/', async (req, res) => {
@@ -76,6 +77,8 @@ router.post('/:id/recenzii', verifyToken, verifyRol('client'), async (req, res) 
             cofetarie_id: req.params.id,
             comanda_id, rating, comentariu
         });
+
+        await Comanda.findByIdAndUpdate(comanda_id, { are_recenzie: true });
 
         res.json({ mesaj: 'Recenzie adăugată cu succes!' });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare internă de server' }); }

@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
-import { Cake, ShoppingCart, MapPin, Star, MessageSquare, X, Calendar } from 'lucide-react'
+import { Cake, MapPin, Star, MessageSquare, X, Calendar, Search, ChevronDown, SlidersHorizontal } from 'lucide-react'
 import NavbarClient from '../../components/NavbarClient';
 
 function AcasaClient(){
@@ -67,19 +67,58 @@ function AcasaClient(){
                 logout={logout}
                 searchValue={cautare}
                 onSearchChange={setCautare}
-                showSearch={true}
+                showSearch={true} /* Ascundem search-ul din navbar, il avem mai mare in pagina acum */
             />
 
             <div className="acasa-continut">
-                <h2>Cofetării disponibile</h2>
+                
+                {/* === NOUL HEADER & BARĂ DE FILTRARE (Asemanator cu designul trimis) === */}
+                <div className="acasa-hero">
+                    <h2>Alege Cofetăria Dorită</h2>
+                    <p>Găsește cele mai bune prăjituri și torturi din zona ta</p>
 
+                    <div className="acasa-filtre-bar">
+                        {/* <div className="search-wrapper-mare">
+                            <Search size={20} color="#9a7a5a" />
+                            <input 
+                                type="text" 
+                                placeholder="Caută cofetărie după nume..." 
+                                value={cautare}
+                                onChange={(e) => setCautare(e.target.value)}
+                            />
+                        </div> */}
+                        
+                        {/* <div className="filtre-butoane">
+                            <button className="filtru-pill">Locație <ChevronDown size={16} /></button>
+                            <button className="filtru-pill activ">Rating 4.5+ <X size={14} /></button>
+                            <button className="filtru-pill">Deschis acum <ChevronDown size={16} /></button>
+                            <button className="filtru-pill">Sortare <SlidersHorizontal size={14} /></button>
+                        </div> */}
+                    </div>
+                </div>
+
+                {/* === GRID-UL DE COFETĂRII === */}
                 {loading ? (
                     <p className="loading">Se încarcă...</p>
                 ) : cofetariiFiltrate.length > 0 ? (
                     <div className="cofetarii-grid">
                         {cofetariiFiltrate.map(cofetarie => (
                             <div key={cofetarie._id} className="cofetarie-card" onClick={() => navigate(`/cofetarie/${cofetarie._id}`)}>
+                                
                                 <div className="cofetarie-card-imagine">
+                                    {/* BADGE STATUS */}
+                                    <span className="badge-status-poza">Deschis</span>
+                                    
+                                    {/* BADGE RATING */}
+                                    <span 
+                                        className="badge-rating-poza" 
+                                        onClick={(e) => deschideRecenzii(e, cofetarie)}
+                                        title="Vezi recenziile"
+                                    >
+                                        <Star size={14} fill="#f5a623" color="#f5a623" />
+                                        {cofetarie.rating_mediu ? cofetarie.rating_mediu.toFixed(1) : 'Nou'}
+                                    </span>
+
                                     {cofetarie.imagine_coperta ? (
                                         <img 
                                             src={cofetarie.imagine_coperta && cofetarie.imagine_coperta.startsWith('http') 
@@ -91,22 +130,21 @@ function AcasaClient(){
                                         <Cake size={48} color="#c97c2e" strokeWidth={1.5} />
                                     )}
                                 </div>
+
                                 <div className="cofetarie-card-info">
                                     <h3>{cofetarie.numeCofetarie}</h3>
-                                    <p className="adresa">
-                                        <MapPin size={16} /> {cofetarie.adresa}
+                                    
+                                    {/* Un text simulat de categorii cum e in model */}
+                                    <p className="cofetarie-categorii-text">
+                                        Prăjituri, Torturi, Specialități
                                     </p>
-                                    <div className="rating">
-                                        <span className="stele">
-                                            {renderStele(cofetarie.rating_mediu)}
-                                        </span>
-                                        <span 
-                                            className="numar-recenzii numar-recenzii-link" 
-                                            onClick={(e) => deschideRecenzii(e, cofetarie)}
-                                        >
-                                            {cofetarie.numar_recenzii > 0 ? `(${cofetarie.numar_recenzii} recenzii)` : '(fără recenzii)'}
-                                        </span>
+
+                                    <div className="cofetarie-locatie">
+                                        <MapPin size={16} color="#c97c2e" /> 
+                                        <span>{cofetarie.adresa}</span> 
                                     </div>
+                                    
+                                    <button className="btn-vezi-meniu">Vezi Meniu</button>
                                 </div>
                             </div>
                         ))}

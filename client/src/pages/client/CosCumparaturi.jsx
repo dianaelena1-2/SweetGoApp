@@ -1,20 +1,22 @@
 import { useState, useEffect, useContext, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, ShoppingCart, Trash2, AlertTriangle, Check, CreditCard, Banknote } from 'lucide-react'
+import { Cake, ShoppingCart, Trash2, Check, CreditCard, Banknote, Truck, ChevronRight, Gift, EyeOff } from 'lucide-react'
 import api from '../../services/api'
 import NavbarClient from '../../components/NavbarClient'
 
 const MIJLOACE_TRANSPORT = [
-    { id: 'bicicleta', nume: '🚲 Bicicletă / Trotinetă', desc: 'Produse mici și rezistente' },
-    { id: 'masina', nume: '🚗 Mașină Standard', desc: 'Prăjituri și pachete medii' },
-    { id: 'frigorific', nume: '❄️ Mașină Frigorifică', desc: 'Torturi și produse sensibile' }
+    { id: 'bicicleta', nume: 'Bicicletă / Trotinetă', desc: '5 RON • Produse mici', icon: '🚲' },
+    { id: 'masina', nume: 'Mașină Standard', desc: '10 RON • Pachete medii', icon: '🚗' },
+    { id: 'frigorific', nume: 'Mașină Frigorifică', desc: '15 RON • Produse sensibile', icon: '❄️' }
 ]
 
 function CosCumparaturi() {
     const { utilizator, logout, salveazaCosPeServer } = useContext(AuthContext)
     const navigate = useNavigate()
     const isFirstRender = useRef(true)
+
+    const [step, setStep] = useState(1)
 
     const [cos, setCos] = useState(() => {
         const cosSalvat = localStorage.getItem('cos')
@@ -27,15 +29,16 @@ function CosCumparaturi() {
     const [eroare, setEroare] = useState('')
     const [succes, setSucces] = useState('')
 
+    // Date Checkout
     const [adresaLivrare, setAdresaLivrare] = useState('')
     const [telefon, setTelefon] = useState('')
     const [observatii, setObservatii] = useState('')
     const [tipTransport, setTipTransport] = useState('masina')
     const [esteCadou, setEsteCadou] = useState(false)
     const [mesajCadou, setMesajCadou] = useState('')
-    const [metodaPlata, setMetodaPlata] = useState('numerar')
+    const [metodaPlata, setMetodaPlata] = useState('card')
     const [simularePlata, setSimularePlata] = useState({ activa: false, status: 'procesare' })
-    const [costLivrare, setCostLivrare] = useState(0);
+    const [costLivrare, setCostLivrare] = useState(10);
 
     useEffect(() => {
         if (cos.cofetarie_id) {
@@ -51,9 +54,7 @@ function CosCumparaturi() {
                 const res = await api.get('/client/profil')
                 if (res.data.adresa_default) setAdresaLivrare(res.data.adresa_default)
                 if (res.data.telefon) setTelefon(res.data.telefon)
-            } catch (err) {
-                console.error('Nu s-a putut încărca adresa implicită')
-            }
+            } catch (err) {}
         }
         fetchDateProfil()
     }, [])
@@ -67,20 +68,6 @@ function CosCumparaturi() {
             isFirstRender.current = false
         }
     }, [cos, salveazaCosPeServer])
-
-    useEffect(() => {
-        const handleCosUpdated = () => {
-            const cosSalvat = localStorage.getItem('cos')
-            if (cosSalvat) {
-                const newCos = JSON.parse(cosSalvat)
-                if (JSON.stringify(newCos) !== JSON.stringify(cos)) {
-                    setCos(newCos)
-                }
-            }
-        }
-        window.addEventListener('cos-updated', handleCosUpdated)
-        return () => window.removeEventListener('cos-updated', handleCosUpdated)
-    }, [cos])
 
     const fetchDetalii = async (cofetarieId) => {
         try {
@@ -99,6 +86,7 @@ function CosCumparaturi() {
         const detaliiProduseCos = cos.produse.map(itemCos => 
             produseProduse.find(p => p._id === (itemCos._id || itemCos.id))
         ).filter(Boolean)
+        
         if (detaliiProduseCos.some(p => p.transport_recomandat === 'frigorific')) return 'frigorific'
         if (detaliiProduseCos.some(p => p.transport_recomandat === 'masina')) return 'masina'
         return 'bicicleta'
@@ -110,9 +98,15 @@ function CosCumparaturi() {
         if (produseProduse.length > 0) {
             setTipTransport(obtineMetodaRecomandata())
         }
-    }, [produseProduse, cos.produse])
+    }, [produseProduse.length])
 
-    const salveazaCos = (cosNou) => setCos(cosNou)
+    useEffect(() => {
+        let cost = 0;
+        if (tipTransport === 'bicicleta') cost = 5;
+        else if (tipTransport === 'masina') cost = 10;
+        else if (tipTransport === 'frigorific') cost = 15;
+        setCostLivrare(cost);
+    }, [tipTransport])
 
     const scadeInCos = (produsId) => {
         const produseActualizate = [...cos.produse]
@@ -124,7 +118,7 @@ function CosCumparaturi() {
                 produseActualizate[index].cantitate -= 1
             }
         }
-        salveazaCos({
+        setCos({
             cofetarie_id: produseActualizate.length > 0 ? cos.cofetarie_id : null,
             produse: produseActualizate
         })
@@ -136,49 +130,29 @@ function CosCumparaturi() {
         if (index >= 0 && produseActualizate[index].cantitate < stocRamas) {
             produseActualizate[index].cantitate += 1
         }
-        salveazaCos({ ...cos, produse: produseActualizate })
+        setCos({ ...cos, produse: produseActualizate })
     }
 
     const stergeProdusDinCos = (produsId) => {
         const produseActualizate = cos.produse.filter(p => (p._id || p.id) !== produsId)
-        salveazaCos({
+        setCos({
             cofetarie_id: produseActualizate.length > 0 ? cos.cofetarie_id : null,
             produse: produseActualizate
         })
     }
 
-    const golestesCos = () => {
-        salveazaCos({ cofetarie_id: null, produse: [] })
-        setCofetarie(null)
-    }
-
-    const stocInsuficient = (produs) => {
-        const stoc = produseProduse.find(p => p._id === (produs._id || produs.id))?.stoc || 0
-        return produs.cantitate > stoc
-    }
-
-    const getCostLivrare = (transport) => {
-        switch(transport) {
-            case 'bicicleta': return 5;
-            case 'masina': return 10;
-            case 'frigorific': return 15;
-            default: return 0;
-        }
-    }
-    useEffect(() => {
-        setCostLivrare(getCostLivrare(tipTransport));
-    }, [tipTransport])
-
+    // ================= CALCUL SUME =================
     const totalProduse = cos.produse.reduce((acc, p) => {
         const produsDB = produseProduse.find(db => db._id === (p._id || p.id));
-        const pretUnitar = produsDB?.este_la_oferta 
-            ? (produsDB.pret * 0.6) 
-            : (produsDB?.pret || p.pret);
+        const pretUnitar = produsDB?.este_la_oferta ? (produsDB.pret * 0.6) : (produsDB?.pret || p.pret);
         return acc + pretUnitar * p.cantitate;
     }, 0);
-    const total = totalProduse + costLivrare
+    
+    const subtotalBaza = step === 1 ? totalProduse : totalProduse + costLivrare;
+    
+    const valoareTvaAdaugat = subtotalBaza * 0.21;
 
-    const areProbleme = cos.produse.some(p => stocInsuficient(p))
+    const totalDePlata = step === 3 ? subtotalBaza + valoareTvaAdaugat : subtotalBaza;
 
     const plaseazaComandaFinala = async (statusPlata) => {
         try {
@@ -189,7 +163,7 @@ function CosCumparaturi() {
                 observatii,
                 tip_transport: tipTransport,
                 este_cadou: esteCadou,
-                mesaj_cadou: esteCadou ? mesajCadou : null,
+                mesaj_cadou: mesajCadou,
                 metoda_plata: metodaPlata,
                 status_plata: statusPlata,
                 cost_livrare: costLivrare,
@@ -200,12 +174,12 @@ function CosCumparaturi() {
                     observatii: p.observatii || null
                 }))
             })
-            golestesCos()
+            setCos({ cofetarie_id: null, produse: [] })
             await api.delete('/client/cos')
             localStorage.removeItem('cos')
             window.dispatchEvent(new Event('cos-updated'))
             setSucces('Comandă plasată cu succes!')
-            setTimeout(() => navigate('/cos-cumparaturi'), 2000)
+            setTimeout(() => navigate('/comenzile-mele'), 2000)
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la plasarea comenzii')
             setLoadingComanda(false)
@@ -213,182 +187,283 @@ function CosCumparaturi() {
         }
     }
 
-    const handlePlaseazaComanda = async () => {
+    const handleNextStep = () => {
         setEroare('')
-        if (!adresaLivrare.trim()) { setEroare('Adresa de livrare este obligatorie'); return }
-        if (!telefon.trim()) { setEroare('Telefonul este obligatoriu'); return }
-        if (areProbleme) { setEroare('Unele produse din coș depășesc stocul disponibil'); return }
-
-        setLoadingComanda(true)
-        if (metodaPlata === 'card') {
-            setSimularePlata({ activa: true, status: 'procesare' })
-            setTimeout(() => {
-                setSimularePlata({ activa: true, status: 'succes' })
+        if (step === 1) {
+            if (cos.produse.length === 0) return setEroare('Coșul este gol')
+            setStep(2)
+        } else if (step === 2) {
+            if (!adresaLivrare.trim()) return setEroare('Adresa de livrare este obligatorie')
+            if (!telefon.trim()) return setEroare('Telefonul este obligatoriu')
+            setStep(3)
+        } else if (step === 3) {
+            setLoadingComanda(true)
+            if (metodaPlata === 'card') {
+                setSimularePlata({ activa: true, status: 'procesare' })
                 setTimeout(() => {
-                    setSimularePlata({ activa: false, status: 'procesare' })
-                    plaseazaComandaFinala('platita')
-                }, 1000)
-            }, 2500)
-        } else {
-            plaseazaComandaFinala('in_asteptare')
+                    setSimularePlata({ activa: true, status: 'succes' })
+                    setTimeout(() => plaseazaComandaFinala('platita'), 1000)
+                }, 2000)
+            } else {
+                plaseazaComandaFinala('in_asteptare')
+            }
         }
+    }
+
+    const getImageUrl = (produsDB) => {
+        if (!produsDB?.imagine) return null;
+        if (produsDB.imagine.startsWith('http')) return produsDB.imagine;
+        return `https://sweetgoapp.onrender.com/${produsDB.imagine}`;
     }
 
     if (loading) return <p className="loading">Se încarcă...</p>
 
     return (
         <div className="acasa-container">
-            <NavbarClient 
-                utilizator={utilizator} logout={logout}
-                searchValue="" onSearchChange={() => {}} showSearch={false}
-            />
+            <NavbarClient utilizator={utilizator} logout={logout} searchValue="" onSearchChange={() => {}} showSearch={false}/>
+            
             <div className="acasa-continut">
-                <button className="btn-inapoi" onClick={() => navigate(-1)}>← Înapoi</button>
-                <h2>Coșul meu 🛒</h2>
+                
+                <div className="checkout-breadcrumb">
+                    <span className={`breadcrumb-step ${step >= 1 ? 'completed' : ''} ${step === 1 ? 'active' : ''}`} onClick={() => step > 1 && setStep(1)}>
+                        <ShoppingCart size={18} /> Coș
+                    </span>
+                    <ChevronRight size={16} className="breadcrumb-separator" />
+                    <span className={`breadcrumb-step ${step >= 2 ? 'completed' : ''} ${step === 2 ? 'active' : ''}`} onClick={() => step > 2 && setStep(2)}>
+                        <Truck size={18} /> Livrare
+                    </span>
+                    <ChevronRight size={16} className="breadcrumb-separator" />
+                    <span className={`breadcrumb-step ${step === 3 ? 'active' : ''}`}>
+                        <CreditCard size={18} /> Plată
+                    </span>
+                </div>
+
                 {eroare && <div className="eroare">{eroare}</div>}
                 {succes && <div className="succes">{succes}</div>}
 
-                {cos.produse.length === 0 ? (
+                {cos.produse.length === 0 && step === 1 ? (
                     <div className="cos-gol">
                         <p><ShoppingCart size={28} /> Coșul tău este gol.</p>
-                        <button className="btn-primar" onClick={() => navigate('/')}>
-                            Explorează cofetăriile
-                        </button>
+                        <button className="btn-primar" onClick={() => navigate('/')}>Explorează cofetăriile</button>
                     </div>
                 ) : (
-                    <div className="cos-layout">
-                        <div className="cos-produse">
-                            <div className="cos-header">
-                                <h3>Produse de la {cofetarie?.numeCofetarie}</h3>
-                                <button className="btn-goleste-cos" onClick={golestesCos}>
-                                    <Trash2 size={16} /> Golește coșul
-                                </button>
-                            </div>
-                            {cos.produse.map(produs => {
-                                const PID = produs._id || produs.id
-                                const produsDB = produseProduse.find(p => p._id === PID)
-                                const stocRamas = produsDB?.stoc || 0
-                                const depasesteStoc = produs.cantitate > stocRamas
-                                const pretUnitar = produsDB?.este_la_oferta 
-                                    ? (produsDB.pret * 0.6) 
-                                    : (produsDB?.pret || produs.pret)
-                                return (
-                                    <div key={PID} className={`cos-produs-card ${depasesteStoc ? 'cos-produs-problema' : ''}`}>
-                                        <div className="cos-produs-imagine">
-                                            {produsDB?.imagine ? (
-                                                <img 
-                                                    src={produsDB.imagine && produsDB.imagine.startsWith('http') 
-                                                        ? produsDB.imagine 
-                                                        : `https://sweetgoapp.onrender.com/${produsDB.imagine}`} 
-                                                    alt={produs.numeProdus}
-                                                />
-                                            ) : <Cake size={48} color="#c97c2e" strokeWidth={1.5} />}
-                                        </div>
-                                        <div className="cos-produs-info">
-                                            <h4>{produs.numeProdus}</h4>
-                                            <p className="cos-produs-pret">
-                                                <span>{pretUnitar.toFixed(2)} lei / buc</span>
-                                                {produsDB?.este_la_oferta && (
-                                                    <span style={{ textDecoration: 'line-through', marginLeft: '8px', color: '#9a7a5a', fontSize: '0.9rem' }}>
-                                                        {produsDB.pret.toFixed(2)} lei
-                                                    </span>
-                                                )}
-                                            </p>
-                                            {produs.optiune_decor && <p className="cos-produs-detaliu">🎨 Decor: {produs.optiune_decor}</p>}
-                                            {produs.observatii && <p className="cos-produs-detaliu">📝 {produs.observatii}</p>}
-                                            {depasesteStoc && <p className="cos-avertisment"><AlertTriangle size={14} /> Stoc disponibil: doar {stocRamas} buc</p>}
-                                        </div>
-                                        <div className="cos-produs-cantitate">
-                                            <div className="cantitate-control">
-                                                <button onClick={() => scadeInCos(PID)}>−</button>
-                                                <span>{produs.cantitate}</span>
-                                                <button onClick={() => cresteInCos(PID, stocRamas)} disabled={produs.cantitate >= stocRamas}>+</button>
-                                            </div>
-                                            <p className="cos-subtotal">{(pretUnitar * produs.cantitate).toFixed(2)} lei</p>
-                                        </div>
-                                        <button className="cos-sterge-produs" onClick={() => stergeProdusDinCos(PID)}>✕</button>
+                    <div className="checkout-layout">
+                        
+                        <div className="checkout-main-content">
+                            
+                            {/* ====== PAS 1: COȘ ====== */}
+                            {step === 1 && (
+                                <>
+                                    <h2 style={{fontSize: '1.8rem', color: '#3d2c1e', marginBottom: '0.5rem'}}>Coșul tău</h2>
+                                    <p style={{color: '#9a7a5a', marginBottom: '2rem'}}>Verifică produsele și adaugă un mesaj special pentru a face ziua cuiva mai frumoasă.</p>
+                                    
+                                    <div className="cos-produse">
+                                        {cos.produse.map(produs => {
+                                            const PID = produs._id || produs.id
+                                            const produsDB = produseProduse.find(p => p._id === PID)
+                                            const pretUnitar = produsDB?.este_la_oferta ? (produsDB.pret * 0.6) : (produsDB?.pret || produs.pret)
+                                            
+                                            return (
+                                                <div key={PID} className="cos-produs-card">
+                                                    <div className="cos-produs-imagine">
+                                                        {getImageUrl(produsDB) ? <img src={getImageUrl(produsDB)} alt={produs.numeProdus}/> : <Cake size={48} color="#c97c2e"/>}
+                                                    </div>
+                                                    <div className="cos-produs-info">
+                                                        <h4>{produs.numeProdus}</h4>
+                                                        
+                                                        {produs.optiune_decor && <p className="cos-produs-detaliu" style={{fontSize: '0.85rem', color: '#7a5230', margin: '2px 0'}}>🎨 Decor: {produs.optiune_decor}</p>}
+                                                        {produs.observatii && <p className="cos-produs-detaliu" style={{fontSize: '0.85rem', color: '#7a5230', margin: '2px 0'}}>📝 {produs.observatii}</p>}
+
+                                                        <div className="cantitate-control" style={{width: 'fit-content', marginTop: '10px'}}>
+                                                            <button onClick={() => scadeInCos(PID)}>−</button>
+                                                            <span>{produs.cantitate}</span>
+                                                            <button onClick={() => cresteInCos(PID, produsDB?.stoc || 0)}>+</button>
+                                                        </div>
+                                                    </div>
+                                                    <div style={{textAlign: 'right'}}>
+                                                        <button className="cos-sterge-produs" onClick={() => stergeProdusDinCos(PID)}><Trash2 size={18}/></button>
+                                                        <p className="cos-subtotal" style={{marginTop: '25px', fontSize:'1.1rem', color:'#e74c3c'}}>{(pretUnitar * produs.cantitate).toFixed(2)} RON</p>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
                                     </div>
-                                )
-                            })}
+
+                                    {/* SECTIUNE CADOU */}
+                                    <div className="cadou-sectiune-moderna">
+                                        <div style={{display:'flex', alignItems:'center', gap:'10px', marginBottom:'15px'}}>
+                                            <div style={{background:'#fffaf5', padding:'8px', borderRadius:'10px', border:'1px solid #f5eadd'}}>
+                                                <Gift size={20} color="#e74c3c"/>
+                                            </div>
+                                            <h3 style={{margin:0, color:'#3d2c1e', fontSize:'1.1rem'}}>Opțiuni Cadou</h3>
+                                        </div>
+                                        
+                                        <label style={{fontSize:'0.9rem', color:'#7a5230', fontWeight:'600', display:'block', marginBottom:'8px'}}>Mesaj personalizat (Opțional)</label>
+                                        <textarea 
+                                            value={mesajCadou} 
+                                            onChange={(e) => setMesajCadou(e.target.value)} 
+                                            placeholder="Scrie aici un gând dulce pentru destinatar..." 
+                                            rows={3} 
+                                            className="cadou-mesaj-textarea"
+                                        />
+
+                                        <label className="cadou-checkbox-wrapper">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={esteCadou} 
+                                                onChange={(e) => setEsteCadou(e.target.checked)} 
+                                            />
+                                            <div className="cadou-checkbox-info" style={{flex: 1}}>
+                                                <span className="cadou-titlu">Este o surpriză?</span>
+                                                <span className="cadou-desc">Dacă bifezi, ascundem prețul și numele tău de pe nota de livrare.</span>
+                                            </div>
+                                            <EyeOff size={24} color="#f5a623" style={{opacity: esteCadou ? 1 : 0.4}}/>
+                                        </label>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* ====== PAS 2: LIVRARE ====== */}
+                            {step === 2 && (
+                                <>
+                                    <div className="checkout-form-section">
+                                        <h2>Metodă de Livrare</h2>
+                                        <p>Alege tipul de transport potrivit pentru produsele tale.</p>
+                                        
+                                        <div className="transport-selectie-grid" style={{flexDirection: 'row', gap: '15px', flexWrap: 'wrap'}}>
+                                            {MIJLOACE_TRANSPORT.map(t => (
+                                                <div 
+                                                    key={t.id} 
+                                                    className={`transport-option ${tipTransport === t.id ? 'active' : ''} ${recomandat === t.id ? 'recommended' : ''}`} 
+                                                    onClick={() => setTipTransport(t.id)} 
+                                                    style={{flex: '1 1 30%', padding:'1.2rem', alignItems:'center', textAlign:'center', background: tipTransport === t.id ? '#fff9f2' : 'white', minWidth: '140px'}}
+                                                >
+                                                    <div style={{fontSize: '2rem', marginBottom: '8px'}}>{t.icon}</div>
+                                                    <span className="transport-nume">{t.nume}</span>
+                                                    <span style={{fontSize:'0.8rem', color:'#9a7a5a', marginTop:'5px'}}>{t.desc}</span>
+                                                    
+                                                    {recomandat === t.id && (
+                                                        <span style={{fontSize: '0.7rem', background: '#fdecd8', color: '#c97c2e', padding: '2px 8px', borderRadius: '10px', marginTop: '8px', fontWeight: 'bold'}}>Recomandat</span>
+                                                    )}
+                                                    {tipTransport === t.id && <Check size={18} color="#c97c2e" style={{position:'absolute', top:'10px', right:'10px'}}/>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="checkout-form-section">
+                                        <h3 style={{marginBottom:'1rem'}}>Detalii Livrare</h3>
+                                        
+                                        <div className="form-group">
+                                            <label>Adresă completă *</label>
+                                            <input type="text" value={adresaLivrare} onChange={(e) => setAdresaLivrare(e.target.value)} placeholder="Ex: Str. Florilor, Nr. 10, Ap. 5" />
+                                        </div>
+                                        
+                                        <div className="form-group">
+                                            <label>Telefon de contact *</label>
+                                            <input type="text" value={telefon} onChange={(e) => setTelefon(e.target.value)} placeholder="07xxxxxxxx" />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Observații pentru curier (Opțional)</label>
+                                            <textarea value={observatii} onChange={(e) => setObservatii(e.target.value)} placeholder="Ex: Sunați când ajungeți la interfon" rows={2}/>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* ====== PAS 3: PLATA ====== */}
+                            {step === 3 && (
+                                <div className="checkout-form-section">
+                                    <h2>Metodă de Plată</h2>
+                                    <p>Alege cum dorești să achiți comanda.</p>
+                                    
+                                    <div className="plata-selectie-grid">
+                                        <div className={`plata-option ${metodaPlata === 'card' ? 'active recommended' : ''}`} onClick={() => setMetodaPlata('card')} style={{padding:'2rem'}}>
+                                            <CreditCard size={32} color={metodaPlata === 'card' ? '#c97c2e' : '#9a7a5a'} />
+                                            <span className="plata-nume">Card online</span>
+                                            <span className="plata-desc">Plată securizată</span>
+                                            {metodaPlata === 'card' && <Check size={20} color="#c97c2e" style={{position:'absolute', top:'10px', right:'10px'}}/>}
+                                        </div>
+                                        <div className={`plata-option ${metodaPlata === 'numerar' ? 'active recommended' : ''}`} onClick={() => setMetodaPlata('numerar')} style={{padding:'2rem'}}>
+                                            <Banknote size={32} color={metodaPlata === 'numerar' ? '#c97c2e' : '#9a7a5a'} />
+                                            <span className="plata-nume">Numerar la livrare</span>
+                                            <span className="plata-desc">Plătești curierului</span>
+                                            {metodaPlata === 'numerar' && <Check size={20} color="#c97c2e" style={{position:'absolute', top:'10px', right:'10px'}}/>}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
-                        <div className="cos-comanda-form">
-                            <h3>Detalii comandă</h3>
-                            <div className="form-group">
-                                <label>Adresă de livrare *</label>
-                                <input type="text" value={adresaLivrare} onChange={(e) => setAdresaLivrare(e.target.value)} placeholder="Strada, număr, oraș" />
-                            </div>
-                            <div className="form-group">
-                                <label>Telefon *</label>
-                                <input type="text" value={telefon} onChange={(e) => setTelefon(e.target.value)} placeholder="07xxxxxxxx" />
-                            </div>
-                            <div className="form-group">
-                                <label>Metodă de plată *</label>
-                                <div className="plata-selectie-grid">
-                                    <div className={`plata-option ${metodaPlata === 'numerar' ? 'active' : ''}`} onClick={() => setMetodaPlata('numerar')}>
-                                        <Banknote size={28} color={metodaPlata === 'numerar' ? '#c97c2e' : '#9a7a5a'} />
-                                        <span className="plata-nume">Numerar la livrare</span>
-                                        <span className="plata-desc">Plătești curierului</span>
-                                    </div>
-                                    <div className={`plata-option ${metodaPlata === 'card' ? 'active' : ''}`} onClick={() => setMetodaPlata('card')}>
-                                        <CreditCard size={28} color={metodaPlata === 'card' ? '#c97c2e' : '#9a7a5a'} />
-                                        <span className="plata-nume">Plată cu cardul</span>
-                                        <span className="plata-desc">Procesare securizată</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label>Mijloc de transport livrare *</label>
-                                <div className="transport-selectie-grid">
-                                    {MIJLOACE_TRANSPORT.map(t => (
-                                        <div key={t.id} className={`transport-option ${tipTransport === t.id ? 'active' : ''} ${recomandat === t.id ? 'recommended' : ''}`} onClick={() => setTipTransport(t.id)}>
-                                            <div className="transport-header">
-                                                {tipTransport === t.id && <Check size={16} className="check-icon" />}
+
+                        {/* COLOANA DREAPTA: SUMAR COMANDĂ */}
+                        <div className="checkout-sumar-card">
+                            <h3>Sumar Comandă</h3>
+                            
+                            {step > 1 && (
+                                <div style={{marginBottom: '1.5rem'}}>
+                                    {cos.produse.map(p => {
+                                        const pDB = produseProduse.find(db => db._id === (p._id || p.id))
+                                        const pret = pDB?.este_la_oferta ? (pDB.pret * 0.6) : (pDB?.pret || p.pret)
+                                        return (
+                                            <div key={p._id || p.id} className="sumar-mini-produs">
+                                                <div className="sumar-mini-info">
+                                                    {getImageUrl(pDB) ? <img src={getImageUrl(pDB)} alt="" className="sumar-mini-img"/> : <div className="sumar-mini-img"></div>}
+                                                    <div className="sumar-mini-text">
+                                                        <h4>{p.numeProdus}</h4>
+                                                        {/* AICI APARE DECORUL SI IN MINI-SUMAR */}
+                                                        {p.optiune_decor && <p style={{fontSize: '0.75rem', color: '#c97c2e', margin: '2px 0'}}>🎨 {p.optiune_decor}</p>}
+                                                        <p>x{p.cantitate}</p>
+                                                    </div>
+                                                </div>
+                                                <span className="sumar-mini-pret">{(pret * p.cantitate).toFixed(2)} RON</span>
                                             </div>
-                                            <div className="transport-body">
-                                                <span className="transport-nume">{t.nume}</span>
-                                                {recomandat === t.id && <span className="badge-recomandat">Recomandat de cofetărie</span>}
-                                            </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    })}
                                 </div>
+                            )}
+
+                            <div className="cos-total" style={{border: 'none', padding: '0.2rem 0', margin:0}}>
+                                <span style={{color: '#9a7a5a', fontWeight:'normal'}}>Subtotal produse</span>
+                                <span>{totalProduse.toFixed(2)} RON</span>
                             </div>
-                            <div className="form-group">
-                                <label>Observații generale</label>
-                                <textarea value={observatii} onChange={(e) => setObservatii(e.target.value)} placeholder="ex: Etaj 2, interfon 14..." rows={3} />
+                            
+                            {/* AFISAM TRANSPORT DOAR DACA SUNTEM DUPA PASUL 1 */}
+                            {step > 1 && (
+                                <div className="cos-total" style={{border: 'none', padding: '0.2rem 0', margin:0}}>
+                                    <span style={{color: '#9a7a5a', fontWeight:'normal'}}>Transport</span>
+                                    <span style={{color: '#3d2c1e'}}>{costLivrare.toFixed(2)} RON</span>
+                                </div>
+                            )}
+
+                            {/* TVA-ul ADAUGAT DE 21% (APARE DOAR LA PASUL 3) */}
+                            {step === 3 && (
+                                <div className="cos-total" style={{border: 'none', padding: '0.2rem 0', margin:'0 0 1rem 0'}}>
+                                    <span style={{color: '#9a7a5a', fontWeight:'normal', fontSize: '0.85rem'}}>TVA (21%)</span>
+                                    <span style={{color: '#9a7a5a', fontSize: '0.85rem'}}>+ {valoareTvaAdaugat.toFixed(2)} RON</span>
+                                </div>
+                            )}
+
+                            <div className="cos-total" style={{ borderTop: '1px solid #f5eadd', paddingTop: '1rem' }}>
+                                <span style={{fontSize:'1.2rem', color:'#3d2c1e'}}>Total</span>
+                                <span className="cos-total-pret" style={{color:'#e74c3c'}}>{totalDePlata.toFixed(2)} RON</span>
                             </div>
-                            <div className="cadou-sectiune">
-                                <label className="cadou-label">
-                                    <input type="checkbox" checked={esteCadou} onChange={(e) => setEsteCadou(e.target.checked)} className="cadou-checkbox" />
-                                    <span className="cadou-icon">🎁</span> Trimite un cadou dulce!
-                                </label>
-                                <p className="cadou-help-text">Numele tău nu va apărea pe eticheta de livrare.</p>
-                                {esteCadou && (
-                                    <div className="cadou-mesaj-container">
-                                        <label className="cadou-mesaj-label">Mesaj pentru destinatar (va fi printat pe felicitare)</label>
-                                        <textarea value={mesajCadou} onChange={(e) => setMesajCadou(e.target.value)} placeholder="ex: La mulți ani! Cu drag..." rows={2} className="cadou-mesaj-textarea" />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="cos-total">
-                                <span>Total produse:</span>
-                                <span>{totalProduse.toFixed(2)} lei</span>
-                            </div>
-                            <div className="cos-total">
-                                <span>Cost livrare ({tipTransport === 'bicicleta' ? 'Bicicletă' : tipTransport === 'masina' ? 'Mașină' : 'Frigorific'}):</span>
-                                <span>{costLivrare.toFixed(2)} lei</span>
-                            </div>
-                            <div className="cos-total" style={{ borderTop: '2px solid #f5d5a8', marginTop: '0.5rem', paddingTop: '0.5rem' }}>
-                                <span>Total de plată:</span>
-                                <span className="cos-total-pret">{total.toFixed(2)} lei</span>
-                            </div>
-                            <button className="btn-primar cos-btn-comanda" onClick={handlePlaseazaComanda} disabled={loadingComanda || areProbleme}>
-                                {loadingComanda ? 'Se plasează...' : '✓ Plasează comanda'}
+
+                            <button className="btn-primar cos-btn-comanda" onClick={handleNextStep} disabled={loadingComanda}>
+                                {loadingComanda ? 'Se procesează...' : (step === 3 ? 'Finalizează Comanda →' : 'Continuă →')}
                             </button>
-                            {areProbleme && <p className="cos-avertisment pt-margin"><AlertTriangle size={14} /> Verifica stocul produselor selectate</p>}
+                            
+                            {step === 3 && (
+                                <div style={{textAlign:'center', marginTop:'1rem', color:'#2ecc71', fontSize:'0.8rem', display:'flex', justifyContent:'center', alignItems:'center', gap:'5px'}}>
+                                    <Check size={14}/> Plată securizată 100%
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
             </div>
+
+            {/* Modal Simulatie Plata */}
             {simularePlata.activa && (
                 <div className="modal-plata-overlay">
                     <div className="modal-plata-content">
@@ -396,7 +471,7 @@ function CosCumparaturi() {
                             <>
                                 <div className="spinner-plata"></div>
                                 <h3 style={{color: '#7a5230', marginBottom: '10px'}}>Se procesează plata...</h3>
-                                <p style={{color: '#9a7a5a', fontSize: '0.9rem'}}>Te rugăm să nu închizi această pagină. Comunicăm cu banca ta.</p>
+                                <p style={{color: '#9a7a5a', fontSize: '0.9rem'}}>Te rugăm să nu închizi această pagină.</p>
                             </>
                         ) : (
                             <>
