@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { LayoutDashboard, ShoppingBag, Package, Star, LogOut, Search, Cake, User, Calendar, MapPin, Phone, SlidersHorizontal, CheckCircle, Hourglass, CheckSquare, Coins, Truck, CreditCard } from 'lucide-react'
 import api from '../../services/api'
-import SidebarCofetarie from '../../components/NavbarCofetarie';
+import SidebarCofetarie from '../../components/SidebarCofetarie';
 
 const STATUSURI = ['toate', 'plasata', 'confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata']
 
