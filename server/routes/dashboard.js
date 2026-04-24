@@ -53,7 +53,7 @@ router.get('/cofetarie', verifyToken, verifyRol('cofetarie'), async (req, res) =
             numeClient: comanda.client_id ? comanda.client_id.nume : 'Client Necunoscut'
         }));
 
-        res.json({ comenziNoi, comenziInCurs, totalIncasari, produseActive, ultimeleComenzi });
+        res.json({ numeCofetarie: cofetarie.numeCofetarie, comenziNoi, comenziInCurs, totalIncasari, produseActive, ultimeleComenzi });
     } catch (err) {
         console.error('Eroare dashboard cofetarie:', err);
         res.status(500).json({ mesaj: 'Eroare la incarcarea dashboard-ului' });

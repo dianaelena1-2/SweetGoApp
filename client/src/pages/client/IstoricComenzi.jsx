@@ -98,7 +98,7 @@ function IstoricComenzi() {
     }
 
     const generateIdFals = (idMongo) => {
-        return `#CMD-${idMongo.substring(idMongo.length - 5).toUpperCase()}`
+        return `#SO-${idMongo.substring(18, 24)}`
     }
 
     const deschideModalRecenzie = (comanda, e) => {
@@ -161,7 +161,7 @@ function IstoricComenzi() {
             <div className="acasa-continut">
                 <div className="istoric-header-top">
                     <div>
-                        <h2>Istoric Comenzi</h2>
+                        <h2>Istoric comenzi</h2>
                         <p>Gestionează și urmărește comenzile tale de la cofetăriile preferate.</p>
                     </div>
                 </div>
@@ -170,7 +170,7 @@ function IstoricComenzi() {
                     <div className="istoric-stat-card">
                         <div className="istoric-stat-icon" style={{background: '#fff3eb', color: '#c97c2e'}}><ShoppingCart size={24} /></div>
                         <div className="istoric-stat-info">
-                            <span className="istoric-stat-label">Total Comenzi</span>
+                            <span className="istoric-stat-label">Total comenzi</span>
                             <span className="istoric-stat-value">{totalComenzi}</span>
                         </div>
                     </div>
@@ -191,16 +191,16 @@ function IstoricComenzi() {
                     <div className="istoric-stat-card">
                         <div className="istoric-stat-icon" style={{background: '#fce4ec', color: '#e74c3c'}}><Wallet size={24} /></div>
                         <div className="istoric-stat-info">
-                            <span className="istoric-stat-label">Total Cheltuit</span>
+                            <span className="istoric-stat-label">Total cheltuit</span>
                             <span className="istoric-stat-value">{totalCheltuit.toFixed(2)} RON</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="istoric-table-card">
-                    <div className="istoric-table-header"><h3>Achiziții Recente</h3></div>
+                    <div className="istoric-table-header"><h3>Achiziții recente</h3></div>
                     <div className="istoric-row-header">
-                        <div>ID Comandă</div><div>Cofetărie</div><div>Dată</div><div>Sumă Totală</div><div>Status</div><div style={{textAlign: 'right'}}>Acțiuni</div>
+                        <div>ID Comandă</div><div>Cofetărie</div><div>Dată</div><div>Sumă totală</div><div>Status</div><div style={{textAlign: 'right'}}>Acțiuni</div>
                     </div>
                     <div className="istoric-table-body">
                         {comenzi.length === 0 ? (

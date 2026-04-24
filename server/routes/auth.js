@@ -92,12 +92,14 @@ router.post('/login', async (req,res) => {
         if (!parolaCorecta) {
             return res.status(401).json({ mesaj: 'Email sau parola incorecte' })
         }
+        let numeCofetarie = undefined;
 
         if (utilizator.rol === 'cofetarie') {
             const cofetarie = await Cofetarie.findOne({ utilizator_id: utilizator._id })
             if (!cofetarie || cofetarie.status !== 'aprobata') {
                 return res.status(403).json({ mesaj: 'Contul tău nu a fost încă aprobat de administrator.' })
             }
+            numeCofetarie = cofetarie.numeCofetarie;
         }
 
         const token = jwt.sign(
@@ -112,7 +114,8 @@ router.post('/login', async (req,res) => {
                 id: utilizator._id,
                 nume: utilizator.nume,
                 email: utilizator.email,
-                rol: utilizator.rol
+                rol: utilizator.rol,
+                ...(numeCofetarie && { numeCofetarie })
             }
         })
     } catch (err) {

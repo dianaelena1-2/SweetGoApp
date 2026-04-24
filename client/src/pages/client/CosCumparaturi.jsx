@@ -150,7 +150,7 @@ function CosCumparaturi() {
     
     const subtotalBaza = step === 1 ? totalProduse : totalProduse + costLivrare;
     
-    const valoareTvaAdaugat = subtotalBaza * 0.21;
+    const valoareTvaAdaugat = totalProduse * 0.21;
 
     const totalDePlata = step === 3 ? subtotalBaza + valoareTvaAdaugat : subtotalBaza;
 

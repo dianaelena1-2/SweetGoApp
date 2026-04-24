@@ -1,13 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { Star, User, Calendar, MessageSquare, TrendingUp } from 'lucide-react';
+import { Star, MessageSquare } from 'lucide-react';
 import api from '../../services/api';
-import NavbarCofetarie from '../../components/NavbarCofetarie';
+import SidebarCofetarie from '../../components/SidebarCofetarie';
 
 function RecenziiCofetarie() {
-    const { utilizator, logout } = useContext(AuthContext);
-    const navigate = useNavigate();
+    const { utilizator } = useContext(AuthContext);
     const [recenzii, setRecenzii] = useState([]);
     const [ratingMediu, setRatingMediu] = useState(0);
     const [totalRecenzii, setTotalRecenzii] = useState(0);
@@ -36,69 +34,101 @@ function RecenziiCofetarie() {
         });
     };
 
+    // Funcție pentru a extrage inițialele din numele clientului
+    const getInitials = (name) => {
+        if (!name) return 'C';
+        const parts = name.trim().split(' ');
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return name[0].toUpperCase();
+    };
+
     const renderStele = (rating) => {
         return [...Array(5)].map((_, i) => (
-            <Star key={i} size={16} fill={i < rating ? '#c97c2e' : 'none'} color={i < rating ? '#c97c2e' : '#ccc'} />
+            <Star 
+                key={i} 
+                size={18} 
+                fill={i < rating ? '#f1c40f' : 'none'} 
+                color={i < rating ? '#f1c40f' : '#e0e0e0'} 
+            />
         ));
     };
 
-    if (loading) return <p className="loading">Se încarcă...</p>;
+    if (loading) return <div className="cd-layout"><p className="loading" style={{width:'100%', marginTop:'5rem'}}>Se încarcă recenziile...</p></div>;
 
     return (
-        <div className="acasa-container">
-            <NavbarCofetarie />
+        <div className="cd-layout">
+            <SidebarCofetarie />
 
-            <div className="acasa-continut">
-                <h2>Recenziile mele</h2>
+            <main className="cd-main">
+                <div className="rc-header-titles">
+                    <h2>Recenziile mele</h2>
+                    <p>Gestionează feedback-ul clienților pentru produsele tale.</p>
+                </div>
+                
                 {eroare && <div className="eroare">{eroare}</div>}
 
-                <div className="db-stats-grid" style={{ marginBottom: '2rem' }}>
-                    <div className="db-stat-card" style={{ borderLeft: '4px solid #c97c2e' }}>
-                        <div className="db-stat-icon"><Star size={32} /></div>
-                        <div className="db-stat-info">
-                            <p className="db-stat-numar">{ratingMediu.toFixed(1)} / 5</p>
-                            <p className="db-stat-label">Rating mediu</p>
+                {/* Carduri Statistici Sus */}
+                <div className="rc-stats-grid">
+                    <div className="rc-stat-card">
+                        <div className="rc-stat-info">
+                            <span className="rc-stat-label">Rating mediu</span>
+                            <div className="rc-stat-value">
+                                {ratingMediu > 0 ? ratingMediu.toFixed(1) : '0.0'} <small>/ 5</small>
+                            </div>
+                        </div>
+                        <div className="rc-stat-icon-red">
+                            <Star size={28} fill="currentColor" />
                         </div>
                     </div>
-                    <div className="db-stat-card" style={{ borderLeft: '4px solid #3498db' }}>
-                        <div className="db-stat-icon"><MessageSquare size={32} /></div>
-                        <div className="db-stat-info">
-                            <p className="db-stat-numar">{totalRecenzii}</p>
-                            <p className="db-stat-label">Total recenzii</p>
+
+                    <div className="rc-stat-card">
+                        <div className="rc-stat-info">
+                            <span className="rc-stat-label">Total recenzii</span>
+                            <div className="rc-stat-value dark">
+                                {totalRecenzii}
+                            </div>
+                        </div>
+                        <div className="rc-stat-icon-gray">
+                            <MessageSquare size={28} />
                         </div>
                     </div>
                 </div>
 
+                {/* Lista de recenzii */}
                 {recenzii.length === 0 ? (
-                    <p className="gol">Nu ai primit încă nicio recenzie.</p>
+                    <p className="gol" style={{padding: '2rem 0'}}>Nu ai primit încă nicio recenzie.</p>
                 ) : (
-                    <div className="ic-lista">
+                    <div className="rc-list">
                         {recenzii.map(recenzie => (
-                            <div key={recenzie._id} className="ic-comanda-card">
-                                <div className="ic-comanda-header" style={{ cursor: 'default' }}>
-                                    <div className="ic-comanda-info">
-                                        <h4><User size={16} /> {recenzie.client_id?.nume}</h4>
-                                        <p className="ic-data"><Calendar size={14} /> {formatDate(recenzie.createdAt)}</p>
-                                    </div>
-                                    <div className="ic-comanda-dreapta">
-                                        <div className="rating" style={{ gap: '4px' }}>
-                                            {renderStele(Math.round(recenzie.rating))}
-                                            <span style={{ fontWeight: 'bold', marginLeft: '4px' }}>({recenzie.rating})</span>
+                            <div key={recenzie._id} className="rc-card">
+                                <div className="rc-card-header">
+                                    
+                                    <div className="rc-user-info">
+                                        <div className="rc-avatar">
+                                            {getInitials(recenzie.client_id?.nume)}
+                                        </div>
+                                        <div className="rc-user-details">
+                                            <h4>{recenzie.client_id?.nume || 'Client Anonim'}</h4>
+                                            <p>{formatDate(recenzie.createdAt)}</p>
                                         </div>
                                     </div>
+
+                                    <div className="rc-stars">
+                                        {renderStele(Math.round(recenzie.rating))}
+                                    </div>
+
                                 </div>
+                                
                                 {recenzie.comentariu && (
-                                    <div className="ic-produse" style={{ paddingTop: '0' }}>
-                                        <div className="ic-observatii-generale" style={{ background: '#fffaf5' }}>
-                                            <p>💬 {recenzie.comentariu}</p>
-                                        </div>
-                                    </div>
+                                    <p className="rc-text">
+                                        "{recenzie.comentariu}"
+                                    </p>
                                 )}
                             </div>
                         ))}
                     </div>
                 )}
-            </div>
+            </main>
         </div>
     );
 }
