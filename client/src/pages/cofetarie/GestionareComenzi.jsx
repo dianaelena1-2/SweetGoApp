@@ -155,7 +155,7 @@ function GestionareComenzi() {
 
     return (
         <div className="cd-layout">
-            <NavbarCofetarie />
+            <SidebarCofetarie />
 
             <main className="cd-main">
                 
