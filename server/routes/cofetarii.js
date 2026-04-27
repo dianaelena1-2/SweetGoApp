@@ -10,17 +10,32 @@ const { Client } = require('@googlemaps/google-maps-services-js')
 // afisare cofetarii publice (cu calcul rating)
 router.get('/', async (req, res) => {
     try {
-        const cofetarii = await Cofetarie.find({ status: 'aprobata' }).lean();
-        
-        // Calculam media recenziilor pentru fiecare (in MongoDB e mai eficient sa facem asta cu Aggregation, dar o facem asa pentru inceput ca sa fie codul usor de inteles)
-        for(let cof of cofetarii) {
-            const recenzii = await Recenzie.find({ cofetarie_id: cof._id });
-            cof.numar_recenzii = recenzii.length;
-            cof.rating_mediu = recenzii.length > 0 ? (recenzii.reduce((acc, curr) => acc + curr.rating, 0) / recenzii.length) : null;
-        }
+        const cofetariiRaw = await Cofetarie.find({ status: 'aprobata' }).lean();
 
-        res.json(cofetarii);
-    } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
+        const cofetariiImbunatatite = await Promise.all(cofetariiRaw.map(async (cof) => {
+           
+            const recenzii = await Recenzie.find({ cofetarie_id: cof._id });
+            const rating_mediu = recenzii.length > 0 
+                ? (recenzii.reduce((acc, curr) => acc + curr.rating, 0) / recenzii.length) 
+                : null;
+
+            const categoriiUnice = await Produs.find({ 
+                cofetarie_id: cof._id 
+            }).distinct('categorie');
+
+            return {
+                ...cof,
+                numar_recenzii: recenzii.length,
+                rating_mediu: rating_mediu,
+                categorii_afisate: categoriiUnice.filter(c => c && c.trim() !== "").slice(0, 3)
+            };
+        }));
+
+        res.json(cofetariiImbunatatite);
+    } catch (err) {
+        console.error("Eroare backend:", err);
+        res.status(500).json({ mesaj: 'Eroare la server' });
+    }
 });
 
 // afisare recenzii pentru o cofetarie (public)

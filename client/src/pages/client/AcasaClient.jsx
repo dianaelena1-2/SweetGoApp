@@ -4,7 +4,6 @@ import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
 import { Cake, MapPin, Star, MessageSquare, X, Calendar, Search, ChevronDown, SlidersHorizontal } from 'lucide-react'
 import NavbarClient from '../../components/NavbarClient';
-import HartaCofetarii from '../../components/HartaCofetarii';
 
 function AcasaClient(){
     const [cofetarii, setCofetarii] = useState([])
@@ -27,7 +26,25 @@ function AcasaClient(){
                 setLoading(false)
             }
         }
-        fetchCofetarii()
+        fetchCofetarii();
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    try {
+                        const raspuns = await api.get('/cofetarii/distante', {
+                            params: { lat: position.coords.latitude, lng: position.coords.longitude }
+                        });
+                        setCofetarii(raspuns.data);
+                    } catch (err) {
+                        console.error('Eroare la calcularea distanțelor', err);
+                    }
+                },
+                (err) => {
+                    console.log('Utilizatorul nu a permis locația. Afișăm lista standard.');
+                }
+            );
+        }
     }, [])
 
     const cofetariiFiltrate = cofetarii.filter(c => 
@@ -96,13 +113,6 @@ function AcasaClient(){
                             <button className="filtru-pill">Sortare <SlidersHorizontal size={14} /></button>
                         </div> */}
                     </div>
-                    <div className="acasa-harta-sectiune">
-                        <div className="acasa-harta-header">
-                            <h3><MapPin size={22} color="#c97c2e" /> Cofetării lângă tine</h3>
-                            <span className="acasa-harta-subtitlu">Distanțele sunt calculate în timp real</span>
-                        </div>
-                        <HartaCofetarii />
-                    </div>
                 </div>
 
                 {/* === GRID-UL DE COFETĂRII === */}
@@ -144,14 +154,24 @@ function AcasaClient(){
                                     
                                     {/* Un text simulat de categorii cum e in model */}
                                     <p className="cofetarie-categorii-text">
-                                        Prăjituri, Torturi, Specialități
+                                        {cofetarie.categorii_afisate && cofetarie.categorii_afisate.length > 0 
+                                        ? cofetarie.categorii_afisate.join(', ') 
+                                        : 'Cofetărie artizanală'}
                                     </p>
 
-                                    <div className="cofetarie-locatie">
-                                        <MapPin size={16} color="#c97c2e" /> 
-                                        <span>{cofetarie.adresa}</span> 
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexGrow: 1, marginBottom: '15px' }}>
+                                        <div className="cofetarie-locatie" style={{ marginBottom: 0 }}>
+                                            <MapPin size={16} color="#c97c2e" /> 
+                                            <span>{cofetarie.adresa}</span> 
+                                        </div>
+                                        
+                                        {cofetarie.distanta_text && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: '#666', paddingLeft: '2px' }}>
+                                                🚗 <span>{cofetarie.distanta_text} • aprox. {cofetarie.durata_text}</span>
+                                            </div>
+                                        )}
                                     </div>
-                                    
+
                                     <button className="btn-vezi-meniu">Vezi Meniu</button>
                                 </div>
                             </div>
