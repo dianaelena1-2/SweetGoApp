@@ -134,7 +134,10 @@ function AcasaClient(){
                                         title="Vezi recenziile"
                                     >
                                         <Star size={14} fill="#f5a623" color="#f5a623" />
-                                        {cofetarie.rating_mediu ? cofetarie.rating_mediu.toFixed(1) : 'Nou'}
+                                        
+                                        {/* {cofetarie.rating_mediu !== null && cofetarie.rating_mediu !== undefined 
+                                            ? cofetarie.rating_mediu.toFixed(1) 
+                                            : 'Nou'} */}
                                     </span>
 
                                     {cofetarie.imagine_coperta ? (

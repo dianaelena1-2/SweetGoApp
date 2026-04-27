@@ -5,62 +5,73 @@ const Cofetarie = require('../models/Cofetarie')
 const Recenzie = require('../models/Recenzie')
 const Produs = require('../models/Produs')
 const Comanda = require('../models/Comanda')
-const { Client } = require('@googlemaps/google-maps-services-js')
+const { Client } = require("@googlemaps/google-maps-services-js");
 
+async function getCofetariiCuRating(query = {}) {
+    try {
+        return await Cofetarie.aggregate([
+            { $match: query },
+            {
+                $lookup: {
+                    // Folosim direct numele colectiei pentru a fi siguri (recenzies)
+                    from: 'recenzies', 
+                    let: { cofetarie_id_doc: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: [
+                                        // Ne asigurăm că ambele părți sunt tratate ca ObjectId în timpul comparației
+                                        { $toObjectId: "$cofetarie_id" }, 
+                                        "$$cofetarie_id_doc"
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'recenzii_gasite'
+                }
+            },
+            {
+                $addFields: {
+                    numar_recenzii: { $size: "$recenzii_gasite" },
+                    rating_mediu: { 
+                        $cond: [
+                            { $gt: [{ $size: "$recenzii_gasite" }, 0] },
+                            { $avg: "$recenzii_gasite.rating" },
+                            null // Dacă nu sunt recenzii, returnăm null pentru a afișa "Nou"
+                        ]
+                    }
+                }
+            },
+            { $project: { recenzii_gasite: 0 } }
+        ]);
+    } catch (err) {
+        console.error("Eroare în getCofetariiCuRating:", err);
+        return [];
+    }
+}
 // afisare cofetarii publice (cu calcul rating)
 router.get('/', async (req, res) => {
     try {
-        const cofetariiRaw = await Cofetarie.find({ status: 'aprobata' }).lean();
-        const rezultat = await Promise.all(cofetariiRaw.map(async (cof) => {
-            const categorii = await Produs.find({ cofetarie_id: cof._id }).distinct('categorie');
-            return {
-                ...cof,
-                categorii_afisate: categorii.filter(c => c).slice(0, 3)
-            };
-        }));
-        res.json(rezultat);
-    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
+        const cofetarii = await getCofetariiCuRating({ status: 'aprobata' });
+        res.json(cofetarii);
+    } catch (err) { 
+        console.error(err);
+        res.status(500).json({ mesaj: 'Eroare la server' }); 
+    }
 });
 
-// afisare recenzii pentru o cofetarie (public)
-router.get('/:id/toate-recenziile', async (req, res) => {
-    try {
-        const recenzii = await Recenzie.find({ cofetarie_id: req.params.id })
-            .populate('client_id', 'nume')
-            .sort({ createdAt: -1 });
-        res.json(recenzii);
-    } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
-});
-
-// afisare recenzii pentru dashboard-ul cofetariei
-router.get('/recenzii', verifyToken, verifyRol('cofetarie'), async (req, res) => {
-    try {
-        const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
-        if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetăria nu a fost găsită.' });
-
-        const recenzii = await Recenzie.find({ cofetarie_id: cofetarie._id })
-            .populate('client_id', 'nume email')
-            .sort({ createdAt: -1 });
-
-        const ratingMediu = recenzii.length > 0 ? (recenzii.reduce((acc, curr) => acc + curr.rating, 0) / recenzii.length) : 0;
-
-        res.json({ recenzii, ratingMediu, totalRecenzii: recenzii.length });
-    } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
-});
-
-//afisare distante
 router.get('/distante', async (req, res) => {
     try {
         const { lat, lng } = req.query;
-        if (!lat || !lng) {
-            return res.status(400).json({ mesaj: 'Coordonatele (lat, lng) sunt obligatorii' });
-        }
+        if (!lat || !lng) return res.status(400).json({ mesaj: 'Coordonate lipsă' });
 
-        const cofetariiRaw = await Cofetarie.find({
+        const cofetariiRaw = await getCofetariiCuRating({
             status: 'aprobata',
             lat: { $exists: true, $ne: null },
             lng: { $exists: true, $ne: null }
-        }).lean();
+        });
 
         if (cofetariiRaw.length === 0) return res.json([]);
 
@@ -87,12 +98,37 @@ router.get('/distante', async (req, res) => {
         }));
 
         rezultat.sort((a, b) => (a.distanta_valoare || Infinity) - (b.distanta_valoare || Infinity));
-        
         res.json(rezultat);
     } catch (error) {
         console.error('Eroare calcul distanțe:', error);
         res.status(500).json({ mesaj: 'Eroare la calcularea distanțelor' });
     }
+});
+
+// afisare recenzii pentru o cofetarie (public)
+router.get('/:id/toate-recenziile', async (req, res) => {
+    try {
+        const recenzii = await Recenzie.find({ cofetarie_id: req.params.id })
+            .populate('client_id', 'nume')
+            .sort({ createdAt: -1 });
+        res.json(recenzii);
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
+});
+
+// afisare recenzii pentru dashboard-ul cofetariei
+router.get('/recenzii', verifyToken, verifyRol('cofetarie'), async (req, res) => {
+    try {
+        const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
+        if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetăria nu a fost găsită.' });
+
+        const recenzii = await Recenzie.find({ cofetarie_id: cofetarie._id })
+            .populate('client_id', 'nume email')
+            .sort({ createdAt: -1 });
+
+        const ratingMediu = recenzii.length > 0 ? (recenzii.reduce((acc, curr) => acc + curr.rating, 0) / recenzii.length) : 0;
+
+        res.json({ recenzii, ratingMediu, totalRecenzii: recenzii.length });
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
 });
 
 // detalii cofetarie si produsele ei
