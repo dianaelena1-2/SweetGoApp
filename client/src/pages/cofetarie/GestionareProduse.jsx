@@ -5,7 +5,7 @@ import { Cake, Pencil, Trash2, Camera, Plus, Save } from 'lucide-react'
 import api from '../../services/api'
 import SidebarCofetarie from '../../components/SidebarCofetarie';
 
-const CATEGORII = ['Torturi', 'Prăjituri', 'Macarons', 'Cupcakes', 'Croissante']
+const CATEGORII = ['Torturi', 'Prăjituri', 'Macarons', 'Cupcakes', 'Croissante', 'Cozonaci']
 
 const produsGol = {
     numeProdus: '',
