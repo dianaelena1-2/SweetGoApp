@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 const { upload } = require('../middleware/upload_documents')
 const User = require('../models/User')
 const Cofetarie = require('../models/Cofetarie')
+const geocodeAddress = require('../utils/geocode')
 
 // INREGISTRARE
 router.post('/register', upload.fields([
@@ -57,12 +58,17 @@ router.post('/register', upload.fields([
             const certifInregistrare = req.files['certificat_inregistrare'][0].path
             const certifSanitar = req.files['certificat_sanitar'][0].path
             const imagineCoperta = req.files['imagine_coperta'] ? req.files['imagine_coperta'][0].path : null
-
+            const coordonate = await geocodeAddress(adresa)
+            
             await Cofetarie.create({
                 utilizator_id: newUser._id,
-                numeCofetarie, adresa, telefon, 
-                certificat_inregistrare: certifInregistrare, 
-                certificat_sanitar: certifSanitar, 
+                numeCofetarie,
+                adresa,
+                lat: coordonate ? coordonate.lat : undefined,
+                lng: coordonate ? coordonate.lng : undefined,
+                telefon,
+                certificat_inregistrare: certifInregistrare,
+                certificat_sanitar: certifSanitar,
                 imagine_coperta: imagineCoperta
             })
         }

@@ -4,6 +4,7 @@ import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
 import { Cake, MapPin, Star, MessageSquare, X, Calendar, Search, ChevronDown, SlidersHorizontal } from 'lucide-react'
 import NavbarClient from '../../components/NavbarClient';
+import HartaCofetarii from '../../components/HartaCofetarii';
 
 function AcasaClient(){
     const [cofetarii, setCofetarii] = useState([])
@@ -94,6 +95,13 @@ function AcasaClient(){
                             <button className="filtru-pill">Deschis acum <ChevronDown size={16} /></button>
                             <button className="filtru-pill">Sortare <SlidersHorizontal size={14} /></button>
                         </div> */}
+                    </div>
+                    <div className="acasa-harta-sectiune">
+                        <div className="acasa-harta-header">
+                            <h3><MapPin size={22} color="#c97c2e" /> Cofetării lângă tine</h3>
+                            <span className="acasa-harta-subtitlu">Distanțele sunt calculate în timp real</span>
+                        </div>
+                        <HartaCofetarii />
                     </div>
                 </div>
 

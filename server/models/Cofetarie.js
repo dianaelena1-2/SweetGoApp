@@ -4,6 +4,8 @@ const cofetarieSchema = new mongoose.Schema({
     utilizator_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
     numeCofetarie: { type: String, required: true },
     adresa: String,
+    lat: Number,
+    lng: Number,
     telefon: String,
     certificat_inregistrare: String,
     certificat_sanitar: String,

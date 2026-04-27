@@ -5,6 +5,7 @@ const Cofetarie = require('../models/Cofetarie')
 const Recenzie = require('../models/Recenzie')
 const Produs = require('../models/Produs')
 const Comanda = require('../models/Comanda')
+const { Client } = require('@googlemaps/google-maps-services-js')
 
 // afisare cofetarii publice (cu calcul rating)
 router.get('/', async (req, res) => {
@@ -82,6 +83,51 @@ router.post('/:id/recenzii', verifyToken, verifyRol('client'), async (req, res) 
 
         res.json({ mesaj: 'Recenzie adăugată cu succes!' });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare internă de server' }); }
+});
+
+//afisare distante
+router.get('/distante', async (req, res) => {
+    try {
+        const { lat, lng } = req.query;
+        if (!lat || !lng) {
+            return res.status(400).json({ mesaj: 'Coordonatele (lat, lng) sunt obligatorii' });
+        }
+
+        const cofetarii = await Cofetarie.find({
+            status: 'aprobata',
+            lat: { $exists: true, $ne: null },
+            lng: { $exists: true, $ne: null }
+        }).lean();
+
+        if (cofetarii.length === 0) return res.json([]);
+
+        const destinations = cofetarii.map(c => `${c.lat},${c.lng}`).join('|');
+
+        const client = new Client({});
+        const response = await client.distancematrix({
+            params: {
+                origins: [`${lat},${lng}`],
+                destinations: destinations,
+                key: process.env.GOOGLE_MAPS_API_KEY,
+                units: 'metric',
+            },
+        });
+
+        const elements = response.data.rows[0].elements;
+        const rezultat = cofetarii.map((cof, i) => ({
+            ...cof,
+            distanta_text: elements[i]?.distance?.text || null,
+            distanta_valoare: elements[i]?.distance?.value || null,
+            durata_text: elements[i]?.duration?.text || null,
+            durata_valoare: elements[i]?.duration?.value || null,
+        }));
+
+        rezultat.sort((a, b) => (a.distanta_valoare || Infinity) - (b.distanta_valoare || Infinity));
+        res.json(rezultat);
+    } catch (error) {
+        console.error('Eroare calcul distanțe:', error);
+        res.status(500).json({ mesaj: 'Eroare la calcularea distanțelor' });
+    }
 });
 
 module.exports = router;
