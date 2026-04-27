@@ -48,43 +48,6 @@ router.get('/recenzii', verifyToken, verifyRol('cofetarie'), async (req, res) =>
         res.json({ recenzii, ratingMediu, totalRecenzii: recenzii.length });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
 });
-
-// detalii cofetarie si produsele ei
-router.get('/:id', async (req, res) => {
-    try {
-        const cofetarie = await Cofetarie.findById(req.params.id).lean();
-        if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetaria nu a fost gasita' });
-
-        const recenzii = await Recenzie.find({ cofetarie_id: cofetarie._id });
-        cofetarie.numar_recenzii = recenzii.length;
-        cofetarie.rating_mediu = recenzii.length > 0 ? (recenzii.reduce((a, c) => a + c.rating, 0) / recenzii.length) : null;
-
-        const produse = await Produs.find({ cofetarie_id: cofetarie._id, disponibil: true });
-
-        res.json({ cofetarie, produse });
-    } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
-});
-
-// adaugare recenzie client
-router.post('/:id/recenzii', verifyToken, verifyRol('client'), async (req, res) => {
-    try {
-        const { rating, comentariu, comanda_id } = req.body;
-        
-        const exista = await Recenzie.findOne({ comanda_id });
-        if (exista) return res.status(400).json({ mesaj: 'Ai lăsat deja o recenzie pentru această comandă.' });
-
-        await Recenzie.create({
-            client_id: req.utilizator.id,
-            cofetarie_id: req.params.id,
-            comanda_id, rating, comentariu
-        });
-
-        await Comanda.findByIdAndUpdate(comanda_id, { are_recenzie: true });
-
-        res.json({ mesaj: 'Recenzie adăugată cu succes!' });
-    } catch (err) { res.status(500).json({ mesaj: 'Eroare internă de server' }); }
-});
-
 //afisare distante
 router.get('/distante', async (req, res) => {
     try {
@@ -128,6 +91,42 @@ router.get('/distante', async (req, res) => {
         console.error('Eroare calcul distanțe:', error);
         res.status(500).json({ mesaj: 'Eroare la calcularea distanțelor' });
     }
+});
+
+// detalii cofetarie si produsele ei
+router.get('/:id', async (req, res) => {
+    try {
+        const cofetarie = await Cofetarie.findById(req.params.id).lean();
+        if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetaria nu a fost gasita' });
+
+        const recenzii = await Recenzie.find({ cofetarie_id: cofetarie._id });
+        cofetarie.numar_recenzii = recenzii.length;
+        cofetarie.rating_mediu = recenzii.length > 0 ? (recenzii.reduce((a, c) => a + c.rating, 0) / recenzii.length) : null;
+
+        const produse = await Produs.find({ cofetarie_id: cofetarie._id, disponibil: true });
+
+        res.json({ cofetarie, produse });
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
+});
+
+// adaugare recenzie client
+router.post('/:id/recenzii', verifyToken, verifyRol('client'), async (req, res) => {
+    try {
+        const { rating, comentariu, comanda_id } = req.body;
+        
+        const exista = await Recenzie.findOne({ comanda_id });
+        if (exista) return res.status(400).json({ mesaj: 'Ai lăsat deja o recenzie pentru această comandă.' });
+
+        await Recenzie.create({
+            client_id: req.utilizator.id,
+            cofetarie_id: req.params.id,
+            comanda_id, rating, comentariu
+        });
+
+        await Comanda.findByIdAndUpdate(comanda_id, { are_recenzie: true });
+
+        res.json({ mesaj: 'Recenzie adăugată cu succes!' });
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare internă de server' }); }
 });
 
 module.exports = router;
