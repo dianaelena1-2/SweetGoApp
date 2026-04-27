@@ -64,7 +64,7 @@ router.get('/distante', async (req, res) => {
 
         if (cofetarii.length === 0) return res.json([]);
 
-        const destinations = cofetarii.map(c => `${c.lat},${c.lng}`).join('|');
+        const destinations = cofetarii.map(c => `${c.lat},${c.lng}`);
 
         const client = new Client({});
         const response = await client.distancematrix({
