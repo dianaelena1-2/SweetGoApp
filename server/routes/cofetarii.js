@@ -11,31 +11,15 @@ const { Client } = require('@googlemaps/google-maps-services-js')
 router.get('/', async (req, res) => {
     try {
         const cofetariiRaw = await Cofetarie.find({ status: 'aprobata' }).lean();
-
-        const cofetariiImbunatatite = await Promise.all(cofetariiRaw.map(async (cof) => {
-           
-            const recenzii = await Recenzie.find({ cofetarie_id: cof._id });
-            const rating_mediu = recenzii.length > 0 
-                ? (recenzii.reduce((acc, curr) => acc + curr.rating, 0) / recenzii.length) 
-                : null;
-
-            const categoriiUnice = await Produs.find({ 
-                cofetarie_id: cof._id 
-            }).distinct('categorie');
-
+        const rezultat = await Promise.all(cofetariiRaw.map(async (cof) => {
+            const categorii = await Produs.find({ cofetarie_id: cof._id }).distinct('categorie');
             return {
                 ...cof,
-                numar_recenzii: recenzii.length,
-                rating_mediu: rating_mediu,
-                categorii_afisate: categoriiUnice.filter(c => c && c.trim() !== "").slice(0, 3)
+                categorii_afisate: categorii.filter(c => c).slice(0, 3)
             };
         }));
-
-        res.json(cofetariiImbunatatite);
-    } catch (err) {
-        console.error("Eroare backend:", err);
-        res.status(500).json({ mesaj: 'Eroare la server' });
-    }
+        res.json(rezultat);
+    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
 });
 
 // afisare recenzii pentru o cofetarie (public)
@@ -63,6 +47,7 @@ router.get('/recenzii', verifyToken, verifyRol('cofetarie'), async (req, res) =>
         res.json({ recenzii, ratingMediu, totalRecenzii: recenzii.length });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
 });
+
 //afisare distante
 router.get('/distante', async (req, res) => {
     try {
@@ -71,17 +56,17 @@ router.get('/distante', async (req, res) => {
             return res.status(400).json({ mesaj: 'Coordonatele (lat, lng) sunt obligatorii' });
         }
 
-        const cofetarii = await Cofetarie.find({
+        const cofetariiRaw = await Cofetarie.find({
             status: 'aprobata',
             lat: { $exists: true, $ne: null },
             lng: { $exists: true, $ne: null }
         }).lean();
 
-        if (cofetarii.length === 0) return res.json([]);
+        if (cofetariiRaw.length === 0) return res.json([]);
 
-        const destinations = cofetarii.map(c => `${c.lat},${c.lng}`);
-
+        const destinations = cofetariiRaw.map(c => `${c.lat},${c.lng}`);
         const client = new Client({});
+        
         const response = await client.distancematrix({
             params: {
                 origins: [`${lat},${lng}`],
@@ -92,15 +77,17 @@ router.get('/distante', async (req, res) => {
         });
 
         const elements = response.data.rows[0].elements;
-        const rezultat = cofetarii.map((cof, i) => ({
+
+        const rezultat = cofetariiRaw.map((cof, i) => ({
             ...cof,
             distanta_text: elements[i]?.distance?.text || null,
             distanta_valoare: elements[i]?.distance?.value || null,
             durata_text: elements[i]?.duration?.text || null,
-            durata_valoare: elements[i]?.duration?.value || null,
+            durata_valoare: elements[i]?.duration?.value || null
         }));
 
         rezultat.sort((a, b) => (a.distanta_valoare || Infinity) - (b.distanta_valoare || Infinity));
+        
         res.json(rezultat);
     } catch (error) {
         console.error('Eroare calcul distanțe:', error);

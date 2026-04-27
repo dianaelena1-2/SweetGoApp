@@ -152,12 +152,12 @@ function AcasaClient(){
                                 <div className="cofetarie-card-info">
                                     <h3>{cofetarie.numeCofetarie}</h3>
                                     
-                                    {/* Un text simulat de categorii cum e in model */}
+                                    {/* Un text simulat de categorii cum e in model
                                     <p className="cofetarie-categorii-text">
                                         {cofetarie.categorii_afisate && cofetarie.categorii_afisate.length > 0 
                                         ? cofetarie.categorii_afisate.join(', ') 
                                         : 'Cofetărie artizanală'}
-                                    </p>
+                                    </p> */}
 
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexGrow: 1, marginBottom: '15px' }}>
                                         <div className="cofetarie-locatie" style={{ marginBottom: 0 }}>
