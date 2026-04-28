@@ -243,8 +243,8 @@ function Profile(){
                         </button>
                     </nav>
 
-                    <button className="profil-btn-logout" onClick={logout}>
-                        <LogOut size={18}/> Deconectare
+                    <button className="cd-btn-logout" onClick={handleLogout}>
+                        <LogOut size={20}/> Deconectează-te
                     </button>
                 </aside>
 
