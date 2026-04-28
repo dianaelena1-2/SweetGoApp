@@ -164,6 +164,11 @@ function Profile(){
         }
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     const deruleazaLaSectiune = (idSectiune) => {
         setSectiuneActiva(idSectiune);
         const element = document.getElementById(idSectiune);
