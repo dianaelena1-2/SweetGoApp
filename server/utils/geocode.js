@@ -20,4 +20,22 @@ const geocodeAddress = async (address) => {
     }
 };
 
-module.exports = geocodeAddress;
+const reverseGeocode = async (lat, lng) => {
+    try {
+        const response = await client.reverseGeocode({
+            params: {
+                latlng: `${lat},${lng}`,
+                key: process.env.GOOGLE_MAPS_API_KEY,
+            },
+        });
+        if (response.data.results.length > 0) {
+            return response.data.results[0].formatted_address;
+        }
+        return null;
+    } catch (error) {
+        console.error('Eroare reverse geocodare:', error.message);
+        return null;
+    }
+};
+
+module.exports = { geocodeAddress, reverseGeocode };

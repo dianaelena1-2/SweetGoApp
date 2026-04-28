@@ -4960,3 +4960,66 @@ body {
     width: 100%;
 }
 .harta-btn-vezi:hover { background: #b5631e; }
+
+/* ================= ADĂUGĂRI PENTRU EDITARE ADRESĂ PROFIL ================= */
+.adresa-editare-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.adresa-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.profil-input-flex {
+    flex: 1;
+    margin: 0;
+}
+
+.btn-locatia-mea {
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 8px;
+    border: 1px solid #c97c2e;
+    background: #fffaf5;
+    color: #c97c2e;
+    cursor: pointer;
+    white-space: nowrap;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-locatia-mea:hover:not(:disabled) {
+    background: #fdecd8;
+}
+
+.btn-locatia-mea:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.adresa-actiuni-row {
+    display: flex;
+    gap: 10px;
+}
+
+/* Stil curat pentru butoanele mici de jos (salvare/anulare) din modul editare */
+.btn-salvare-mic {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    float: none;
+}
+
+.btn-anulare-mic {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 25px;
+    background: #fffaf5;
+    border: 1px solid #f5d5a8;
+}

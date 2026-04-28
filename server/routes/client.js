@@ -6,6 +6,7 @@ const User = require('../models/User');
 const Cofetarie = require('../models/Cofetarie');
 const Notificare = require('../models/Notificare');
 const Cos = require('../models/Cos');
+const { reverseGeocode } = require('../utils/geocode');
 
 router.use(verifyToken, verifyRol('client'));
 
@@ -137,6 +138,24 @@ router.delete('/cos', async (req, res) => {
         await Cos.findOneAndDelete({ client_id: req.utilizator.id });
         res.json({ mesaj: 'Coș șters cu succes.' });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
+});
+
+router.get('/reverse-geocode', async (req, res) => {
+    try {
+        const { lat, lng } = req.query;
+        if (!lat || !lng) return res.status(400).json({ mesaj: 'Coordonate lipsă' });
+
+        const adresa = await reverseGeocode(lat, lng);
+        
+        if (adresa) {
+            res.json({ adresa });
+        } else {
+            res.status(404).json({ mesaj: 'Adresa nu a putut fi identificată' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ mesaj: 'Eroare la obținerea adresei' });
+    }
 });
 
 module.exports = router;

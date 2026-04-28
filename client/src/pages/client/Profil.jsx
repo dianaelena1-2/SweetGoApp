@@ -24,6 +24,8 @@ function Profile(){
     const [favorite, setFavorite] = useState([]);
     const [loadingFavorite, setLoadingFavorite] = useState(false);
 
+    const [loadingLocatie, setLoadingLocatie] = useState(false);
+
     useEffect(() => {
         if (utilizator?.rol !== 'client') {
             navigate('/');
@@ -83,6 +85,38 @@ function Profile(){
         } catch (err) {
             setEroare(err.response?.data?.mesaj || 'Eroare la actualizare.');
         }
+    };
+
+    const handleFolosesteLocatiaCurenta = () => {
+        if (!navigator.geolocation) {
+            setEroare('Geolocația nu este suportată de browser-ul tău.');
+            return;
+        }
+
+        setLoadingLocatie(true);
+        setEroare('');
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    const res = await api.get(`/client/reverse-geocode?lat=${latitude}&lng=${longitude}`);
+                    if (res.data.adresa) {
+                        setProfil({ ...profil, adresa_default: res.data.adresa });
+                        setSucces('Adresa a fost preluată cu succes! Nu uita să o salvezi.');
+                        setTimeout(() => setSucces(''), 3000);
+                    }
+                } catch (err) {
+                    setEroare('Nu am putut identifica adresa exactă din coordonate.');
+                } finally {
+                    setLoadingLocatie(false);
+                }
+            },
+            (error) => {
+                setLoadingLocatie(false);
+                setEroare('Permisiunea pentru locație a fost respinsă sau a apărut o eroare.');
+            }
+        );
     };
 
     const handleStergereAdresa = async () => {
@@ -262,24 +296,48 @@ function Profile(){
                             </div>
                             
                             {editareAdresa ? (
-                                <div className="adresa-info-text" style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
-                                    <input 
-                                        type="text" 
-                                        className="profil-input" 
-                                        placeholder="Introdu adresa ta (Ex: Str. Lalelelor, nr. 4, București)"
-                                        value={profil.adresa_default} 
-                                        onChange={e => setProfil({...profil, adresa_default: e.target.value})}
-                                        autoFocus
-                                    />
-                                    <div style={{display: 'flex', gap: '10px'}}>
-                                        <button className="profil-btn-salvare" style={{padding: '0.5rem 1rem', fontSize: '0.85rem', float: 'none'}} onClick={() => handleUpdateProfil()}>Salvează</button>
-                                        <button className="btn-secundar" style={{padding: '0.5rem 1rem', fontSize: '0.85rem', borderRadius: '25px', background: '#fffaf5', border: '1px solid #f5d5a8'}} onClick={() => setEditareAdresa(false)}>Anulează</button>
+                                <div className="adresa-info-text adresa-editare-container">
+                                    {/* Rândul cu Inputul și butonul de locație */}
+                                    <div className="adresa-input-row">
+                                        <input 
+                                            type="text" 
+                                            className="profil-input profil-input-flex" 
+                                            placeholder="Introdu adresa ta (Ex: Str. Lalelelor, nr. 4, București)"
+                                            value={profil.adresa_default} 
+                                            onChange={e => setProfil({...profil, adresa_default: e.target.value})}
+                                            autoFocus
+                                        />
+                                        <button 
+                                            type="button" 
+                                            className="btn-locatia-mea" 
+                                            onClick={handleFolosesteLocatiaCurenta}
+                                            disabled={loadingLocatie}
+                                        >
+                                            <MapPin size={18} />
+                                            {loadingLocatie ? 'Se caută...' : 'Locația mea'}
+                                        </button>
+                                    </div>
+
+                                    {/* Rândul cu Salvare / Anulare */}
+                                    <div className="adresa-actiuni-row">
+                                        <button 
+                                            className="profil-btn-salvare btn-salvare-mic" 
+                                            onClick={() => handleUpdateProfil()}
+                                        >
+                                            Salvează
+                                        </button>
+                                        <button 
+                                            className="btn-secundar btn-anulare-mic" 
+                                            onClick={() => setEditareAdresa(false)}
+                                        >
+                                            Anulează
+                                        </button>
                                     </div>
                                 </div>
                             ) : (
                                 <>
                                     <div className="adresa-info-text">
-                                        <h4>Acasă (Principală)</h4>
+                                        <h4>Acasă (principală)</h4>
                                         <p>{profil.adresa_default || 'Nu ai setat nicio adresă implicită. Adaugă una pentru o comandă rapidă!'}</p>
                                     </div>
                                     <div className="adresa-actiuni">

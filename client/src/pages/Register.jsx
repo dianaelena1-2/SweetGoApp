@@ -114,7 +114,7 @@ function Register() {
                 <form onSubmit={handleSubmit}>
                     {/* Câmp Nume Complet */}
                     <div className="form-group">
-                        <label className="form-group-label">Nume Complet</label>
+                        <label className="form-group-label">Nume complet administrator</label>
                         <div className="input-icon-wrapper">
                             <input
                                 type="text"
@@ -130,7 +130,7 @@ function Register() {
 
                     {/* Câmp Email */}
                     <div className="form-group">
-                        <label className="form-group-label">Email</label>
+                        <label className="form-group-label">Email administrator</label>
                         <div className="input-icon-wrapper">
                             <input
                                 type="email"
@@ -166,7 +166,7 @@ function Register() {
                             <h4 style={{ color: '#c97c2e', marginBottom: '1rem', fontSize: '0.9rem' }}>Detalii Cofetărie</h4>
                             
                             <div className="form-group">
-                                <label className="form-group-label">Nume Cofetărie</label>
+                                <label className="form-group-label">Nume cofetărie</label>
                                 <div className="input-icon-wrapper">
                                     <input type="text" name="numeCofetarie" className="form-group-input" value={formData.numeCofetarie} onChange={handleChange} placeholder="Numele cofetăriei" required />
                                 </div>
