@@ -5,7 +5,7 @@ import { Cake, Pencil, Trash2, Camera, Plus, Save } from 'lucide-react'
 import api from '../../services/api'
 import SidebarCofetarie from '../../components/SidebarCofetarie';
 
-const CATEGORII = ['Torturi', 'Prăjituri', 'Macarons', 'Cupcakes', 'Croissante', 'Cozonaci']
+const CATEGORII_DEFAULT = ['Torturi', 'Prăjituri', 'Macarons', 'Cupcakes', 'Croissante', 'Cozonaci']
 
 const produsGol = {
     numeProdus: '',
@@ -47,6 +47,9 @@ function GestionareProduse() {
     const [produseExpirate, setProduseExpirate] = useState([])
     const [produseIndisponibile, setProduseIndisponibile] = useState([])
 
+    const [categorii, setCategorii] = useState(CATEGORII_DEFAULT);
+    const [arataInputCategorieNoua, setArataInputCategorieNoua] = useState(false);
+
     useEffect(() => {
         fetchProduse()
         fetchProduseExpirate()
@@ -78,6 +81,10 @@ function GestionareProduse() {
         try {
             const raspuns = await api.get(`/produse/cofetarie/${utilizator.id}`)
             setProduse(raspuns.data)
+
+            const categoriiDinProduse = raspuns.data.map(p => p.categorie).filter(Boolean)
+            const categoriiCombinate = [...new Set([...CATEGORII_DEFAULT, ...categoriiDinProduse])].sort();
+            setCategorii(categoriiCombinate);
         } catch (err) {
             setEroare('Eroare la încărcarea produselor')
         } finally {
@@ -144,6 +151,7 @@ function GestionareProduse() {
         setIngredienteSelectate([])
         setOptiuniDecor([])
         setEditareId(-1)
+        setArataInputCategorieNoua(false)
         if(fileInputRef.current) fileInputRef.current.value = ""
     }
 
@@ -192,6 +200,7 @@ function GestionareProduse() {
     const handleIncepeEditare = (produs) => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
         setEditareId(produs._id)
+        setArataInputCategorieNoua(false)
         setFormNou({
             numeProdus: produs.numeProdus,
             descriere: produs.descriere || '',
@@ -317,9 +326,48 @@ function GestionareProduse() {
                                 </div>
                                 <div>
                                     <label className="gp-label">Categorie</label>
-                                    <select className="gp-input-modern" value={formNou.categorie} onChange={(e) => setFormNou({ ...formNou, categorie: e.target.value })}>
-                                        {CATEGORII.map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
+                                    {!arataInputCategorieNoua ? (
+                                        <select 
+                                            className="gp-input-modern" 
+                                            value={formNou.categorie} 
+                                            onChange={(e) => {
+                                                if (e.target.value === 'ALTA_CATEGORIE') {
+                                                    setArataInputCategorieNoua(true);
+                                                    setFormNou({ ...formNou, categorie: '' });
+                                                } else {
+                                                    setFormNou({ ...formNou, categorie: e.target.value });
+                                                }
+                                            }}
+                                        >
+                                            {categorii.map(c => <option key={c} value={c}>{c}</option>)}
+                                            <option value="ALTA_CATEGORIE" style={{ fontWeight: 'bold', color: '#c0392b' }}>
+                                                + Adaugă o categorie nouă...
+                                            </option>
+                                        </select>
+                                    ) : (
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <input 
+                                                type="text" 
+                                                className="gp-input-modern" 
+                                                placeholder="Tastează noua categorie..." 
+                                                value={formNou.categorie} 
+                                                onChange={(e) => setFormNou({ ...formNou, categorie: e.target.value })} 
+                                                autoFocus
+                                            />
+                                            <button 
+                                                type="button" 
+                                                className="btn-secundar" 
+                                                style={{ padding: '0 1rem', borderRadius: '12px' }}
+                                                onClick={() => {
+                                                    setArataInputCategorieNoua(false);
+                                                    setFormNou({ ...formNou, categorie: categorii[0] }); 
+                                                }}
+                                                title="Anulează adăugarea"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="gp-label">Disponibil</label>

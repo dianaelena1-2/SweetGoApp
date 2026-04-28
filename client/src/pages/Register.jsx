@@ -114,7 +114,7 @@ function Register() {
                 <form onSubmit={handleSubmit}>
                     {/* Câmp Nume Complet */}
                     <div className="form-group">
-                        <label className="form-group-label">Nume complet administrator</label>
+                        <label className="form-group-label">Nume complet</label>
                         <div className="input-icon-wrapper">
                             <input
                                 type="text"
@@ -130,7 +130,7 @@ function Register() {
 
                     {/* Câmp Email */}
                     <div className="form-group">
-                        <label className="form-group-label">Email administrator</label>
+                        <label className="form-group-label">Email</label>
                         <div className="input-icon-wrapper">
                             <input
                                 type="email"
