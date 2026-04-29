@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { User, ShoppingCart, Home, LogOut, ClipboardList, UserCircle } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import NotificationBell from './NotificationBell';
+import ButonSuport from './ButonSuport';
 
 function NavbarClient({ utilizator, logout, searchValue, onSearchChange, showSearch = true }) {
     const navigate = useNavigate();
@@ -57,57 +58,60 @@ function NavbarClient({ utilizator, logout, searchValue, onSearchChange, showSea
     }
 
     return (
-        <nav className="navbar">
-            <h1 className="navbar-logo" onClick={() => navigate('/')}>
-                SweetGo 🍰
-            </h1>
+        <>
+            <nav className="navbar">
+                <h1 className="navbar-logo" onClick={() => navigate('/')}>
+                    SweetGo 🍰
+                </h1>
 
-            {showSearch && (
-                <div className="navbar-search-container">
-                    <input
-                        type="text"
-                        className="navbar-search-input"
-                        placeholder={searchPlaceholder}
-                        value={searchValue}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                    />
-                </div>
-            )}
-
-            <div className="navbar-actiuni">
-                {!isHomePage && (
-                    <button className="btn-nav-ghost" onClick={() => navigate('/')} title="Acasă">
-                         <Home size={20} />
-                    </button>
+                {showSearch && (
+                    <div className="navbar-search-container">
+                        <input
+                            type="text"
+                            className="navbar-search-input"
+                            placeholder={searchPlaceholder}
+                            value={searchValue}
+                            onChange={(e) => onSearchChange(e.target.value)}
+                        />
+                    </div>
                 )}
-                
-                <NotificationBell />
-                
-                <button className="btn-nav-cart" onClick={() => navigate('/cos-cumparaturi')}>
-                    🛒 Coș 
-                    {cosCount > 0 && <span className="cart-badge">{cosCount}</span>}
-                </button>
-                
-                <div className="user-menu" ref={dropdownRef}>
-                    <button className="user-menu-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
-                        <User size={18} /> Bună, {prenume}!
-                    </button>
-                    {dropdownOpen && (
-                        <div className="user-dropdown">
-                            <button onClick={() => { navigate('/profil'); setDropdownOpen(false); }}>
-                                <UserCircle size={16} /> Profilul meu
-                            </button>
-                            <button onClick={() => { navigate('/comenzile-mele'); setDropdownOpen(false); }}>
-                                <ClipboardList size={16} /> Comenzile mele
-                            </button>
-                            <button onClick={handleLogout} className="btn-dropdown-logout">
-                                <LogOut size={16} /> Deconectare
-                            </button>
-                        </div>
+
+                <div className="navbar-actiuni">
+                    {!isHomePage && (
+                        <button className="btn-nav-ghost" onClick={() => navigate('/')} title="Acasă">
+                            <Home size={20} />
+                        </button>
                     )}
+                    
+                    <NotificationBell />
+                    
+                    <button className="btn-nav-cart" onClick={() => navigate('/cos-cumparaturi')}>
+                        🛒 Coș 
+                        {cosCount > 0 && <span className="cart-badge">{cosCount}</span>}
+                    </button>
+                    
+                    <div className="user-menu" ref={dropdownRef}>
+                        <button className="user-menu-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                            <User size={18} /> Bună, {prenume}!
+                        </button>
+                        {dropdownOpen && (
+                            <div className="user-dropdown">
+                                <button onClick={() => { navigate('/profil'); setDropdownOpen(false); }}>
+                                    <UserCircle size={16} /> Profilul meu
+                                </button>
+                                <button onClick={() => { navigate('/comenzile-mele'); setDropdownOpen(false); }}>
+                                    <ClipboardList size={16} /> Comenzile mele
+                                </button>
+                                <button onClick={handleLogout} className="btn-dropdown-logout">
+                                    <LogOut size={16} /> Deconectare
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav> 
+            <ButonSuport />
+        </>
     );
 }
 

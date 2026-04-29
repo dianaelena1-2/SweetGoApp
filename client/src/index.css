@@ -5023,3 +5023,419 @@ body {
     background: #fffaf5;
     border: 1px solid #f5d5a8;
 }
+
+/* ================= DASHBOARD ADMIN MODERN ================= */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #fdfbf9;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.admin-sidebar {
+    width: 260px;
+    background: white;
+    border-right: 1px solid #f5eadd;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.admin-logo {
+    font-size: 1.6rem;
+    color: #c97c2e;
+    font-weight: 800;
+    margin-bottom: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.9rem 1.2rem;
+    border-radius: 12px;
+    color: #7a5230;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+.admin-nav-item:hover {
+    background: #fffaf5;
+    color: #c97c2e;
+}
+
+.admin-nav-item.active {
+    background: #fff5f5;
+    color: #c0392b; /* Roșu admin */
+    border-left: 4px solid #c0392b;
+    border-radius: 0 12px 12px 0;
+}
+
+.admin-main {
+    flex: 1;
+    padding: 2rem 3rem;
+    overflow-y: auto;
+}
+
+/* Header-ul de sus (Top Bar) */
+.admin-topbar {
+    display: flex;
+    justify-content: flex-end; /* Împinge totul spre dreapta */
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.admin-top-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: right;
+}
+
+.admin-top-user h4 {
+    margin: 0;
+    color: #3d2c1e;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.admin-top-user p {
+    margin: 0;
+    color: #9a7a5a;
+    font-size: 0.8rem;
+}
+
+.admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #c0392b;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Statistici Grid */
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.admin-stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid #f5eadd;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.admin-stat-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-stat-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.icon-blue { background: #e3f2fd; color: #1976d2; }
+.icon-pink { background: #fce4ec; color: #c2185b; }
+.icon-yellow { background: #fff8e1; color: #fbc02d; }
+.icon-green { background: #e8f5e9; color: #388e3c; }
+
+.admin-stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-stat-label {
+    font-size: 0.85rem;
+    color: #7a5230;
+    font-weight: 600;
+}
+
+.admin-stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #3d2c1e;
+    margin-top: 5px;
+}
+
+/* Tab-uri */
+.admin-tabs-modern {
+    display: flex;
+    gap: 2rem;
+    border-bottom: 2px solid #f5eadd;
+    margin-bottom: 1.5rem;
+}
+
+.admin-tab-modern {
+    padding: 0.8rem 0;
+    background: none;
+    border: none;
+    color: #9a7a5a;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.admin-tab-modern:hover {
+    color: #3d2c1e;
+}
+
+.admin-tab-modern.activ {
+    color: #c0392b;
+}
+
+.admin-tab-modern.activ::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #c0392b;
+    border-radius: 3px 3px 0 0;
+}
+
+/* Tabel */
+.admin-table-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid #f5eadd;
+    overflow-x: auto;
+}
+
+.admin-table-modern {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.admin-table-modern th {
+    background: #fffaf5;
+    padding: 1.2rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    color: #9a7a5a;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #f5eadd;
+}
+
+.admin-table-modern td {
+    padding: 1.2rem 1.5rem;
+    font-size: 0.95rem;
+    color: #3d2c1e;
+    border-bottom: 1px solid #f5eadd;
+    vertical-align: middle;
+}
+
+.admin-table-modern tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table-modern tr:hover td {
+    background: #fffcf9;
+}
+
+.admin-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.admin-badge.rol-admin { background: #c0392b; color: white; }
+.admin-badge.rol-client { background: #e8f5e9; color: #2e7d32; }
+.admin-badge.rol-cofetar { background: #fff3cd; color: #f39c12; }
+
+/* Butoane Acțiuni Tabel */
+.btn-icon-red {
+    background: transparent;
+    color: #c0392b;
+    border: 1px solid transparent;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-icon-red:hover {
+    background: #feebee;
+    border-color: #fad4cc;
+}
+
+.btn-icon-green {
+    background: transparent;
+    color: #2e7d32;
+    border: 1px solid transparent;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-icon-green:hover {
+    background: #e8f5e9;
+    border-color: #c8e6c9;
+}
+
+.btn-icon-blue {
+    background: transparent;
+    color: #1976d2;
+    border: 1px solid transparent;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-icon-blue:hover {
+    background: #e3f2fd;
+    border-color: #bbdefb;
+}
+
+.admin-td-nume {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+.admin-avatar-mic {
+    width: 32px;
+    height: 32px;
+    background: #f5eadd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: #7a5230;
+}
+/* ================= BUTON SUPORT CLIENT (FLOATING) ================= */
+.suport-fab-wrapper {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.suport-popup {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    margin-bottom: 15px;
+    width: 280px;
+    border: 1px solid #f5eadd;
+    transform-origin: bottom right;
+    animation: popupFade 0.2s ease-out;
+}
+
+@keyframes popupFade {
+    from { opacity: 0; transform: scale(0.8) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.suport-popup h4 {
+    margin: 0 0 1rem 0;
+    color: #3d2c1e;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.suport-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+    color: #7a5230;
+    font-size: 0.95rem;
+}
+
+.suport-item:last-child {
+    margin-bottom: 0;
+}
+
+.suport-icon-bg {
+    background: #fdecd8;
+    color: #c97c2e;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.suport-fab-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #e74c3c; /* Roșul aprins din poza ta */
+    color: white;
+    border: none;
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.suport-fab-btn:hover {
+    transform: scale(1.08);
+    background: #c0392b;
+}

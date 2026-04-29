@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
-import { Cake, Users, Store, Package, Coins, Hourglass, User, MapPin, Phone, FileText, Check, X } from 'lucide-react'
+import { Users, Store, ShoppingCart, Banknote, LayoutDashboard, BarChart3, LogOut, Trash2, Check, X, FileText } from 'lucide-react'
 import api from '../../services/api'
 
 function DashboardAdmin() {
@@ -13,7 +13,7 @@ function DashboardAdmin() {
     const [loading, setLoading] = useState(true)
     const [eroare, setEroare] = useState('')
     const [succes, setSucces] = useState('')
-    const [tabActiv, setTabActiv] = useState('asteptare')
+    const [tabActiv, setTabActiv] = useState('utilizatori') // Implicit tab-ul cu utilizatori ca în poză
 
     useEffect(() => {
         fetchDate()
@@ -67,15 +67,13 @@ function DashboardAdmin() {
             await api.put(`/admin/cofetarii/${id}/respingere`)
             afiseazaSucces('Cofetărie respinsă și ștearsă!')
             fetchDate()
-            window.scrollTo({ top: 0, behavior: 'smooth' }) 
         } catch (err) {
             setEroare('Eroare la respingerea cofetăriei')
-            window.scrollTo({ top: 0, behavior: 'smooth' })
         }
     }
 
     const handleStergeUtilizator = async (id, nume) => {
-        if (!window.confirm(`Ești sigur că vrei să ștergi utilizatorul "${nume}"? Această acțiune este ireversibilă și va șterge toate datele asociate (comenzi, recenzii, favorite etc.).`)) return;
+        if (!window.confirm(`Ești sigur că vrei să ștergi utilizatorul "${nume}"? Această acțiune este ireversibilă.`)) return;
         try {
             await api.delete(`/admin/utilizatori/${id}`);
             fetchUtilizatori();
@@ -89,177 +87,155 @@ function DashboardAdmin() {
     }
 
     const getRolBadgeClass = (rol) => {
-        if (rol === 'client') return 'badge-client'
-        if (rol === 'cofetarie') return 'badge-cofetarie'
-        return 'badge-admin'
+        if (rol === 'admin') return 'rol-admin'
+        if (rol === 'cofetarie' || rol === 'cofetar') return 'rol-cofetar'
+        return 'rol-client'
     }
 
-    const openDocument = (fileUrl) => {
-        const url = fileUrl?.startsWith('http') 
-            ? fileUrl 
-            : `https://sweetgoapp.onrender.com/${fileUrl}`;
-        const downloadUrl = url.replace('/upload/', '/upload/fl_attachment/');
-        window.open(downloadUrl, '_blank', 'noopener,noreferrer');
-    };
+    const getInitials = (name) => {
+        if (!name) return 'U';
+        const parts = name.trim().split(' ');
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return name[0].toUpperCase();
+    }
 
-    if (loading) return <p className="loading">Se încarcă...</p>
+    if (loading) return <div className="admin-layout"><p className="loading" style={{width:'100%', marginTop:'5rem'}}>Se încarcă...</p></div>
 
     return (
-        <div className="acasa-container">
-            <nav className="navbar">
-                <h1 className="navbar-logo">SweetGo 🍰</h1>
-                <div className="navbar-actiuni">
-                    <span>{utilizator?.nume}</span>
-                    <button onClick={handleLogout} className="btn-logout">Deconectare</button>
-                </div>
-            </nav>
+        <div className="admin-layout">
+            
+            {/* ================= SIDEBAR LATERAL ================= */}
+            <aside className="admin-sidebar">
+                <div className="admin-logo">SweetGo 🍰</div>
 
-            <div className="acasa-continut">
-                <h2>Dashboard Admin</h2>
+                <nav className="admin-nav">
+                    <button className="admin-nav-item active">
+                        <LayoutDashboard size={20}/> Dashboard
+                    </button>
+                    <button className="admin-nav-item">
+                        <BarChart3 size={20}/> Statistici
+                    </button>
+                </nav>
+
+                {/* Buton Deconectare la fel ca la cofetarie, cu text rosu */}
+                <button className="cd-btn-logout" onClick={handleLogout}>
+                    <LogOut size={20}/> Deconectează-te
+                </button>
+            </aside>
+
+            {/* ================= CONȚINUT PRINCIPAL ================= */}
+            <main className="admin-main">
+                
+                {/* Topbar: Fără search, doar admin info în dreapta */}
+                <div className="admin-topbar">
+                    <div className="admin-top-user">
+                        <div>
+                            <h4>{utilizator?.nume || 'Administrator'}</h4>
+                            
+                        </div>
+                        {/* <div className="admin-avatar">
+                            {getInitials(utilizator?.nume || 'Admin')}
+                        </div> */}
+                    </div>
+                </div>
 
                 {eroare && <div className="eroare">{eroare}</div>}
                 {succes && <div className="succes">{succes}</div>}
 
-                {/* STATISTICI */}
-                <div className="db-stats-grid">
-                    <div className="db-stat-card db-stat-nou">
-                        <div className="db-stat-icon"><Users size={32} /></div>
-                        <div className="db-stat-info">
-                            <p className="db-stat-numar">{date.totalUtilizatori}</p>
-                            <p className="db-stat-label">Utilizatori</p>
+                {/* STATISTICI GRID (Cele 4 carduri din poză) */}
+                <div className="admin-stats-grid">
+                    <div className="admin-stat-card">
+                        <div className="admin-stat-header">
+                            <div className="admin-stat-icon icon-blue"><Users size={22} /></div>
+                            <span className="admin-stat-label">Utilizatori</span>
                         </div>
+                        <div className="admin-stat-value">{date.totalUtilizatori}</div>
                     </div>
-                    <div className="db-stat-card db-stat-curs">
-                        <div className="db-stat-icon"><Store size={32} /></div>
-                        <div className="db-stat-info">
-                            <p className="db-stat-numar">{date.totalCofetarii}</p>
-                            <p className="db-stat-label">Cofetării aprobate</p>
+
+                    <div className="admin-stat-card">
+                        <div className="admin-stat-header">
+                            <div className="admin-stat-icon icon-pink"><Store size={22} /></div>
+                            <span className="admin-stat-label">Cofetării aprobate</span>
                         </div>
+                        <div className="admin-stat-value">{date.totalCofetarii}</div>
                     </div>
-                    <div className="db-stat-card db-stat-produse">
-                        <div className="db-stat-icon"><Package size={32} /></div>
-                        <div className="db-stat-info">
-                            <p className="db-stat-numar">{date.totalComenzi}</p>
-                            <p className="db-stat-label">Total comenzi</p>
+
+                    <div className="admin-stat-card">
+                        <div className="admin-stat-header">
+                            <div className="admin-stat-icon icon-yellow"><ShoppingCart size={22} /></div>
+                            <span className="admin-stat-label">Total comenzi</span>
                         </div>
+                        <div className="admin-stat-value">{date.totalComenzi}</div>
                     </div>
-                    <div className="db-stat-card db-stat-incasari">
-                        <div className="db-stat-icon"><Coins size={32} /></div>
-                        <div className="db-stat-info">
-                            <p className="db-stat-numar">{date.totalIncasari.toFixed(2)} lei</p>
-                            <p className="db-stat-label">Total încasări platformă</p>
+
+                    <div className="admin-stat-card">
+                        <div className="admin-stat-header">
+                            <div className="admin-stat-icon icon-green"><Banknote size={22} /></div>
+                            <span className="admin-stat-label">Încasări platformă</span>
                         </div>
+                        <div className="admin-stat-value">{date.totalIncasari.toFixed(2)} lei</div>
                     </div>
                 </div>
 
-                {/* TABS */}
-                <div className="admin-tabs">
+                {/* TAB-URI */}
+                <div className="admin-tabs-modern">
                     <button
-                        className={`admin-tab ${tabActiv === 'asteptare' ? 'activ' : ''}`}
+                        className={`admin-tab-modern ${tabActiv === 'asteptare' ? 'activ' : ''}`}
                         onClick={() => setTabActiv('asteptare')}
+                        style={{display: 'flex', alignItems: 'center', gap: '8px'}}
                     >
-                        ⏳ Cofetării în așteptare
+                        ⏳Cofetării în așteptare
                         {date.cofetariiInAsteptare.length > 0 && (
-                            <span className="admin-tab-badge">{date.cofetariiInAsteptare.length}</span>
+                            <span style={{background: '#c0392b', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem'}}>
+                                {date.cofetariiInAsteptare.length} noi
+                            </span>
                         )}
                     </button>
                     <button
-                        className={`admin-tab ${tabActiv === 'utilizatori' ? 'activ' : ''}`}
+                        className={`admin-tab-modern ${tabActiv === 'utilizatori' ? 'activ' : ''}`}
                         onClick={() => setTabActiv('utilizatori')}
                     >
-                        👥 Utilizatori
+                        👥Utilizatori
                     </button>
+                    
                 </div>
 
-                {/* TAB COFETARII IN ASTEPTARE */}
-                {tabActiv === 'asteptare' && (
-                    <div className="admin-sectiune">
-                        {date.cofetariiInAsteptare.length === 0 ? (
-                            <p className="gol">Nu există cofetării în așteptare.</p>
-                        ) : (
-                            <div className="admin-lista">
-                                {date.cofetariiInAsteptare.map(cofetarie => (
-                                    <div key={cofetarie._id} className="admin-card">
-                                        <div className="admin-card-info">
-                                            <h4><Store size={18} color="#c97c2e" /> {cofetarie.numeCofetarie}</h4>
-                                            <p><User size={14} /> {cofetarie.nume} — {cofetarie.email}</p>
-                                            <p><MapPin size={14} /> {cofetarie.adresa}</p>
-                                            <p><Phone size={14} /> {cofetarie.telefon}</p>
-                                            <div className="admin-documente">
-                                                {cofetarie.certificat_inregistrare && (
-                                                   <a
-                                                        href={cofetarie.certificat_inregistrare}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="admin-doc-link"
-                                                        >
-                                                        📄 Certificat înregistrare
-                                                    </a>
-                                                )}
-                                                {cofetarie.certificat_sanitar && (
-                                                    <a
-                                                        href={cofetarie.certificat_sanitar}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="admin-doc-link"
-                                                        >
-                                                        📄 Certificat sanitar
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="admin-card-actiuni">
-                                            <button
-                                                className="btn-primar"
-                                                onClick={() => handleAproba(cofetarie._id)}
-                                            >
-                                                <Check size={16} /> Aprobă
-                                            </button>
-                                            <button
-                                                className="btn-stergere"
-                                                onClick={() => handleRespinge(cofetarie._id)}
-                                            >
-                                                <X size={16} /> Respinge
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* TAB UTILIZATORI */}
+                {/* TAB: UTILIZATORI */}
                 {tabActiv === 'utilizatori' && (
-                    <div className="admin-sectiune">
-                        <table className="admin-tabel">
+                    <div className="admin-table-container">
+                        <table className="admin-table-modern">
                             <thead>
                                 <tr>
                                     <th>Nume</th>
                                     <th>Email</th>
                                     <th>Rol</th>
-                                    <th>Data înregistrării</th>
+                                    <th>Data Înregistrării</th>
                                     <th>Acțiuni</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {utilizatori.map(u => (
                                     <tr key={u._id}>
-                                        <td>{u.nume}</td>
-                                        <td>{u.email}</td>
                                         <td>
-                                            <span className={`admin-rol-badge ${getRolBadgeClass(u.rol)}`}>
-                                                {u.rol}
+                                            <div className="admin-td-nume">
+                                                <div className="admin-avatar-mic">{getInitials(u.nume)}</div>
+                                                {u.nume}
+                                            </div>
+                                        </td>
+                                        <td style={{color: '#9a7a5a'}}>{u.email}</td>
+                                        <td>
+                                            <span className={`admin-badge ${getRolBadgeClass(u.rol)}`}>
+                                                {u.rol === 'cofetarie' ? 'cofetarie' : u.rol}
                                             </span>
                                         </td>
-                                        <td>{new Date(u.createdAt).toLocaleDateString('ro-RO')}</td>
+                                        <td style={{color: '#9a7a5a'}}>{new Date(u.createdAt).toLocaleDateString('ro-RO', {day: '2-digit', month: 'short', year: 'numeric'})}</td>
                                         <td>
                                             <button 
-                                                className="btn-stergere" 
+                                                className="btn-icon-red" 
                                                 onClick={() => handleStergeUtilizator(u._id, u.nume)}
-                                                style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}
+                                                title="Șterge utilizator"
                                             >
-                                                🗑️ Șterge
+                                                <Trash2 size={16} />
                                             </button>
                                         </td>
                                     </tr>
@@ -268,7 +244,71 @@ function DashboardAdmin() {
                         </table>
                     </div>
                 )}
-            </div>
+
+                {/* TAB: COFETARII IN ASTEPTARE */}
+                {tabActiv === 'asteptare' && (
+                    <div className="admin-table-container">
+                        {date.cofetariiInAsteptare.length === 0 ? (
+                            <p className="gol" style={{padding: '2rem'}}>Nu există cereri de aprobare în așteptare.</p>
+                        ) : (
+                            <table className="admin-table-modern">
+                                <thead>
+                                    <tr>
+                                        <th>Cofetărie</th>
+                                        <th>Proprietar & Contact</th>
+                                        <th>Adresă</th>
+                                        <th>Documente</th>
+                                        <th>Acțiuni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {date.cofetariiInAsteptare.map(cofetarie => (
+                                        <tr key={cofetarie._id}>
+                                            <td>
+                                                <div className="admin-td-nume">
+                                                    <div className="admin-avatar-mic" style={{background: '#fce4ec', color: '#c2185b'}}><Store size={14}/></div>
+                                                    {cofetarie.numeCofetarie}
+                                                </div>
+                                            </td>
+                                            <td style={{color: '#9a7a5a'}}>
+                                                <strong>{cofetarie.nume}</strong><br/>
+                                                {cofetarie.email}<br/>
+                                                {cofetarie.telefon}
+                                            </td>
+                                            <td style={{color: '#9a7a5a'}}>{cofetarie.adresa}</td>
+                                            <td>
+                                                <div style={{display: 'flex', gap: '5px'}}>
+                                                    {cofetarie.certificat_inregistrare && (
+                                                        <a href={cofetarie.certificat_inregistrare.startsWith('http') ? cofetarie.certificat_inregistrare : `https://sweetgoapp.onrender.com/${cofetarie.certificat_inregistrare}`} target="_blank" rel="noopener noreferrer" className="btn-icon-blue" title="Certificat Înregistrare">
+                                                            <FileText size={16} />
+                                                        </a>
+                                                    )}
+                                                    {cofetarie.certificat_sanitar && (
+                                                        <a href={cofetarie.certificat_sanitar.startsWith('http') ? cofetarie.certificat_sanitar : `https://sweetgoapp.onrender.com/${cofetarie.certificat_sanitar}`} target="_blank" rel="noopener noreferrer" className="btn-icon-blue" title="Certificat Sanitar">
+                                                            <FileText size={16} />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div style={{display: 'flex', gap: '8px'}}>
+                                                    <button className="btn-icon-green" onClick={() => handleAproba(cofetarie._id)} title="Aprobă">
+                                                        <Check size={16} />
+                                                    </button>
+                                                    <button className="btn-icon-red" onClick={() => handleRespinge(cofetarie._id)} title="Respinge">
+                                                        <X size={16} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+                )}
+
+            </main>
         </div>
     )
 }

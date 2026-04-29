@@ -85,15 +85,15 @@ function AcasaClient(){
                 logout={logout}
                 searchValue={cautare}
                 onSearchChange={setCautare}
-                showSearch={true} /* Ascundem search-ul din navbar, il avem mai mare in pagina acum */
+                showSearch={true} 
             />
 
             <div className="acasa-continut">
                 
                 {/* === NOUL HEADER & BARĂ DE FILTRARE (Asemanator cu designul trimis) === */}
                 <div className="acasa-hero">
-                    <h2>Alege Cofetăria Dorită</h2>
-                    <p>Găsește cele mai bune prăjituri și torturi din zona ta</p>
+                    <h2>Alege cofetăria dorită</h2>
+                    <p>Găsește cele mai bune dulciuri din zona ta</p>
 
                     <div className="acasa-filtre-bar">
                         {/* <div className="search-wrapper-mare">

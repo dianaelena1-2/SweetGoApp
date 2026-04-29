@@ -4,6 +4,7 @@ const { verifyToken, verifyRol } = require('../middleware/auth')
 const Comanda = require('../models/Comanda')
 const Produs = require('../models/Produs')
 const Cofetarie = require('../models/Cofetarie')
+const Notificare = require('../models/Notificare')
 
 const PROCENT_OFERTA = 0.6
 // plasare comandă
@@ -83,11 +84,52 @@ router.get('/cofetarie', verifyToken, verifyRol('cofetarie'), async (req, res) =
 router.put('/:id/status', verifyToken, verifyRol('cofetarie'), async (req, res) => {
     try {
         const statusValide = ['confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata'];
-        if (!statusValide.includes(req.body.status)) return res.status(400).json({ mesaj: 'Status invalid' });
+        const noulStatus = req.body.status;
+        if (!statusValide.includes(noulStatus)) {
+                return res.status(400).json({ mesaj: 'Status invalid' });
+        }
 
-        await Comanda.findByIdAndUpdate(req.params.id, { status: req.body.status });
+        const comanda = await Comanda.findById(req.params.id);
+        if (!comanda) {
+            return res.status(404).json({ mesaj: 'Comanda nu a fost găsită' });
+        }
+
+        comanda.status = noulStatus;
+        await comanda.save();
+
+        let mesajNotificare = '';
+        const idScurt = `#CMD-${comanda._id.toString().substring(comanda._id.toString().length - 5).toUpperCase()}`;
+
+        if (noulStatus === 'confirmata') mesajNotificare = `Comanda ta ${idScurt} a fost confirmată de cofetărie!`;
+        if (noulStatus === 'in_preparare') mesajNotificare = `Comanda ta ${idScurt} a intrat în preparare. 👨‍🍳`;
+        if (noulStatus === 'in_livrare') mesajNotificare = `Comanda ${idScurt} a fost predată curierului și este pe drum! 🚚`;
+        if (noulStatus === 'livrata') mesajNotificare = `Comanda ${idScurt} a fost livrată cu succes. Poftă bună! 🍰`;
+        if (noulStatus === 'anulata') mesajNotificare = `Ne pare rău, comanda ${idScurt} a fost anulată.`;
+
+        // === LOGICA NOUĂ DE DEBUG ===
+        console.log(`\n[DEBUG] Încerc să generez notificarea pentru statusul: "${noulStatus}"`);
+        console.log(`[DEBUG] Mesajul generat a ieșit așa: "${mesajNotificare}"`);
+        console.log(`[DEBUG] ID-ul clientului pentru baza de date este:`, comanda.client_id);
+
+        try {
+            const notif = await Notificare.create({
+                client_id: comanda.client_id,
+                // Dacă mesajul e gol dintr-o eroare de typing, băgăm un text de siguranță:
+                mesaj: mesajNotificare || `Statusul comenzii a fost schimbat în ${noulStatus}`,
+                tip: 'status_comanda',
+                link: '/comenzile-mele' 
+            });
+            console.log(`[DEBUG] ✅ SUCCES! Notificarea a fost salvată în baza de date cu ID: ${notif._id}\n`);
+        } catch (eroareNotificare) {
+            console.error(`[DEBUG] ❌ EROARE MONGODB: Baza de date a refuzat salvarea! Motivul:`, eroareNotificare.message);
+        }
+
         res.json({ mesaj: 'Status actualizat' });
-    } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
+
+    } catch (err) { 
+        console.error('[DEBUG] EROARE GENERALA:', err);
+        res.status(500).json({ mesaj: 'Eroare la actualizarea statusului' });
+    }
 })
 
 // anulare comandă client

@@ -98,8 +98,8 @@ function IstoricComenzi() {
     }
 
     const generateIdFals = (idMongo) => {
-        return `#SO-${idMongo.substring(18, 24)}`
-    }
+    return `#CMD-${idMongo.substring(idMongo.length - 5).toUpperCase()}`;
+}
 
     const deschideModalRecenzie = (comanda, e) => {
         e.stopPropagation()

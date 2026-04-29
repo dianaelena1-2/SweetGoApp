@@ -10,10 +10,13 @@ function NotificationBell(){
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
 
-    const fetchNotificari = async () => {
+    const fetchDateNotificari = async () => {
         try {
-            const res = await api.get('/client/notificari');
-            setNotificari(res.data);
+            const resList = await api.get('/client/notificari');
+            setNotificari(resList.data);
+            
+            const resCount = await api.get('/client/notificari/necitite/count');
+            setNecititeCount(resCount.data.count);
         } catch (err) {
             console.error('Eroare la încărcarea notificărilor', err);
         }
@@ -29,9 +32,8 @@ function NotificationBell(){
     };
 
     useEffect(() => {
-        fetchNotificari();
-        fetchCount();
-        const interval = setInterval(fetchCount, 20000); 
+        fetchDateNotificari(); 
+        const interval = setInterval(fetchDateNotificari, 10000); 
         return () => clearInterval(interval);
     }, []);
 

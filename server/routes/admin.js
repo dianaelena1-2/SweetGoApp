@@ -33,7 +33,6 @@ router.put('/cofetarii/:id/aprobare', verifyToken, verifyRol('admin'), async (re
                     <h2>Vești bune, ${utilizator.nume}! 🎉</h2>
                     <p>Contul pentru cofetăria ta, <strong>${cofetarie.numeCofetarie}</strong>, a fost <strong>aprobat oficial</strong>!</p>
                     <p>Acum te poți autentifica în contul tău de partener pentru a adăuga produse și a începe să primești comenzi.</p>
-                    <p><a href="https://sweetgoapp.onrender.com/login">Apasă aici pentru a te loga în cont</a></p>
                     <br>
                     <p>Spor la vânzări,</p>
                     <p><strong>Echipa SweetGo</strong></p>

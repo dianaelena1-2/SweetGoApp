@@ -212,7 +212,7 @@ function GestionareComenzi() {
                             return (
                                 <div key={comanda._id} style={{borderBottom: '1px solid #f5eadd'}}>
                                     <div className="gc-table-row">
-                                        <div className="gc-id-comanda">#SO-{comanda._id.substring(18, 24)}</div>
+                                        <div className="gc-id-comanda">#CMD-{comanda._id.substring(comanda._id.length - 5).toUpperCase()}</div>
                                         
                                         <div className="gc-client-cell">
                                             <div className="cd-avatar-mic">{getInitials(comanda.client_id?.nume)}</div>
