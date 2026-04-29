@@ -61,12 +61,16 @@ function DashboardAdmin() {
     }
 
     const handleRespinge = async (id) => {
+       if (!window.confirm('Ești sigur că vrei să respingi această cofetărie? Datele vor fi șterse.')) return;
+
         try {
             await api.put(`/admin/cofetarii/${id}/respingere`)
-            afiseazaSucces('Cofetărie respinsă')
+            afiseazaSucces('Cofetărie respinsă și ștearsă!')
             fetchDate()
+            window.scrollTo({ top: 0, behavior: 'smooth' }) 
         } catch (err) {
             setEroare('Eroare la respingerea cofetăriei')
+            window.scrollTo({ top: 0, behavior: 'smooth' })
         }
     }
 

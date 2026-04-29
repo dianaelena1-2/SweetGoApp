@@ -67,11 +67,12 @@ router.put('/cofetarii/:id/respingere', verifyToken, verifyRol('admin'), async (
                 <p><strong>Echipa SweetGo</strong></p>
             `;
             
-            await trimiteEmail(utilizator.email, 'Update cerere înregistrare SweetGo', continutEmail);
+            trimiteEmail(utilizator.email, 'Update cerere înregistrare SweetGo', continutEmail);
 
-            await Cofetarie.findByIdAndDelete(cofetarie._id);
             await User.findByIdAndDelete(utilizator._id);
         }
+        
+        await Cofetarie.findByIdAndDelete(cofetarie._id);
 
         res.json({ mesaj: 'Cofetăria a fost respinsă și toate datele asociate au fost șterse.' });
     } catch (err) { 
