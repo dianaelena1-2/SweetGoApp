@@ -82,7 +82,7 @@ router.post('/register', upload.fields([
                 <p>O zi dulce îți dorim,</p>
                 <p><strong>Echipa SweetGo</strong></p>
             `;
-            await trimiteEmail(email, 'Bine ai venit la SweetGo! 🍰', continutEmail);
+            trimiteEmail(email, 'Bine ai venit la SweetGo! 🍰', continutEmail);
         } else if (rol === 'cofetarie') {
             const continutEmail = `
                 <h2>Salut, ${nume}! Mulțumim pentru înregistrare! 🏪</h2>
@@ -92,7 +92,7 @@ router.post('/register', upload.fields([
                 <p>Cu drag,</p>
                 <p><strong>Echipa SweetGo</strong></p>
             `;
-            await trimiteEmail(email, 'Cerere înregistrare cofetărie primită', continutEmail);
+            trimiteEmail(email, 'Cerere înregistrare cofetărie primită', continutEmail);
         }
         res.status(201).json({ mesaj: 'Cont creat cu succes', id: newUser._id })
     } catch (err) {
