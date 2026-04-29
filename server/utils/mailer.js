@@ -1,32 +1,38 @@
-const nodemailer = require('nodemailer');
-
-require('dns').setDefaultResultOrder('ipv4first');
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, 
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    family: 4
-});
+const axios = require('axios');
 
 const trimiteEmail = async (destinatar, subiect, continutHtml) => {
     try {
-        const mailOptions = {
-            from: `"Echipa SweetGo" <${process.env.EMAIL_USER}>`,
-            to: destinatar,
+        // Configurăm structura cerută de Brevo
+        const dateCatreBrevo = {
+            sender: {
+                name: "Echipa SweetGo",
+                email: process.env.EMAIL_USER // Aceasta trebuie să fie adresa verificată în Brevo
+            },
+            to: [
+                { email: destinatar }
+            ],
             subject: subiect,
-            html: continutHtml
+            htmlContent: continutHtml
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`Email trimis către ${destinatar}: ${info.messageId}`);
+        // Adăugăm cheia ta de securitate
+        const config = {
+            headers: {
+                'accept': 'application/json',
+                'api-key': process.env.BREVO_API_KEY,
+                'content-type': 'application/json'
+            }
+        };
+
+        // Trimitem cererea către serverele lor (prin HTTPS, nu poate fi blocată)
+        await axios.post('https://api.brevo.com/v3/smtp/email', dateCatreBrevo, config);
+        
+        console.log(`✅ Email trimis cu succes către ${destinatar} via Brevo!`);
         return true;
+
     } catch (error) {
-        console.error(`Eroare la trimiterea emailului către ${destinatar}:`, error);
+        // Afișăm eroarea exactă dacă ceva merge prost
+        console.error(`❌ Eroare Brevo către ${destinatar}:`, error.response?.data || error.message);
         return false;
     }
 };
