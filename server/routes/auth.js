@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken')
 const { upload } = require('../middleware/upload_documents')
 const User = require('../models/User')
 const Cofetarie = require('../models/Cofetarie')
-const geocodeAddress = require('../utils/geocode')
+const { geocodeAddress } = require('../utils/geocode')
+const { trimiteEmail } = require('../utils/mailer');
 
 // INREGISTRARE
 router.post('/register', upload.fields([
@@ -72,7 +73,27 @@ router.post('/register', upload.fields([
                 imagine_coperta: imagineCoperta
             })
         }
-
+        if (rol === 'client') {
+            const continutEmail = `
+                <h2>Salutare, ${nume}! Bine ai venit la SweetGo! 🍰</h2>
+                <p>Ne bucurăm super mult să te avem în comunitatea noastră.</p>
+                <p>Acum poți explora cele mai bune cofetării din oraș și poți comanda bunătățile preferate direct la ușa ta.</p>
+                <br>
+                <p>O zi dulce îți dorim,</p>
+                <p><strong>Echipa SweetGo</strong></p>
+            `;
+            await trimiteEmail(email, 'Bine ai venit la SweetGo! 🍰', continutEmail);
+        } else if (rol === 'cofetarie') {
+            const continutEmail = `
+                <h2>Salut, ${nume}! Mulțumim pentru înregistrare! 🏪</h2>
+                <p>Am primit cererea ta pentru cofetăria <strong>${numeCofetarie}</strong>.</p>
+                <p>Echipa noastră va analiza documentele trimise în cel mai scurt timp. Te vom anunța printr-un e-mail imediat ce contul tău va fi aprobat!</p>
+                <br>
+                <p>Cu drag,</p>
+                <p><strong>Echipa SweetGo</strong></p>
+            `;
+            await trimiteEmail(email, 'Cerere înregistrare cofetărie primită', continutEmail);
+        }
         res.status(201).json({ mesaj: 'Cont creat cu succes', id: newUser._id })
     } catch (err) {
         console.error(err)
