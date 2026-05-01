@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { LayoutDashboard, ShoppingBag, Package, Star, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Star, LogOut, BarChart3 } from 'lucide-react';
 import ButonSuport from './ButonSuport';
 
 function SidebarCofetarie() {
@@ -47,6 +47,12 @@ function SidebarCofetarie() {
                         onClick={() => navigate('/cofetarie/recenzii')}
                     >
                         <Star size={20}/> Recenzii clienți
+                    </button>
+                    <button 
+                        className={`cd-nav-item ${esteActiv('/cofetarie/statistici-cofetarie') ? 'active' : ''}`} 
+                        onClick={() => navigate('/cofetarie/statistici-cofetarie')}
+                    >
+                        <BarChart3 size={20}/> Statistici
                     </button>
                 </nav>
 

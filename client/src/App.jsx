@@ -19,9 +19,11 @@ import DashboardCofetarie from './pages/cofetarie/DashboardCofetarie'
 import GestionareProduse from './pages/cofetarie/GestionareProduse'
 import GestionareComenzi from './pages/cofetarie/GestionareComenzi'
 import RecenziiCofetarie from './pages/cofetarie/RecenziiCofetarie'
+import StatisticiCofetarie from './pages/cofetarie/StatisticiCofetarie'
 
 //admin pages
 import DashboardAdmin from './pages/admin/DashboardAdmin'
+
 
 const ProtectedRoute = ({ children, rol }) => {
   const { utilizator, loading } = useContext(AuthContext)
@@ -54,6 +56,7 @@ function App(){
         <Route path="/cofetarie/produse" element={<ProtectedRoute rol="cofetarie"><GestionareProduse/></ProtectedRoute>} />
         <Route path="/cofetarie/comenzi" element={<ProtectedRoute rol="cofetarie"><GestionareComenzi /></ProtectedRoute>} />
         <Route path="/cofetarie/recenzii" element={<ProtectedRoute rol="cofetarie"><RecenziiCofetarie /></ProtectedRoute>} />
+        <Route path="/cofetarie/statistici-cofetarie" element={<ProtectedRoute rol="cofetarie"><StatisticiCofetarie /></ProtectedRoute>} />
 
         {/*admin*/}
         <Route path="/admin/dashboard" element={<ProtectedRoute rol="admin"><DashboardAdmin /></ProtectedRoute>} />

@@ -131,6 +131,114 @@ router.get('/recenzii', verifyToken, verifyRol('cofetarie'), async (req, res) =>
     } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
 });
 
+//statistici cofetarie
+router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (req, res) => {
+    try {
+        const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
+        if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetăria nu a fost găsită' });
+
+        const startOf30Days = new Date();
+        startOf30Days.setDate(startOf30Days.getDate() - 30);
+
+        // 1. Evoluție Vânzări (ultimele 30 de zile, grupate pe zile)
+        const evolutieVanzari = await Comanda.aggregate([
+            { 
+                $match: { 
+                    cofetarie_id: cofetarie._id, 
+                    createdAt: { $gte: startOf30Days },
+                    status: { $ne: 'anulata' } 
+                } 
+            },
+            { 
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Europe/Bucharest" } },
+                    totalZilnic: { $sum: "$total" }
+                }
+            },
+            { $sort: { "_id": 1 } } 
+        ]);
+
+        // 2. Distribuție pe Categorii 
+        const distributieCategorii = await Comanda.aggregate([
+            { $match: { cofetarie_id: cofetarie._id, status: { $ne: 'anulata' } } },
+            { $unwind: "$detalii" }, 
+            { 
+                $lookup: { 
+                    from: Produs.collection.name, 
+                    localField: 'detalii.produs_id',
+                    foreignField: '_id',
+                    as: 'produs_info'
+                }
+            },
+            { $unwind: "$produs_info" },
+            { 
+                $group: {
+                    _id: "$produs_info.categorie",
+                    cantitateVanduta: { $sum: "$detalii.cantitate" }
+                }
+            }
+        ]);
+
+        // 3. Ora de Vârf 
+        const oraDeVarfAgregare = await Comanda.aggregate([
+            { $match: { cofetarie_id: cofetarie._id, status: { $ne: 'anulata' } } },
+            { 
+                $group: {
+                    _id: { 
+                        ziua: { $dayOfWeek: { date: "$createdAt", timezone: "Europe/Bucharest" } },
+                        ora: { $hour: { date: "$createdAt", timezone: "Europe/Bucharest" } }
+                    },
+                    numar_comenzi: { $sum: 1 }
+                }
+            },
+            { $sort: { numar_comenzi: -1 } }, 
+            { $limit: 1 }
+        ]);
+
+        const zileSaptamana = ["", "Duminică", "Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă"];
+        let insightOraVarf = null;
+        if (oraDeVarfAgregare.length > 0) {
+            const varf = oraDeVarfAgregare[0];
+            insightOraVarf = {
+                ziua: zileSaptamana[varf._id.ziua],
+                ora: `${varf._id.ora}:00`,
+                comenzi: varf.numar_comenzi
+            };
+        }
+
+        // 4. Impact Anti-Risipă
+        // Deoarece oferta se aplică după ora 20:00, calculăm automat produsele comandate seara târziu
+        const produseSalvate = await Comanda.aggregate([
+            { $match: { cofetarie_id: cofetarie._id, status: { $ne: 'anulata' } } },
+            { $unwind: "$detalii" }, 
+            { 
+                $lookup: { 
+                    from: Produs.collection.name, 
+                    localField: 'detalii.produs_id',
+                    foreignField: '_id',
+                    as: 'produs_info'
+                }
+            },
+            { $unwind: "$produs_info" },
+            { 
+                $match: { 
+                    $expr: { $lt: ["$detalii.pret_unitar", "$produs_info.pret"] }
+                } 
+            },
+            { 
+                $group: {
+                    _id: null,
+                    total_salvate: { $sum: "$detalii.cantitate" }
+                }
+            }
+        ]);
+
+    } catch (err) {
+        console.error("Eroare la generarea statisticilor:", err);
+        res.status(500).json({ mesaj: 'Eroare la generarea statisticilor' });
+    }
+});
+
 // detalii cofetarie si produsele ei
 router.get('/:id', async (req, res) => {
     try {
