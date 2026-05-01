@@ -233,6 +233,13 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
             }
         ]);
 
+        res.json({
+            evolutieVanzari,
+            distributieCategorii,
+            insightOraVarf,
+            produseSalvate: produseSalvate.length > 0 ? produseSalvate[0].total_salvate : 0
+        });
+
     } catch (err) {
         console.error("Eroare la generarea statisticilor:", err);
         res.status(500).json({ mesaj: 'Eroare la generarea statisticilor' });
