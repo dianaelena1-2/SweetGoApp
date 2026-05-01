@@ -316,7 +316,7 @@ function DetaliiCofetarie() {
                                                     {produs.ingrediente.slice(0, 3).join(', ')}{produs.ingrediente.length > 3 && '...'}
                                                 </div>
                                             )}
-                                            {produs.este_la_oferta && (
+                                            {produs.este_la_oferta && produs.disponibil && produs.stoc > 0 && (
                                                 <div style={{marginTop: '8px', marginBottom: '8px'}}>
                                                     <span className="badge-oferta">🔥 SALVEAZĂ-MĂ! -40%</span>
                                                 </div>

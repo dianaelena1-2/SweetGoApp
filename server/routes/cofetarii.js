@@ -141,7 +141,7 @@ router.get('/:id', async (req, res) => {
         cofetarie.numar_recenzii = recenzii.length;
         cofetarie.rating_mediu = recenzii.length > 0 ? (recenzii.reduce((a, c) => a + c.rating, 0) / recenzii.length) : null;
 
-        const produse = await Produs.find({ cofetarie_id: cofetarie._id, disponibil: true });
+        const produse = await Produs.find({ cofetarie_id: cofetarie._id });
 
         res.json({ cofetarie, produse });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
