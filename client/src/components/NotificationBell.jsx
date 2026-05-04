@@ -105,7 +105,7 @@ function NotificationBell(){
                                 onClick={handleMarkAllAsRead}
                                 title="Marchează toate ca citite"
                             >
-                                <CheckCheck size={16} /> Citite toate
+                                <CheckCheck size={16} /> Marchează toate ca citite
                             </button>
                         )}
                     </div>
