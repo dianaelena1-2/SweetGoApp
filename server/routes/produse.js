@@ -197,4 +197,4 @@ router.get('/expirate', verifyToken, verifyRol('cofetarie'), async (req, res) =>
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
 });
 
-module.exports = router;
+module.exports = { router, verificaDisponibilitate };
