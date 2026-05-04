@@ -1,9 +1,11 @@
 const express = require('express')
 const cors = require('cors')
 const dotenv = require('dotenv')
+const cron = require('node-cron')
+
 const authRoutes = require('./routes/auth')
 const adminRoutes = require('./routes/admin')
-const produseRoutes = require('./routes/produse')
+const { router: produseRoutes, verificaDisponibilitate } = require('./routes/produse')
 const comenziRoutes = require('./routes/comenzi')
 const cofetariiRoutes = require('./routes/cofetarii')
 const dashboardRoutes = require('./routes/dashboard')
@@ -12,7 +14,6 @@ const clientRoutes = require('./routes/client')
 
 dotenv.config()
 const connectDB = require('./db')
-//db.actualizeazaDisponibilitateProduse()
 connectDB()
 
 const app = express()
@@ -39,6 +40,19 @@ app.use('/api/client', clientRoutes)
 
 app.get('/', (req,res) => {
     res.json({ mesaj: 'Server pornit cu succes!'})
+})
+
+cron.schedule('0 0 * * *', async () => {
+    //console.log('[CRON] Ora 00:00! Rulez verificarea produselor expirate...');
+    try {
+        await verificaDisponibilitate();
+        //console.log('[CRON] Verificarea s-a încheiat. Produsele expirate au fost ascunse.');
+    } catch (eroare) {
+        console.error('[CRON] Eroare la ascunderea produselor expirate:', eroare);
+    }
+}, {
+    scheduled: true,
+    timezone: "Europe/Bucharest" 
 })
 
 app.listen(PORT, () => {

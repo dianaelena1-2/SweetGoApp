@@ -137,27 +137,26 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
         const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
         if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetăria nu a fost găsită' });
 
-        const startOf30Days = new Date();
-        startOf30Days.setDate(startOf30Days.getDate() - 30);
+        const dataStart = new Date();
+        dataStart.setDate(dataStart.getDate() - 30);
 
-        // 1. Evoluție Vânzări (ultimele 30 de zile, grupate pe zile)
+        // 1. Evoluție Vânzări 
         const evolutieVanzari = await Comanda.aggregate([
             { 
                 $match: { 
                     cofetarie_id: cofetarie._id, 
-                    createdAt: { $gte: startOf30Days },
-                    status: { $ne: 'anulata' } 
+                    createdAt: { $gte: dataStart},
+                    status: { $nin: ['anulata', 'plasata'] } 
                 } 
             },
             { 
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Europe/Bucharest" } },
+                    _id: { $dateToString: { format: formatGrupare, date: "$createdAt", timezone: "Europe/Bucharest" } },
                     totalZilnic: { $sum: "$total" }
                 }
             },
             { $sort: { "_id": 1 } } 
         ]);
-
         // 2. Distribuție pe Categorii 
         const distributieCategorii = await Comanda.aggregate([
             { $match: { cofetarie_id: cofetarie._id, status: { $ne: 'anulata' } } },
@@ -207,7 +206,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
         }
 
         // 4. Impact Anti-Risipă
-        // Deoarece oferta se aplică după ora 20:00, calculăm automat produsele comandate seara târziu
         const produseSalvate = await Comanda.aggregate([
             { $match: { cofetarie_id: cofetarie._id, status: { $ne: 'anulata' } } },
             { $unwind: "$detalii" }, 

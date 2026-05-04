@@ -91,6 +91,18 @@ router.get('/notificari', async (req, res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
 });
 
+router.put('/notificari/citite-toate', async (req, res) => {
+    try {
+        await Notificare.updateMany(
+            { client_id: req.utilizator.id, citita: false },
+            { $set: { citita: true } }
+        );
+        res.json({ mesaj: 'Toate notificările au fost marcate ca citite.' });
+    } catch (err) { 
+        res.status(500).json({ mesaj: 'Eroare' }); 
+    }
+});
+
 // notificare citita
 router.put('/notificari/:id/citita', async (req, res) => {
     try {

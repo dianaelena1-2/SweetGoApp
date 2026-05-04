@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell, X, Circle } from 'lucide-react';
+import { Bell, Circle, CheckCheck } from 'lucide-react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,15 +19,6 @@ function NotificationBell(){
             setNecititeCount(resCount.data.count);
         } catch (err) {
             console.error('Eroare la încărcarea notificărilor', err);
-        }
-    };
-
-    const fetchCount = async () => {
-        try {
-            const res = await api.get('/client/notificari/necitite/count');
-            setNecititeCount(res.data.count);
-        } catch (err) {
-            console.error(err);
         }
     };
 
@@ -57,6 +48,21 @@ function NotificationBell(){
         }
     };
 
+    const handleMarkAllAsRead = async (e) => {
+        e.preventDefault();
+        e.stopPropagation(); 
+        
+        if (necititeCount === 0) return;
+
+        try {
+            await api.put('/client/notificari/citite-toate');
+            setNotificari(prev => prev.map(n => ({ ...n, citita: true })));
+            setNecititeCount(0);
+        } catch (err) {
+            console.error('Eroare la marcarea tuturor ca citite:', err);
+        }
+    };
+
     const handleNotificationClick = (notif) => {
         if (!notif.citita) handleMarkAsRead(notif._id);
         if (notif.link) navigate(notif.link);
@@ -64,7 +70,7 @@ function NotificationBell(){
     };
 
     const formatDate = (dateStr) => {
-        const date = new Date(dateStr); // MongoDB trimite deja in format valid
+        const date = new Date(dateStr); 
         const now = new Date();
         const diffMs = now - date;
         const diffMins = Math.floor(diffMs / 60000);
@@ -91,31 +97,44 @@ function NotificationBell(){
             {open && (
                 <div className="notification-dropdown">
                     <div className="notification-header">
-                        Notificări
-                    </div>
-                    {notificari.length === 0 ? (
-                        <div className="notification-empty">
-                            Nu ai notificări.
-                        </div>
-                    ) : (
-                        notificari.map(notif => (
-                            <div 
-                                key={notif._id} 
-                                onClick={() => handleNotificationClick(notif)}
-                                className={`notification-item ${notif.citita ? 'notification-item-read' : 'notification-item-unread'}`}
+                        <span>Notificări</span>
+                        
+                        {necititeCount > 0 && (
+                            <button 
+                                className="btn-mark-read"
+                                onClick={handleMarkAllAsRead}
+                                title="Marchează toate ca citite"
                             >
-                                <div className="notification-content">
-                                    <div className="notification-message">
-                                        <p>{notif.mesaj}</p>
-                                        <small className="notification-date">{formatDate(notif.createdAt)}</small>
-                                    </div>
-                                    {!notif.citita && (
-                                        <Circle size={10} fill="#c97c2e" color="#c97c2e" className="notification-unread-dot" />
-                                    )}
-                                </div>
+                                <CheckCheck size={16} /> Citite toate
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="notification-list">
+                        {notificari.length === 0 ? (
+                            <div className="notification-empty">
+                                Nu ai notificări.
                             </div>
-                        ))
-                    )}
+                        ) : (
+                            notificari.map(notif => (
+                                <div 
+                                    key={notif._id} 
+                                    onClick={() => handleNotificationClick(notif)}
+                                    className={`notification-item ${notif.citita ? 'notification-item-read' : 'notification-item-unread'}`}
+                                >
+                                    <div className="notification-content">
+                                        <div className="notification-message">
+                                            <p>{notif.mesaj}</p>
+                                            <small className="notification-date">{formatDate(notif.createdAt)}</small>
+                                        </div>
+                                        {!notif.citita && (
+                                            <Circle size={10} fill="#c97c2e" color="#c97c2e" className="notification-unread-dot" />
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </div>
             )}
         </div>
