@@ -151,7 +151,7 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
             },
             { 
                 $group: {
-                    _id: { $dateToString: { format: formatGrupare, date: "$createdAt", timezone: "Europe/Bucharest" } },
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Europe/Bucharest" } },
                     totalZilnic: { $sum: "$total" }
                 }
             },
