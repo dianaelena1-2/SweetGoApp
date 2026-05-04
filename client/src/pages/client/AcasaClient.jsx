@@ -2,13 +2,14 @@ import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
-import { Cake, MapPin, Star, MessageSquare, X, Calendar, Search, ChevronDown, SlidersHorizontal } from 'lucide-react'
+import { Cake, MapPin, Star, MessageSquare, X, Calendar, Search, ChevronDown, SlidersHorizontal, Map as MapIcon } from 'lucide-react'
 import NavbarClient from '../../components/NavbarClient';
 
 function AcasaClient(){
     const [cofetarii, setCofetarii] = useState([])
     const [cautare, setCautare] = useState('')
     const [loading, setLoading] = useState(true)
+    const [filtruDistanta, setFiltruDistanta] = useState('toate');
     const { utilizator, logout } = useContext(AuthContext)
     const navigate = useNavigate()
 
@@ -47,9 +48,29 @@ function AcasaClient(){
         }
     }, [])
 
-    const cofetariiFiltrate = cofetarii.filter(c => 
-        c.numeCofetarie.toLowerCase().includes(cautare.toLowerCase())
-    );
+    const cofetariiFiltrate = cofetarii.filter(c => {
+        const respectaNumele = c.numeCofetarie.toLowerCase().includes(cautare.toLowerCase());
+
+        let respectaDistanta = true;
+        
+        if (filtruDistanta !== 'toate') {
+            if (!c.distanta_valoare) {
+                respectaDistanta = false;
+            } else {
+                const distantaKm = c.distanta_valoare / 1000; 
+                
+                if (filtruDistanta === '<5' && distantaKm >= 5) {
+                    respectaDistanta = false;
+                } else if (filtruDistanta === '5-10' && (distantaKm < 5 || distantaKm > 10)) {
+                    respectaDistanta = false;
+                } else if (filtruDistanta === '>10' && distantaKm <= 10) {
+                    respectaDistanta = false;
+                }
+            }
+        }
+        
+        return respectaNumele && respectaDistanta;
+    });
 
     const deschideRecenzii = async (e, cofetarie) => {
         e.stopPropagation();
@@ -96,22 +117,35 @@ function AcasaClient(){
                     <p>Găsește cele mai bune dulciuri din zona ta</p>
 
                     <div className="acasa-filtre-bar">
-                        {/* <div className="search-wrapper-mare">
-                            <Search size={20} color="#9a7a5a" />
-                            <input 
-                                type="text" 
-                                placeholder="Caută cofetărie după nume..." 
-                                value={cautare}
-                                onChange={(e) => setCautare(e.target.value)}
-                            />
-                        </div> */}
-                        
-                        {/* <div className="filtre-butoane">
-                            <button className="filtru-pill">Locație <ChevronDown size={16} /></button>
-                            <button className="filtru-pill activ">Rating 4.5+ <X size={14} /></button>
-                            <button className="filtru-pill">Deschis acum <ChevronDown size={16} /></button>
-                            <button className="filtru-pill">Sortare <SlidersHorizontal size={14} /></button>
-                        </div> */}
+                        <div className="filtre-butoane">
+                            <span style={{ color: '#9a7a5a', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <MapIcon size={16} /> Distanță:
+                            </span>
+                            <button 
+                                className={`filtru-pill ${filtruDistanta === 'toate' ? 'activ' : ''}`}
+                                onClick={() => setFiltruDistanta('toate')}
+                            >
+                                Toate
+                            </button>
+                            <button 
+                                className={`filtru-pill ${filtruDistanta === '<5' ? 'activ' : ''}`}
+                                onClick={() => setFiltruDistanta('<5')}
+                            >
+                                &lt; 5 km
+                            </button>
+                            <button 
+                                className={`filtru-pill ${filtruDistanta === '5-10' ? 'activ' : ''}`}
+                                onClick={() => setFiltruDistanta('5-10')}
+                            >
+                                5 - 10 km
+                            </button>
+                            <button 
+                                className={`filtru-pill ${filtruDistanta === '>10' ? 'activ' : ''}`}
+                                onClick={() => setFiltruDistanta('>10')}
+                            >
+                                &gt; 10 km
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -182,7 +216,14 @@ function AcasaClient(){
                     </div>
                 ) : (
                     <div className="cautare-fara-rezultat">
-                        <p>Nu am găsit nicio cofetărie cu numele "<strong>{cautare}</strong>".</p>
+                        <p>
+                            {cautare && filtruDistanta !== 'toate' 
+                                ? <>Nu am găsit nicio cofetărie cu numele "<strong>{cautare}</strong>" la distanța selectată.</>
+                                : cautare 
+                                    ? <>Nu am găsit nicio cofetărie cu numele "<strong>{cautare}</strong>".</>
+                                    : <>Nu am găsit nicio cofetărie la distanța selectată.</>
+                            }
+                        </p>
                     </div>
                 )}
             </div>
