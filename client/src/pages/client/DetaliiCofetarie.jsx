@@ -328,7 +328,21 @@ function DetaliiCofetarie() {
                                                         <span className="pret-nou">{(produs.pret * 0.6).toFixed(2)} lei</span>
                                                     </div>
                                                 ) : (
-                                                    <span className="produs-pret">{produs.pret} lei</span>
+                                                    <div className="pret-container-standard">
+                                                        {produs.pret_vechi && produs.pret_vechi > produs.pret && (
+                                                            <span className="pret-taiat" style={{ 
+                                                                textDecoration: 'line-through', 
+                                                                color: '#9a7a5a', 
+                                                                marginRight: '8px',
+                                                                fontSize: '0.9rem' 
+                                                            }}>
+                                                                {produs.pret_vechi.toFixed(2)} lei
+                                                            </span>
+                                                        )}
+                                                        <span className="produs-pret" style={{ color: produs.pret_vechi ? '#c0392b' : '#c97c2e' }}>
+                                                            {produs.pret.toFixed(2)} lei
+                                                        </span>
+                                                    </div>
                                                 )}
 
                                                 {!produs.disponibil || produs.stoc === 0 ? (

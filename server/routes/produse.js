@@ -102,14 +102,22 @@ router.put('/:id', verifyToken, verifyRol('cofetarie'), uploadImaginiProduse.sin
         const { numeProdus, descriere, pret, categorie, disponibil, stoc, transport_recomandat, data_expirare } = req.body;
         
         const produsExistent = await Produs.findById(req.params.id)
-        const imagine = req.file ? req.file.path : produsExistent.imagine
 
+        const pretNou = parseFloat(pret)
+        let pret_vechi_nou = produsExistent.pret_vechi
+        if (pretNou < produsExistent.pret) {
+            pret_vechi_nou = produsExistent.pret;
+        } else if (pretNou > produsExistent.pret) {
+            pret_vechi_nou = null;
+        }
+
+        const imagine = req.file ? req.file.path : produsExistent.imagine
         let listaIngrediente = parseArrayFromBody(req.body.ingredienteAlese)
         if (req.body.ingredientNou) listaIngrediente.push(req.body.ingredientNou)
-        let optiuniDecor = parseArrayFromBody(req.body.optiuni_decor);
+        let optiuniDecor = parseArrayFromBody(req.body.optiuni_decor)
 
         await Produs.findByIdAndUpdate(req.params.id, {
-            numeProdus, descriere, pret, categorie, disponibil, stoc, imagine, transport_recomandat, data_expirare,
+            numeProdus, descriere, pret, pret_vechi: pret_vechi_nou, categorie, disponibil, stoc, imagine, transport_recomandat, data_expirare,
             ingrediente: [...new Set(listaIngrediente)],
             optiuni_decor: [...new Set(optiuniDecor)]
         });

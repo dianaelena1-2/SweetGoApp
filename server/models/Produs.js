@@ -5,6 +5,7 @@ const produsSchema = new mongoose.Schema({
     numeProdus: { type: String, required: true },
     descriere: String,
     pret: { type: Number, required: true },
+    pret_vechi: { type: Number, default: null },
     categorie: String,
     stoc: { type: Number, default: 0 },
     disponibil: { type: Boolean, default: true },

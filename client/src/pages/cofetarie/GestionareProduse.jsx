@@ -500,8 +500,13 @@ function GestionareProduse() {
 
                                 <div className="gp-prod-footer">
                                     <div className="gp-prod-price-box">
-                                        <span className="gp-price-label">Preț/Stoc</span>
+                                        <span className="gp-price-label">Preț curent / Stoc</span>
                                         <span className="gp-price-val">
+                                            {produs.pret_vechi && produs.pret_vechi > produs.pret && (
+                                                <small style={{ textDecoration: 'line-through', opacity: 0.6, marginRight: '5px' }}>
+                                                    {produs.pret_vechi}
+                                                </small>
+                                            )}
                                             {produs.pret} lei <span>/ {produs.stoc} buc</span>
                                         </span>
                                     </div>
