@@ -113,6 +113,145 @@ router.delete('/utilizatori/:id', verifyToken, verifyRol('admin'), async (req, r
         
         res.json({ mesaj: 'Utilizator șters cu succes.' })
     } catch (err) { res.status(500).json({ mesaj: 'Eroare internă la ștergere.' }) }
-})
+});
+
+// STATISTICI DASHBOARD ADMIN 
+router.get('/dashboard-statistici', verifyToken, verifyRol('admin'), async (req, res) => {
+    try {
+        const dataStart30Zile = new Date();
+        dataStart30Zile.setDate(dataStart30Zile.getDate() - 30);
+
+        const dataStart14Zile = new Date();
+        dataStart14Zile.setDate(dataStart14Zile.getDate() - 14);
+
+        // 1. CREȘTEREA PLATFORMEI (Ultimele 30 de zile)
+        const cresterePlatformaRaw = await User.aggregate([
+            { 
+                $match: { 
+                    rol: { $in: ['client', 'cofetarie'] },
+                    createdAt: { $gte: dataStart30Zile }
+                } 
+            },
+            {
+                $group: {
+                    _id: {
+                        data: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Europe/Bucharest" } },
+                        rol: "$rol"
+                    },
+                    total: { $sum: 1 }
+                }
+            },
+            { $sort: { "_id.data": 1 } }
+        ]);
+
+        // Formatăm datele pentru Recharts (o singură înregistrare per zi)
+        const crestereMap = {};
+        cresterePlatformaRaw.forEach(item => {
+            const data = item._id.data;
+            if (!crestereMap[data]) crestereMap[data] = { data, clientiNovi: 0, cofetariiNoi: 0 };
+            
+            if (item._id.rol === 'client') crestereMap[data].clientiNovi = item.total;
+            if (item._id.rol === 'cofetarie') crestereMap[data].cofetariiNoi = item.total;
+        });
+        const cresterePlatforma = Object.values(crestereMap).sort((a, b) => a.data.localeCompare(b.data));
+
+        // 2. RATA DE SUCCES COMENZI (Ultimele 14 zile)
+        const rataSuccesRaw = await Comanda.aggregate([
+            { 
+                $match: { 
+                    createdAt: { $gte: dataStart14Zile }
+                } 
+            },
+            {
+                $group: {
+                    _id: {
+                        data: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Europe/Bucharest" } },
+                        statusSimplificat: {
+                            $cond: [{ $eq: ["$status", "anulata"] }, "anulate", "livrate"] // Tot ce nu e anulat consideram succes/in curs
+                        }
+                    },
+                    total: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const rataSuccesMap = {};
+        rataSuccesRaw.forEach(item => {
+            const data = item._id.data;
+            if (!rataSuccesMap[data]) rataSuccesMap[data] = { data, livrate: 0, anulate: 0 };
+            rataSuccesMap[data][item._id.statusSimplificat] = item.total;
+        });
+        const rataSuccesComenzi = Object.values(rataSuccesMap).sort((a, b) => a.data.localeCompare(b.data));
+
+        // 3. TOP COFETĂRII (După venit generat)
+        const topCofetarii = await Comanda.aggregate([
+            { $match: { status: { $ne: 'anulata' } } },
+            { 
+                $group: {
+                    _id: "$cofetarie_id",
+                    totalVenit: { $sum: "$total" },
+                    totalComenzi: { $sum: 1 }
+                }
+            },
+            { $sort: { totalVenit: -1 } },
+            { $limit: 5 },
+            {
+                $lookup: {
+                    from: Cofetarie.collection.name,
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "detalii_cofetarie"
+                }
+            },
+            { $unwind: "$detalii_cofetarie" },
+            {
+                $project: {
+                    _id: 0, 
+                    nume: "$detalii_cofetarie.numeCofetarie",
+                    totalVenit: 1,
+                    totalComenzi: 1
+                }
+            }
+        ]);
+
+        // 4. IMPACT ANTI-RISIPĂ GLOBAL
+        const antiRisipa = await Comanda.aggregate([
+            { $match: { status: { $ne: 'anulata' } } },
+            { $unwind: "$detalii" },
+            { 
+                $lookup: { 
+                    from: Produs.collection.name, 
+                    localField: 'detalii.produs_id',
+                    foreignField: '_id',
+                    as: 'produs_info'
+                }
+            },
+            { $unwind: "$produs_info" },
+            { 
+                $match: { 
+                    $expr: { $lt: ["$detalii.pret_unitar", "$produs_info.pret"] } 
+                } 
+            },
+            { 
+                $group: {
+                    _id: null,
+                    total_salvate: { $sum: "$detalii.cantitate" }
+                }
+            }
+        ]);
+        const produseSalvateGlobal = antiRisipa.length > 0 ? antiRisipa[0].total_salvate : 0;
+
+        res.json({
+            cresterePlatforma,
+            rataSuccesComenzi,
+            topCofetarii,
+            produseSalvateGlobal
+        });
+
+    } catch (err) {
+        console.error("Eroare generare statistici admin:", err);
+        res.status(500).json({ mesaj: 'Eroare la generarea statisticilor' });
+    }
+});
 
 module.exports = router

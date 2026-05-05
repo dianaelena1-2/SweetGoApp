@@ -23,6 +23,7 @@ import StatisticiCofetarie from './pages/cofetarie/StatisticiCofetarie'
 
 //admin pages
 import DashboardAdmin from './pages/admin/DashboardAdmin'
+import StatisticiAdmin from './pages/admin/StatisticiAdmin';
 
 
 const ProtectedRoute = ({ children, rol }) => {
@@ -60,6 +61,7 @@ function App(){
 
         {/*admin*/}
         <Route path="/admin/dashboard" element={<ProtectedRoute rol="admin"><DashboardAdmin /></ProtectedRoute>} />
+        <Route path="/admin/statistici" element={<ProtectedRoute rol="admin"><StatisticiAdmin /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )
