@@ -25,7 +25,7 @@ function Login() {
             const rol = raspuns.data.utilizator.rol
             if (rol === 'client') navigate('/')
             else if (rol === 'cofetarie') navigate('/cofetarie/dashboard')
-            else if (rol === 'admin') navigate('/admin/dashboard')
+            else if (rol === 'admin') navigate('/admin/dashboard-admin')
 
         } catch (err) {
             if (err.response?.status === 403) {

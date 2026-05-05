@@ -2,13 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { LayoutDashboard, BarChart3, LogOut, PackageCheck } from 'lucide-react';
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import api from '../../services/api';
 
 function StatisticiAdmin() {
     const { utilizator, logout } = useContext(AuthContext);
     const navigate = useNavigate();
-    const location = useLocation(); // Pentru a evidenția butonul activ din Sidebar
+    const location = useLocation();
 
     const [statistici, setStatistici] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -34,27 +34,43 @@ function StatisticiAdmin() {
         navigate('/login');
     };
 
-    if (loading) return <div className="admin-layout"><p className="loading" style={{width:'100%', marginTop:'5rem'}}>Se generează rapoartele...</p></div>;
-    if (eroare) return <div className="admin-layout"><p className="gol" style={{color: 'red', width:'100%', marginTop:'5rem'}}>{eroare}</p></div>;
+    const CustomTooltipTopCofetarii = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+        const data = payload[0].payload;
+        return (
+            <div className="dash-custom-tooltip">
+                <p className="dash-tooltip-label">{data.nume}</p>
+                <p className="dash-tooltip-value">
+                    Vânzări: <span>{payload[0].value.toFixed(2)} Lei</span>
+                </p>
+                <p className="dash-tooltip-subtext">
+                    Total: {data.totalComenzi} comenzi finalizate
+                </p>
+            </div>
+        );
+    }
+    return null;
+};
+
+    if (loading) return <div className="admin-layout"><p className="loading">Se generează rapoartele...</p></div>;
+    if (eroare) return <div className="admin-layout"><p className="gol">{eroare}</p></div>;
     if (!statistici) return null;
 
     return (
         <div className="admin-layout">
-            
-            {/* ================= SIDEBAR LATERAL (Fix la fel ca in Dashboard) ================= */}
             <aside className="admin-sidebar">
                 <div className="admin-logo">SweetGo 🍰</div>
 
                 <nav className="admin-nav">
                     <button 
-                        className={`admin-nav-item ${location.pathname === '/admin/dashboard' ? 'active' : ''}`}
-                        onClick={() => navigate('/admin/dashboard')}
+                        className={`admin-nav-item ${location.pathname === '/admin/dashboard-admin' ? 'active' : ''}`}
+                        onClick={() => navigate('/admin/dashboard-admin')}
                     >
                         <LayoutDashboard size={20}/> Dashboard
                     </button>
                     <button 
-                        className={`admin-nav-item ${location.pathname === '/admin/statistici' ? 'active' : ''}`}
-                        onClick={() => navigate('/admin/statistici')}
+                        className={`admin-nav-item ${location.pathname === '/admin/statistici-admin' ? 'active' : ''}`}
+                        onClick={() => navigate('/admin/statistici-admin')}
                     >
                         <BarChart3 size={20}/> Statistici
                     </button>
@@ -65,43 +81,40 @@ function StatisticiAdmin() {
                 </button>
             </aside>
 
-            {/* ================= CONȚINUT PRINCIPAL (Grafice) ================= */}
             <main className="admin-main">
-                
                 <div className="admin-topbar">
                     <div className="admin-top-user">
                         <div>
                             <h4>{utilizator?.nume || 'Administrator'}</h4>
-                            <p>Overview Platformă</p>
                         </div>
                     </div>
                 </div>
 
-                <div style={{ marginBottom: '2rem' }}>
-                    <h2 style={{ color: '#3d2c1e', fontSize: '1.8rem', marginBottom: '0.5rem' }}>Statistici Platformă</h2>
-                    <p style={{ color: '#9a7a5a', fontSize: '0.95rem' }}>O privire de ansamblu asupra creșterii și sănătății ecosistemului SweetGo.</p>
+                <div className="admin-sectiune">
+                    <h2>Performanța platformei</h2>
+                    <p className="text-muted">Urmărește evoluția, vânzările și activitatea generală din aplicația SweetGo.</p>
                 </div>
 
-                {/* 1. Impactul Anti-Risipă (Highlight mare) */}
-                <div className="admin-stats-grid" style={{ gridTemplateColumns: '1fr', marginBottom: '2rem' }}>
-                    <div className="admin-stat-card" style={{ background: 'linear-gradient(135deg, #2ecc71, #27ae60)', color: 'white', border: 'none', flexDirection: 'row', justifyContent: 'space-between', padding: '2rem' }}>
-                        <div>
-                            <span style={{ fontSize: '1rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.9 }}>Misiune Îndeplinită: Impact Ecologic</span>
-                            <h3 style={{ fontSize: '3rem', margin: '10px 0', fontWeight: '900' }}>
-                                {statistici.produseSalvateGlobal}
+                <div className="admin-stats-grid" style={{ gridTemplateColumns: '1fr', marginBottom: '2.5rem' }}>
+                    <div className="admin-eco-card">
+                        <div className="eco-card-content">
+                            <span className="eco-card-label">Misiune îndeplinită: Deserturi salvate cu oferta anti-risipă</span>
+                            <h3 className="eco-card-value">
+                                {statistici.produseSalvateGlobal} 
                             </h3>
-                            <p style={{ fontSize: '1.1rem', margin: 0, opacity: 0.9 }}>Deserturi salvate de la risipă pe întreaga platformă.</p>
+                            <p className="eco-card-desc">
+                                <strong>Felicitări!</strong> Acesta este numărul total de deserturi care au ajuns pe masa clienților în loc să fie aruncate.
+                            </p>
                         </div>
-                        <div style={{ background: 'rgba(255,255,255,0.2)', padding: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <PackageCheck size={64} color="white" />
+                        <div className="eco-card-icon" style={{ fontSize: '4.5rem', lineHeight: 1 }}>
+                            🌍
                         </div>
                     </div>
                 </div>
 
                 <div className="dash-grid-top">
-                    {/* 2. Creșterea Platformei (Area Chart) */}
                     <div className="dash-card">
-                        <h3 className="dash-card-title">Creșterea Ecosistemului</h3>
+                        <h3 className="dash-card-title">Evoluția aplicației </h3>
                         <p className="dash-card-subtitle">Conturi noi create în ultimele 30 de zile</p>
                         <div className="dash-chart-container">
                             <ResponsiveContainer>
@@ -129,9 +142,8 @@ function StatisticiAdmin() {
                         </div>
                     </div>
 
-                    {/* 3. Rata de succes comenzi (Stacked Bar Chart) */}
                     <div className="dash-card">
-                        <h3 className="dash-card-title">Rata de Succes Comenzi</h3>
+                        <h3 className="dash-card-title">Rata de succes - comenzi</h3>
                         <p className="dash-card-subtitle">Performanța comenzilor (ultimele 14 zile)</p>
                         <div className="dash-chart-container">
                             <ResponsiveContainer>
@@ -150,25 +162,20 @@ function StatisticiAdmin() {
                     </div>
                 </div>
 
-                {/* 4. Top Cofetării (Bar Chart Orizontal) */}
-                <div className="dash-card" style={{ marginTop: '20px' }}>
-                    <h3 className="dash-card-title">Top Parteneri (Cofetării)</h3>
-                    <p className="dash-card-subtitle">Cei mai performanți parteneri după volumul total al vânzărilor (Lei)</p>
-                    <div style={{ width: '100%', height: '300px' }}>
+                <div className="dash-card pt-margin">
+                    <h3 className="dash-card-title">Top parteneri (Cofetării)</h3>
+                    <p className="dash-card-subtitle">Cei mai performanți parteneri după volumul total al vânzărilor (lei)</p>
+                    <div className="dash-chart-container" style={{ height: '300px' }}>
                         <ResponsiveContainer>
                             <BarChart data={statistici.topCofetarii} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
                                 <XAxis type="number" tick={{fontSize: 12, fill: '#95a5a6'}} axisLine={false} tickLine={false}/>
                                 <YAxis dataKey="nume" type="category" tick={{fontSize: 12, fill: '#3d2c1e', fontWeight: 'bold'}} axisLine={false} tickLine={false} width={150}/>
                                 <Tooltip 
-                                    cursor={{fill: '#fffaf5'}} 
-                                    contentStyle={{borderRadius: '12px', border: '1px solid #f5d5a8'}} 
-                                    formatter={(value, name) => [
-                                        name === 'totalVenit' ? `${value} Lei` : value, 
-                                        name === 'totalVenit' ? 'Încasări Totale' : 'Număr Comenzi'
-                                    ]}
+                                    content={<CustomTooltipTopCofetarii />} 
+                                    cursor={{ fill: '#fffaf5' }} 
                                 />
                                 <Legend verticalAlign="top" height={36}/>
-                                <Bar dataKey="totalVenit" name="Încasări Totale (Lei)" fill="#c97c2e" radius={[0, 6, 6, 0]} barSize={20} />
+                                <Bar dataKey="totalVenit" name="Încasări totale (lei)" fill="#c97c2e" radius={[0, 6, 6, 0]} barSize={20} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

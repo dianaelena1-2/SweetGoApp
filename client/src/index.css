@@ -5874,3 +5874,97 @@ body {
     font-weight: 500;
     padding: 10px;
 }
+/* ================= CARD IMPACT ECOLOGIC PREMIU (ADMIN) - TEMA PALA / VERDE ================= */
+.admin-eco-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f1f8e9 100%); /* Fundal alb spre verde foarte pal */
+    border: 1.5px solid #c8e6c9; /* Contur verde pastel */
+    border-radius: 28px;
+    padding: 2.5rem 3rem;
+    color: #2e7d32; 
+    box-shadow: 0 10px 30px rgba(46, 125, 50, 0.06); /* Umbra verde extrem de subtila */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    margin-top: 2rem; /* FORȚEAZĂ SPAȚIUL față de textul de sus */
+}
+
+.eco-card-content {
+    position: relative;
+    z-index: 2;
+}
+
+.eco-card-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    opacity: 0.8;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #2e7d32;
+}
+
+.eco-card-value {
+    font-size: 5rem; /* Cifră mare și vizibilă */
+    font-weight: 900;
+    color: #27ae60;
+    margin: 0;
+    line-height: 1;
+    padding-left: 20px;
+}
+
+.eco-card-desc {
+    font-size: 1.1rem;
+    margin: 0.5rem 0 0 0;
+    font-weight: 500;
+    color: #558b2f;
+}
+
+.eco-card-icon {
+    font-size: 6.5rem; /* O planetă mult mai mare! */
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    /* Adăugăm o umbră fină direct sub planetă pentru un efect 3D mișto */
+    filter: drop-shadow(0 15px 25px rgba(46, 125, 50, 0.2));
+}
+
+.dash-custom-tooltip {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px solid #f5d5a8;
+    box-shadow: 0 8px 20px rgba(201, 124, 46, 0.15);
+}
+
+.dash-tooltip-label {
+    margin: 0 0 6px 0;
+    font-weight: 800;
+    color: #3d2c1e;
+    font-size: 1rem;
+}
+
+.dash-tooltip-value {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #7a5230;
+    font-weight: 600;
+}
+
+.dash-tooltip-value span {
+    color: #c97c2e;
+    font-weight: 800;
+}
+
+.dash-tooltip-subtext {
+    margin: 4px 0 0 0;
+    font-size: 0.8rem;
+    color: #9a7a5a;
+    font-style: italic;
+}

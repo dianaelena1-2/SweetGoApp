@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Users, Store, ShoppingCart, Banknote, LayoutDashboard, BarChart3, LogOut, Trash2, Check, X, FileText } from 'lucide-react'
 import api from '../../services/api'
@@ -7,6 +7,7 @@ import api from '../../services/api'
 function DashboardAdmin() {
     const { utilizator, logout } = useContext(AuthContext)
     const navigate = useNavigate()
+    const location = useLocation()
 
     const [date, setDate] = useState(null)
     const [utilizatori, setUtilizatori] = useState([])
@@ -109,10 +110,16 @@ function DashboardAdmin() {
                 <div className="admin-logo">SweetGo 🍰</div>
 
                 <nav className="admin-nav">
-                    <button className="admin-nav-item active">
-                        <LayoutDashboard size={20}/> Dashboard
+                    <button 
+                        className={`admin-nav-item ${location.pathname === '/admin/dashboard-admin' ? 'active' : ''}`}
+                        onClick={() => navigate('/admin/dashboard-admin')}
+                    >
+                    <LayoutDashboard size={20}/> Dashboard
                     </button>
-                    <button className="admin-nav-item">
+                        <button 
+                            className={`admin-nav-item ${location.pathname === '/admin/statistici-admin' ? 'active' : ''}`}
+                            onClick={() => navigate('/admin/statistici-admin')}
+                        >
                         <BarChart3 size={20}/> Statistici
                     </button>
                 </nav>

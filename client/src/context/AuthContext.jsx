@@ -9,6 +9,9 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true)
 
     const incarcaCosDinServer = async () => {
+        if (!utilizator || utilizator.rol !== 'client') {
+            return; 
+        }
         try {
             const res = await api.get('/client/cos');
             if (res.data && res.data.produse !== undefined) {

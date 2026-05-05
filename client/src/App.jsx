@@ -60,8 +60,8 @@ function App(){
         <Route path="/cofetarie/statistici-cofetarie" element={<ProtectedRoute rol="cofetarie"><StatisticiCofetarie /></ProtectedRoute>} />
 
         {/*admin*/}
-        <Route path="/admin/dashboard" element={<ProtectedRoute rol="admin"><DashboardAdmin /></ProtectedRoute>} />
-        <Route path="/admin/statistici" element={<ProtectedRoute rol="admin"><StatisticiAdmin /></ProtectedRoute>} />
+        <Route path="/admin/dashboard-admin" element={<ProtectedRoute rol="admin"><DashboardAdmin /></ProtectedRoute>} />
+        <Route path="/admin/statistici-admin" element={<ProtectedRoute rol="admin"><StatisticiAdmin /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )
