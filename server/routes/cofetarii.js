@@ -244,6 +244,51 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
     }
 });
 
+// Statistici pe ORE pentru o anumita zi ceruta
+router.get('/dashboard-statistici/ziua', verifyToken, verifyRol('cofetarie'), async (req, res) => {
+    try {
+        const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
+        if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetăria nu a fost găsită' });
+
+        const { data } = req.query; 
+        if (!data) return res.status(400).json({ mesaj: 'Data lipsă din cerere' });
+
+        const vanzariPeOre = await Comanda.aggregate([
+            { 
+                $match: { 
+                    cofetarie_id: cofetarie._id, 
+                    status: { $nin: ['anulata', 'plasata'] } 
+                } 
+            },
+            {
+                $addFields: {
+                    dataFormatata: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Europe/Bucharest" } }
+                }
+            },
+            { 
+                $match: { dataFormatata: data } 
+            },
+            {
+                $group: {
+                    _id: { $hour: { date: "$createdAt", timezone: "Europe/Bucharest" } },
+                    totalZilnic: { $sum: "$total" }
+                }
+            },
+            { $sort: { "_id": 1 } } 
+        ]);
+
+        const rezultatFormatat = vanzariPeOre.map(item => ({
+            oraText: `${item._id < 10 ? '0' : ''}${item._id}:00`,
+            totalZilnic: item.totalZilnic
+        }));
+
+        res.json(rezultatFormatat);
+    } catch (err) {
+        console.error("Eroare statistici zilnice:", err);
+        res.status(500).json({ mesaj: 'Eroare la server' });
+    }
+});
+
 // detalii cofetarie si produsele ei
 router.get('/:id', async (req, res) => {
     try {

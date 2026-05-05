@@ -7,6 +7,10 @@ function StatisticiCofetarie(){
     const [statistici, setStatistici] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const [ziSelectata, setZiSelectata] = useState(null);
+    const [dateZi, setDateZi] = useState([]);
+    const [loadingZi, setLoadingZi] = useState(false);
+
     const CULORI_PIE = ['#c97c2e', '#bd081c', '#7a5230', '#2ecc71', '#f39c12'];
 
     useEffect(() => {
@@ -22,6 +26,21 @@ function StatisticiCofetarie(){
         };
         fetchStatistici();
     }, []);
+
+    const handleBarClick = async (data) => {
+        if (!data || !data._id) return;
+        setZiSelectata(data._id); 
+        setLoadingZi(true);
+        
+        try {
+            const raspuns = await api.get(`/cofetarii/dashboard-statistici/ziua?data=${data._id}`);
+            setDateZi(raspuns.data);
+        } catch (err) {
+            console.error("Eroare aducere date zilnice", err);
+        } finally {
+            setLoadingZi(false);
+        }
+    };
 
     const renderLegendaPersonalizata = (props) => {
         const { payload } = props;
@@ -69,22 +88,59 @@ function StatisticiCofetarie(){
                 <div className="dash-grid-top">
                     {/* Graficul de Bare */}
                     <div className="dash-card">
-                        <h3 className="dash-card-title">Evoluție vânzări</h3>
-                        <p className="dash-card-subtitle">Performanță zilnică în ultimele 30 de zile (Lei)</p>
+                        {!ziSelectata ? (
+                            <>
+                                <h3 className="dash-card-title">Evoluție vânzări</h3>
+                                <p className="dash-card-subtitle">Performanță zilnică (Apasă pe o bară pentru detalii pe ore)</p>
+                            </>
+                        ) : (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                <div>
+                                    <h3 className="dash-card-title" style={{ color: '#c97c2e' }}>Vânzări: {ziSelectata}</h3>
+                                    <p className="dash-card-subtitle" style={{ margin: 0 }}>Distribuție pe ore</p>
+                                </div>
+                                <button 
+                                    onClick={() => setZiSelectata(null)} 
+                                    style={{ background: '#fffaf5', border: '1px solid #f5d5a8', color: '#c97c2e', padding: '6px 12px', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold' }}
+                                >
+                                    ← Înapoi
+                                </button>
+                            </div>
+                        )}
                         <div className="dash-chart-container">
-                            <ResponsiveContainer>
-                                <BarChart data={statistici.evolutieVanzari} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                    <XAxis dataKey="_id" tick={{fontSize: 10, fill: '#95a5a6'}} axisLine={false} tickLine={false} />
-                                    <YAxis tick={{fontSize: 12, fill: '#95a5a6'}} axisLine={false} tickLine={false} />
-                                    <Tooltip 
-                                        cursor={{fill: '#fffaf5'}} 
-                                        contentStyle={{borderRadius: '12px', border: '1px solid #f5d5a8', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'}} 
-                                        itemStyle={{ color: '#c97c2e', fontWeight: 700, fontSize: '1.1rem' }}
-                                        formatter={(value) => [`${value} Lei`, 'Total încasări']}
-                                    />
-                                    <Bar dataKey="totalZilnic" fill="#fdecd8" radius={[6, 6, 0, 0]} activeBar={{ fill: '#c97c2e' }} />
-                                </BarChart>
-                            </ResponsiveContainer>
+                            {ziSelectata && loadingZi ? (
+                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9a7a5a' }}>Se încarcă...</div>
+                            ) : ziSelectata ? (
+                                /* Graficul PE ORE  */
+                                <ResponsiveContainer>
+                                    <BarChart data={dateZi} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <XAxis dataKey="oraText" tick={{fontSize: 11, fill: '#95a5a6'}} axisLine={false} tickLine={false} />
+                                        <YAxis tick={{fontSize: 12, fill: '#95a5a6'}} axisLine={false} tickLine={false} />
+                                        <Tooltip 
+                                            cursor={{fill: '#fffaf5'}} 
+                                            contentStyle={{borderRadius: '12px', border: '1px solid #f5d5a8', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'}} 
+                                            itemStyle={{ color: '#c97c2e', fontWeight: 700, fontSize: '1.1rem' }}
+                                            formatter={(value) => [`${value} Lei`, 'Total ora']}
+                                        />
+                                        <Bar dataKey="totalZilnic" fill="#c97c2e" radius={[6, 6, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                /* Graficul PE ZILE */
+                                <ResponsiveContainer>
+                                    <BarChart data={statistici.evolutieVanzari} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <XAxis dataKey="_id" tick={{fontSize: 10, fill: '#95a5a6'}} axisLine={false} tickLine={false} />
+                                        <YAxis tick={{fontSize: 12, fill: '#95a5a6'}} axisLine={false} tickLine={false} />
+                                        <Tooltip 
+                                            cursor={{fill: '#fffaf5'}} 
+                                            contentStyle={{borderRadius: '12px', border: '1px solid #f5d5a8', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'}} 
+                                            itemStyle={{ color: '#c97c2e', fontWeight: 700, fontSize: '1.1rem' }}
+                                            formatter={(value) => [`${value} Lei`, 'Total încasări']}
+                                        />
+                                        <Bar dataKey="totalZilnic" fill="#fdecd8" radius={[6, 6, 0, 0]} activeBar={{ fill: '#c97c2e' }} onClick={handleBarClick} cursor="pointer" />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            )}
                         </div>
                     </div>
 
