@@ -1,4 +1,4 @@
-# SweetGo 🍰 - Platformă pentru gestionarea comenzilor si livrarilor din cofetarii
+# SweetGo 🍰 - Platformă pentru gestiunea comenzilor si livrarilor din cofetarii
 
 SweetGo este o aplicație web de tip Single Page Application (SPA) concepută cu un dublu scop: eficientizarea procesului de comandă a produselor de cofetărie și reducerea activă a risipei alimentare. Platforma conectează direct clienții dornici de deserturi cu laboratoarele locale, oferind un mecanism inteligent de achiziție a produselor cu un termen de valabilitate redus, în special prin intermediul „ofertelor de seară”.
 
