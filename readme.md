@@ -54,7 +54,7 @@ Aplicația este structurată pe trei roluri de utilizatori, fiecare beneficiind 
 * **Lucide React:** Set de pictograme vectoriale moderne și minimaliste pentru interfață.
 * **Axios:** Client HTTP utilizat pentru comunicarea asincronă cu serverul backend.
 
-### Backend & Bază de date (Interfațat prin API-uri)
+### Backend & Bază de date 
 * Arhitectură RESTful API bazată pe rute securizate.
 * Logica de colectare a datelor și agregare pe intervale de timp (zile/ore, topuri, analize de business intelligence).
 
