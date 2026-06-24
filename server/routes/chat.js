@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
 
         const produseDisponibile = await Produs.find({ disponibil: true })
             .populate('cofetarie_id', 'numeCofetarie')
-            .limit(20);
+            .limit(40);
 
         let meniuText = 'Momentan nu avem produse disponibile în platformă.';
         
@@ -43,46 +43,25 @@ router.post('/', async (req, res) => {
             ------------------------------------------
             `;
 
-        // ----- Folosim axios direct (fără SDK) -----
         const fullPrompt = systemInstruction + "\n\nÎntrebarea utilizatorului: " + message;
 
-        let attempts = 0;
-        const maxAttempts = 5;
-        let response = null;
-        let lastError = null;
-
-        while (attempts < maxAttempts) {
-            try {
-                response = await axios.post(
-                    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-                    {
-                        contents: [{ parts: [{ text: fullPrompt }] }]
-                    }
-                );
-                break;
-            } catch (error) {
-                attempts++;
-                lastError = error;
-                
-                if (error.response?.status === 429 && attempts < maxAttempts) {
-                    const delay = Math.pow(2, attempts) * 1000; 
-                    console.log(`🔄 Retry ${attempts}/${maxAttempts} după ${delay}ms (429 Too Many Requests)`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                } else {
-                    throw error;
-                }
+        // Am scos retry-ul și am asigurat calea v1beta
+        const response = await axios.post(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+            {
+                contents: [{ parts: [{ text: fullPrompt }] }]
             }
-        }
-
-        if (!response) {
-            throw lastError || new Error('Nu s-a primit răspuns după multiple încercări');
-        }
+        );
 
         const responseText = response.data.candidates[0].content.parts[0].text;
         res.status(200).json({ reply: responseText });
 
     } catch (error) {
-        console.error('[CHAT API] Eroare:', error);
+        if (error.response) {
+            console.error('[CHAT API] Eroare (Status ' + error.response.status + '):', error.response.data);
+        } else {
+            console.error('[CHAT API] Eroare:', error.message);
+        }
         res.status(500).json({ mesaj: 'Eroare la procesarea mesajului.' });
     }
 });
