@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const axios = require('axios'); 
 const Produs = require('../models/Produs');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 router.post('/', async (req, res) => {
     try {
@@ -31,7 +30,6 @@ router.post('/', async (req, res) => {
             }).join('\n');
         }
 
-        //Setez comportamentul botului
         const systemInstruction = `
             Ești asistentul virtual al platformei de livrări prăjituri "SweetGo".
             Numele tău este SweetBot. Rolul tău este să ajuți clienții să aleagă prăjituri și să le oferi detalii.
@@ -46,13 +44,17 @@ router.post('/', async (req, res) => {
             ------------------------------------------
             `;
 
-        const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-pro",
-            systemInstruction: systemInstruction
-        });
+        // ----- Folosim axios direct (fără SDK) -----
+        const fullPrompt = systemInstruction + "\n\nÎntrebarea utilizatorului: " + message;
 
-        const result = await model.generateContent(message);
-        const responseText = result.response.text();
+        const response = await axios.post(
+            `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+            {
+                contents: [{ parts: [{ text: fullPrompt }] }]
+            }
+        );
+
+        const responseText = response.data.candidates[0].content.parts[0].text;
 
         res.status(200).json({ reply: responseText });
 
