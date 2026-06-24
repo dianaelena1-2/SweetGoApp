@@ -2,16 +2,6 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios'); 
 const Produs = require('../models/Produs');
-const axiosRetry = require('axios-retry').default;
-
-axiosRetry(axios, {
-    retries: 4,                     
-    retryDelay: axiosRetry.exponentialDelay, 
-    retryCondition: (error) => {
-        return error.response?.status === 429 || error.response?.status === 500;
-    }
-});
-
 
 router.post('/', async (req, res) => {
     try {
@@ -56,15 +46,39 @@ router.post('/', async (req, res) => {
         // ----- Folosim axios direct (fără SDK) -----
         const fullPrompt = systemInstruction + "\n\nÎntrebarea utilizatorului: " + message;
 
-        const response = await axios.post(
-            `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-            {
-                contents: [{ parts: [{ text: fullPrompt }] }]
+        let attempts = 0;
+        const maxAttempts = 5;
+        let response = null;
+        let lastError = null;
+
+        while (attempts < maxAttempts) {
+            try {
+                response = await axios.post(
+                    `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+                    {
+                        contents: [{ parts: [{ text: fullPrompt }] }]
+                    }
+                );
+                break;
+            } catch (error) {
+                attempts++;
+                lastError = error;
+                
+                if (error.response?.status === 429 && attempts < maxAttempts) {
+                    const delay = Math.pow(2, attempts) * 1000; 
+                    console.log(`🔄 Retry ${attempts}/${maxAttempts} după ${delay}ms (429 Too Many Requests)`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                } else {
+                    throw error;
+                }
             }
-        );
+        }
+
+        if (!response) {
+            throw lastError || new Error('Nu s-a primit răspuns după multiple încercări');
+        }
 
         const responseText = response.data.candidates[0].content.parts[0].text;
-
         res.status(200).json({ reply: responseText });
 
     } catch (error) {
