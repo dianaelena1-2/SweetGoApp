@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios'); 
 const Produs = require('../models/Produs');
+const axiosRetry = require('axios-retry');
+
+axiosRetry(axios, {
+    retries: 4,                     
+    retryDelay: axiosRetry.exponentialDelay, 
+    retryCondition: (error) => {
+        return error.response?.status === 429 || error.response?.status === 500;
+    }
+});
 
 
 router.post('/', async (req, res) => {
