@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
 
         const produseDisponibile = await Produs.find({ disponibil: true })
             .populate('cofetarie_id', 'numeCofetarie')
-            .limit(40);
+            .limit(20);
 
         let meniuText = 'Momentan nu avem produse disponibile în platformă.';
         
@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
         while (attempts < maxAttempts) {
             try {
                 response = await axios.post(
-                    `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+                    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
                     {
                         contents: [{ parts: [{ text: fullPrompt }] }]
                     }
