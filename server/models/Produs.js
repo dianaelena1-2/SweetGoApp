@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 
 const produsSchema = new mongoose.Schema({
-    cofetarie_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Cofetarie', required: true },
+    cofetarie_id: 
+        { 
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Cofetarie',
+            required: true 
+        },
     numeProdus: { type: String, required: true },
     descriere: String,
     pret: { type: Number, required: true },

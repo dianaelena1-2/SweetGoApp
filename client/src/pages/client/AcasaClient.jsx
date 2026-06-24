@@ -4,6 +4,7 @@ import { AuthContext } from '../../context/AuthContext'
 import api from '../../services/api'
 import { Cake, MapPin, Star, MessageSquare, X, Calendar, Search, ChevronDown, SlidersHorizontal, Map as MapIcon } from 'lucide-react'
 import NavbarClient from '../../components/NavbarClient';
+import ChatWidget from '../../components/ChatWidget';
 
 function AcasaClient(){
     const [cofetarii, setCofetarii] = useState([])
@@ -260,6 +261,7 @@ function AcasaClient(){
                     </div>
                 </div>
             )}
+            <ChatWidget />
         </div>
     )
 }

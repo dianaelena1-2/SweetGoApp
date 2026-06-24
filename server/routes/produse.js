@@ -179,7 +179,6 @@ router.put('/:id/aplica-oferta', verifyToken, verifyRol('cofetarie'), async (req
 
         if (!produs) return res.status(404).json({ mesaj: 'Produsul nu există sau are deja ofertă activă.' });
 
-        // Notificam utilizatorii care au cofetaria la favorite
         const users = await User.find({ favorite: produs.cofetarie_id._id });
         const notificari = users.map(u => ({
             client_id: u._id,

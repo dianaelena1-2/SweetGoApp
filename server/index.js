@@ -11,6 +11,7 @@ const cofetariiRoutes = require('./routes/cofetarii')
 const dashboardRoutes = require('./routes/dashboard')
 const ingredienteRoutes = require('./routes/ingrediente')
 const clientRoutes = require('./routes/client')
+const chatRoutes = require('./routes/chat')
 
 dotenv.config()
 const connectDB = require('./db')
@@ -37,16 +38,15 @@ app.use('/api/cofetarii', cofetariiRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/ingrediente', ingredienteRoutes)
 app.use('/api/client', clientRoutes)
+app.use('/api/chat', chatRoutes)
 
 app.get('/', (req,res) => {
     res.json({ mesaj: 'Server pornit cu succes!'})
 })
 
 cron.schedule('0 0 * * *', async () => {
-    //console.log('[CRON] Ora 00:00! Rulez verificarea produselor expirate...');
     try {
         await verificaDisponibilitate();
-        //console.log('[CRON] Verificarea s-a încheiat. Produsele expirate au fost ascunse.');
     } catch (eroare) {
         console.error('[CRON] Eroare la ascunderea produselor expirate:', eroare);
     }

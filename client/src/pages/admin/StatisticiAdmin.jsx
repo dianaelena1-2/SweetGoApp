@@ -35,22 +35,22 @@ function StatisticiAdmin() {
     };
 
     const CustomTooltipTopCofetarii = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-        const data = payload[0].payload;
-        return (
-            <div className="dash-custom-tooltip">
-                <p className="dash-tooltip-label">{data.nume}</p>
-                <p className="dash-tooltip-value">
-                    Vânzări: <span>{payload[0].value.toFixed(2)} Lei</span>
-                </p>
-                <p className="dash-tooltip-subtext">
-                    Total: {data.totalComenzi} comenzi finalizate
-                </p>
-            </div>
-        );
-    }
-    return null;
-};
+        if (active && payload && payload.length) {
+            const data = payload[0].payload;
+            return (
+                <div className="dash-custom-tooltip">
+                    <p className="dash-tooltip-label">{data.nume}</p>
+                    <p className="dash-tooltip-value">
+                        Vânzări: <span>{payload[0].value.toFixed(2)} Lei</span>
+                    </p>
+                    <p className="dash-tooltip-subtext">
+                        Total: {data.totalComenzi} comenzi finalizate
+                    </p>
+                </div>
+            );
+        }
+        return null;
+    };
 
     if (loading) return <div className="admin-layout"><p className="loading">Se generează rapoartele...</p></div>;
     if (eroare) return <div className="admin-layout"><p className="gol">{eroare}</p></div>;

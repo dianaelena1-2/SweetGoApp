@@ -378,7 +378,8 @@ function GestionareProduse() {
                                 </div>
                                 <div>
                                     <label className="gp-label">Transport recomandat</label>
-                                    <select className="gp-input-modern" value={formNou.transport_recomandat} onChange={(e) => setFormNou({ ...formNou, transport_recomandat: e.target.value })}>
+                                    <select className="gp-input-modern" value={formNou.transport_recomandat} 
+                                        onChange={(e) => setFormNou({ ...formNou, transport_recomandat: e.target.value })}>
                                         <option value="bicicleta">🚲 Bicicletă / Trotinetă</option>
                                         <option value="masina">🚗 Mașină Standard</option>
                                         <option value="frigorific">❄️ Mașină Frigorifică</option>
