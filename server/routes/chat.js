@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios'); 
 const Produs = require('../models/Produs');
-const axiosRetry = require('axios-retry');
+const axiosRetry = require('axios-retry').default;
 
 axiosRetry(axios, {
     retries: 4,                     
