@@ -5,12 +5,6 @@ const Produs = require('../models/Produs');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-async function debugModels() {
-    const models = await genAI.listModels();
-    console.log("Modele disponibile:", models.models.map(m => m.name));
-}
-debugModels();
-
 router.post('/', async (req, res) => {
     try {
         const { message } = req.body;
