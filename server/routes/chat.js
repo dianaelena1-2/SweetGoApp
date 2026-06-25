@@ -2,19 +2,17 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios'); 
 const Produs = require('../models/Produs');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 router.post('/', async (req, res) => {
     try {
         const { message } = req.body;
         const msg = message.toLowerCase();
 
-        // 1. Căutăm produse în baza de date
-        const produse = await Produs.find({ disponibil: true });
+        const produse = await Produs.find({ disponibil: true })
+                                    .populate('cofetarie_id','numeCofetarie')
+                                    .sort({pret: 1})
+                                    .limit(10);
 
-        // 2. Logica de răspuns (foarte simplă)
         let reply = "Scuze, nu am înțeles. Întreabă-mă despre produse sau oferte!";
 
         if (msg.includes('ciocolată')) {
@@ -31,6 +29,9 @@ router.post('/', async (req, res) => {
         }
         else if (msg.includes('salut')) {
             reply = "Salut! Sunt SweetBot. Te pot ajuta cu lista de produse sau oferte!";
+        }
+        else if (msg.includes('ieftin') || msg.includes('preț')) {
+            reply = `Cele mai ieftine produse de azi sunt: ${produse.map(p => p.numeProdus).join(', ')}.`;
         }
 
         res.status(200).json({ reply });
