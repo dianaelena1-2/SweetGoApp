@@ -6,6 +6,7 @@ const Produs = require('../models/Produs');
 router.post('/', async (req, res) => {
     try {
         const { message } = req.body;
+        console.log('Cheia API detectată:', process.env.GEMINI_API_KEY ? 'DA' : 'NU');
 
         if (!message) {
             return res.status(400).json({ mesaj: 'Te rog să trimiți un mesaj.' });

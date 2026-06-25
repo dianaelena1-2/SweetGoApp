@@ -66,7 +66,7 @@ const ChatWidget = () => {
     return (
         <div style={{ 
             position: 'fixed', 
-            bottom: isOpen ? '24px' : '0', // Dacă e închis se lipește de jos
+            bottom: isOpen ? '24px' : '0',
             right: '24px', 
             zIndex: 9999, 
             fontFamily: 'sans-serif', 
