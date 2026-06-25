@@ -9,55 +9,35 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 router.post('/', async (req, res) => {
     try {
         const { message } = req.body;
-        console.log('Cheia API detectată:', process.env.GEMINI_API_KEY ? 'DA' : 'NU');
+        const msg = message.toLowerCase();
 
-        if (!message) {
-            return res.status(400).json({ mesaj: 'Te rog să trimiți un mesaj.' });
+        // 1. Căutăm produse în baza de date
+        const produse = await Produs.find({ disponibil: true });
+
+        // 2. Logica de răspuns (foarte simplă)
+        let reply = "Scuze, nu am înțeles. Întreabă-mă despre produse sau oferte!";
+
+        if (msg.includes('ciocolată')) {
+            const produseCiocolata = produse.filter(p => p.ingrediente.some(i => i.toLowerCase().includes('ciocolata')));
+            reply = produseCiocolata.length > 0 
+                ? `Avem următoarele produse cu ciocolată: ${produseCiocolata.map(p => p.numeProdus).join(', ')}`
+                : "Momentan nu avem produse cu ciocolată.";
+        } 
+        else if (msg.includes('ofertă') || msg.includes('risipă')) {
+            const oferte = produse.filter(p => p.este_la_oferta);
+            reply = oferte.length > 0 
+                ? `Avem aceste oferte anti-risipă: ${oferte.map(p => p.numeProdus).join(', ')}`
+                : "Momentan nu avem oferte active.";
+        }
+        else if (msg.includes('salut')) {
+            reply = "Salut! Sunt SweetBot. Te pot ajuta cu lista de produse sau oferte!";
         }
 
-        const produseDisponibile = await Produs.find({ disponibil: true })
-            .populate('cofetarie_id', 'numeCofetarie')
-            .limit(40);
-
-        let meniuText = 'Momentan nu avem produse disponibile în platformă.';
-        
-        if (produseDisponibile.length > 0) {
-            meniuText = produseDisponibile.map(p => {
-                const numeCofetarie = p.cofetarie_id ? p.cofetarie_id.numeCofetarie : 'Cofetărie';
-                const ingrediente = p.ingrediente && p.ingrediente.length > 0 ? p.ingrediente.join(', ') : 'Nespecificat';
-                
-                const pretFinal = p.este_la_oferta ? (p.pret * 0.6).toFixed(2) : p.pret.toFixed(2);
-                const alertaOferta = p.este_la_oferta ? ' [Ofertă Anti-Risipă -40%]' : '';
-
-                return `- ${p.numeProdus} de la ${numeCofetarie} | Preț: ${pretFinal} RON ${alertaOferta} | Ingrediente: ${ingrediente} | Categorie: ${p.categorie}`;
-            }).join('\n');
-        }
-
-        const systemInstruction = `
-            Ești asistentul virtual al platformei de livrări prăjituri "SweetGo".
-            Numele tău este SweetBot. Rolul tău este să ajuți clienții să aleagă prăjituri și să le oferi detalii.
-
-            Reguli stricte:
-            1. NU inventa produse, cofetării sau prețuri. Oferă informații DOAR din "Lista Produselor" de mai jos.
-            2. Dacă un utilizator întreabă ceva ce nu se află în listă, spune-i politicos că momentan nu avem acel produs.
-            3. Răspunde pe scurt, politicos și folosește emoji-uri potrivite.
-
-            --- LISTA PRODUSELOR DISPONIBILE ACUM ---
-            ${meniuText}
-            ------------------------------------------
-            `;
-
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-        // Apelul către API prin SDK
-        const result = await model.generateContent(systemInstruction + "\n\nÎntrebare: " + message);
-        const responseText = result.response.text();
-
-        res.status(200).json({ reply: responseText });
+        res.status(200).json({ reply });
 
     } catch (error) {
-        console.error('[CHAT API] Eroare:', error.message || error); 
-        res.status(500).json({ mesaj: 'Eroare la procesarea mesajului.' });
+        console.error('Eroare chatbot local:', error);
+        res.status(500).json({ reply: 'Eroare internă.' });
     }
 });
 
