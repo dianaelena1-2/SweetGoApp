@@ -31,8 +31,15 @@ router.post('/', async (req, res) => {
             reply = "Salut! Sunt SweetBot. Te pot ajuta cu lista de produse sau oferte!";
         }
         else if (msg.includes('ieftin') || msg.includes('preț')) {
-            reply = `Cele mai ieftine produse de azi sunt: ${produse.map(p => p.numeProdus).join(', ')}.`;
-        }
+                if (produse.length > 0) {
+                    const listaPreturi = produse
+                        .map(p => `\n- ${p.numeProdus}: ${p.pret} RON`)
+                        .join('');
+                    reply = `Iată cele mai accesibile produse din oferta noastră:${listaPreturi}`;
+                } else {
+                    reply = "Momentan nu am informații despre prețuri.";
+                }
+            }
 
         res.status(200).json({ reply });
 
