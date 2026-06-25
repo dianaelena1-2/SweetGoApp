@@ -31,16 +31,20 @@ router.post('/', async (req, res) => {
             reply = "Salut! Sunt SweetBot. Te pot ajuta cu lista de produse sau oferte!";
         }
         else if (msg.includes('ieftin') || msg.includes('preț')) {
-                if (produse.length > 0) {
-                    const listaPreturi = produse
-                        .map(p => `\n- ${p.numeProdus}: ${p.pret} RON`)
-                        .join('');
-                    reply = `Iată cele mai accesibile produse din oferta noastră:${listaPreturi}`;
-                } else {
-                    reply = "Momentan nu am informații despre prețuri.";
-                }
+            if (produse.length > 0) {
+                const pretMinim = produse[0].pret; 
+   
+                const celeMaiIeftine = produse.filter(p => p.pret === pretMinim);
+              
+                const listaProduse = celeMaiIeftine
+                    .map(p => `\n- ${p.numeProdus}: ${p.pret} RON`)
+                    .join('');
+                
+                reply = `Cele mai ieftine produse (la prețul de ${pretMinim} RON) sunt:${listaProduse}`;
+            } else {
+                reply = "Momentan nu am informații despre prețuri.";
             }
-
+        }
         res.status(200).json({ reply });
 
     } catch (error) {
