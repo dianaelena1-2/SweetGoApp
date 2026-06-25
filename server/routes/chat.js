@@ -46,10 +46,12 @@ router.post('/', async (req, res) => {
         }
 
         if (reply === "Scuze, nu am înțeles. Întreabă-mă despre produse sau oferte!") {
+            const mesajNormalizat = msg.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
             const produsGasit = await Produs.findOne({
                 $or: [
-                    { numeProdus: { $regex: msg, $options: 'i' } },
-                    { ingrediente: { $in: [new RegExp(msg, 'i')] } }
+                    { numeProdus: { $regex: mesajNormalizat, $options: 'i' } },
+                    { ingrediente: { $regex: mesajNormalizat, $options: 'i' } }
                 ]
             }).populate('cofetarie_id', 'numeCofetarie');
 
