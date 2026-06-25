@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios'); 
 const Produs = require('../models/Produs');
 
 router.post('/', async (req, res) => {
@@ -43,6 +42,23 @@ router.post('/', async (req, res) => {
                 reply = `Cele mai ieftine produse (la prețul de ${pretMinim} RON) sunt:${listaProduse}`;
             } else {
                 reply = "Momentan nu am informații despre prețuri.";
+            }
+        }
+
+        if (reply === "Scuze, nu am înțeles. Întreabă-mă despre produse sau oferte!") {
+            const produsGasit = await Produs.findOne({
+                $or: [
+                    { numeProdus: { $regex: msg, $options: 'i' } },
+                    { ingrediente: { $in: [new RegExp(msg, 'i')] } }
+                ]
+            }).populate('cofetarie_id', 'numeCofetarie');
+
+            if (produsGasit) {
+                const numeCofetarie = produsGasit.cofetarie_id 
+                    ? produsGasit.cofetarie_id.numeCofetarie 
+                    : "o cofetărie parteneră";
+
+                reply = `Am găsit ${produsGasit.numeProdus} la ${numeCofetarie}, la prețul de ${produsGasit.pret} RON. Îl dorești în coș?`;
             }
         }
         res.status(200).json({ reply });
