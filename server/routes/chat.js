@@ -46,21 +46,23 @@ router.post('/', async (req, res) => {
         }
 
         if (reply === "Scuze, nu am înțeles. Întreabă-mă despre produse sau oferte!") {
-            const mesajNormalizat = msg.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const cuvinteInterzise = ['vreau', 'ceva', 'cu', 'as', 'avea', 'intreb', 'despre'];
+            const cuvinteMesaj = msg.normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(' ');
             
-            const produsGasit = await Produs.findOne({
-                $or: [
-                    { numeProdus: { $regex: mesajNormalizat, $options: 'i' } },
-                    { ingrediente: { $regex: mesajNormalizat, $options: 'i' } }
-                ]
-            }).populate('cofetarie_id', 'numeCofetarie');
+            const cuvantCheie = cuvinteMesaj.find(w => w.length >= 3 && !cuvinteInterzise.includes(w));
 
-            if (produsGasit) {
-                const numeCofetarie = produsGasit.cofetarie_id 
-                    ? produsGasit.cofetarie_id.numeCofetarie 
-                    : "o cofetărie parteneră";
+            if (cuvantCheie) {
+                const produsGasit = await Produs.findOne({
+                    $or: [
+                        { numeProdus: { $regex: cuvantCheie, $options: 'i' } },
+                        { ingrediente: { $in: [new RegExp(cuvantCheie, 'i')] } }
+                    ]
+                }).populate('cofetarie_id', 'numeCofetarie');
 
-                reply = `Am găsit ${produsGasit.numeProdus} la ${numeCofetarie}, la prețul de ${produsGasit.pret} RON. Îl dorești în coș?`;
+                if (produsGasit) {
+                    const numeCofetarie = produsGasit.cofetarie_id ? produsGasit.cofetarie_id.numeCofetarie : "o cofetărie parteneră";
+                    reply = `Am găsit ceva cu ${cuvantCheie}: ${produsGasit.numeProdus} la ${numeCofetarie}, la ${produsGasit.pret} RON. Îl dorești în coș?`;
+                }
             }
         }
         res.status(200).json({ reply });
