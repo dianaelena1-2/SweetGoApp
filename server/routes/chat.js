@@ -45,7 +45,6 @@ router.post('/', async (req, res) => {
 
         const fullPrompt = systemInstruction + "\n\nÎntrebarea utilizatorului: " + message;
 
-        // Am scos retry-ul și am asigurat calea v1beta
         const response = await axios.post(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
             {

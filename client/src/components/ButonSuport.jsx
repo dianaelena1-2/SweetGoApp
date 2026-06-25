@@ -1,8 +1,16 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { MessageCircle, X, Mail, Phone } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext'; 
+import { useLocation } from 'react-router-dom';
 
 function ButonSuport() {
     const [deschis, setDeschis] = useState(false);
+    const { utilizator } = useContext(AuthContext); 
+    const location = useLocation(); 
+
+    if (utilizator && utilizator.rol === 'client' && (location.pathname === '/' || location.pathname === '/acasa')) {
+        return null;
+    }
 
     return (
         <div className="suport-fab-wrapper">
@@ -32,7 +40,7 @@ function ButonSuport() {
                         <div className="suport-icon-bg"><Mail size={18} /></div>
                         <div>
                             <strong>Email</strong><br/>
-                            <a style={{color: '#c97c2e', textDecoration: 'none'}}>contact.sweetgo@gmail.com"</a>
+                            <a style={{color: '#c97c2e', textDecoration: 'none'}}>contact.sweetgo@gmail.com</a>
                         </div>
                     </div>
                 </div>
