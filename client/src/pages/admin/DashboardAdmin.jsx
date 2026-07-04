@@ -104,7 +104,7 @@ function DashboardAdmin() {
 
     return (
         <div className="admin-layout">
-        
+
             <aside className="admin-sidebar">
                 <div className="admin-logo">SweetGo 🍰</div>
 
@@ -129,7 +129,6 @@ function DashboardAdmin() {
             </aside>
 
             <main className="admin-main">
-                
                 <div className="admin-topbar">
                     <div className="admin-top-user">
                         <div>
