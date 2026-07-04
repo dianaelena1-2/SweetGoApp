@@ -101,6 +101,7 @@ function DashboardAdmin() {
     }
 
     if (loading) return <div className="admin-layout"><p className="loading" style={{width:'100%', marginTop:'5rem'}}>Se încarcă...</p></div>
+    if (!date) return <div className="admin-layout"><p className="gol" style={{width:'100%', marginTop:'5rem'}}>Eroare la încărcarea datelor. Reîncearcă mai târziu.</p></div>
 
     return (
         <div className="admin-layout">

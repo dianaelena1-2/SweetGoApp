@@ -58,6 +58,7 @@ router.get('/admin', verifyToken, verifyRol('admin'), async (req, res) => {
     try {
         const totalUtilizatori = await User.countDocuments({ rol: { $ne: 'admin' } });
 
+        const totalCofetarii = await Cofetarie.countDocuments({ status: 'aprobata' });
    
         const totalComenzi = await Comanda.countDocuments();
 
