@@ -14,7 +14,6 @@ function SidebarCofetarie() {
         navigate('/login');
     };
 
-    // Funcție care verifică dacă un link este activ pe baza rutei curente
     const esteActiv = (cale) => location.pathname === cale;
 
     return (

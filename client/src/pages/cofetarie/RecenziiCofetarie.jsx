@@ -34,7 +34,6 @@ function RecenziiCofetarie() {
         });
     };
 
-    // Funcție pentru a extrage inițialele din numele clientului
     const getInitials = (name) => {
         if (!name) return 'C';
         const parts = name.trim().split(' ');

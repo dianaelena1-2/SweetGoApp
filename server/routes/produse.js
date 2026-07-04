@@ -167,7 +167,7 @@ router.put('/:id/aplica-oferta', verifyToken, verifyRol('cofetarie'), async (req
         });
         const oraCurenta = parseInt(oraRomania, 10);
         
-        if (oraCurenta < 12) {
+        if (oraCurenta < 20) {
             return res.status(400).json({ mesaj: 'Ofertele anti-risipă pot fi activate doar după ora 20:00!' });
         }
 

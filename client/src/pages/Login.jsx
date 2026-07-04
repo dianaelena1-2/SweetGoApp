@@ -40,7 +40,6 @@ function Login() {
 
     return (
         <div className="auth-split-layout">
-            {/* Partea stângă - Formular */}
             <div className="auth-form-side">
                 <h1 className="auth-logo">SweetGo 🍰</h1>
                 
@@ -74,8 +73,6 @@ function Login() {
                     <div className="form-group">
                         <label className="form-group-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <span>Parolă</span>
-                            {/* Un link mic pentru "Ai uitat parola?" cum era in model
-                            <Link to="#" style={{ textTransform: 'none', color: '#c97c2e', textDecoration: 'none' }}>Ai uitat parola?</Link> */}
                         </label>
                         <div className="input-icon-wrapper">
                             <input
@@ -95,7 +92,6 @@ function Login() {
                 </form>
             </div>
 
-            {/* Partea dreaptă - Imagine */}
             <div className="auth-image-side">
                 <div className="auth-image-badge">
                 </div>

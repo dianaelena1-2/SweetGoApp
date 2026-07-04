@@ -29,7 +29,6 @@ function CosCumparaturi() {
     const [eroare, setEroare] = useState('')
     const [succes, setSucces] = useState('')
 
-    // Date Checkout
     const [adresaLivrare, setAdresaLivrare] = useState('')
     const [telefon, setTelefon] = useState('')
     const [observatii, setObservatii] = useState('')
@@ -141,7 +140,6 @@ function CosCumparaturi() {
         })
     }
 
-    // ================= CALCUL SUME =================
     const totalProduse = cos.produse.reduce((acc, p) => {
         const produsDB = produseProduse.find(db => db._id === (p._id || p.id));
         const pretUnitar = produsDB?.este_la_oferta ? (produsDB.pret * 0.6) : (produsDB?.pret || p.pret);
@@ -250,8 +248,6 @@ function CosCumparaturi() {
                     <div className="checkout-layout">
                         
                         <div className="checkout-main-content">
-                            
-                            {/* ====== PAS 1: COȘ ====== */}
                             {step === 1 && (
                                 <>
                                     <h2 style={{fontSize: '1.8rem', color: '#3d2c1e', marginBottom: '0.5rem'}}>Coșul tău</h2>
@@ -289,7 +285,6 @@ function CosCumparaturi() {
                                         })}
                                     </div>
 
-                                    {/* SECTIUNE CADOU */}
                                     <div className="cadou-sectiune-moderna">
                                         <div style={{display:'flex', alignItems:'center', gap:'10px', marginBottom:'15px'}}>
                                             <div style={{background:'#fffaf5', padding:'8px', borderRadius:'10px', border:'1px solid #f5eadd'}}>
@@ -323,11 +318,10 @@ function CosCumparaturi() {
                                 </>
                             )}
 
-                            {/* ====== PAS 2: LIVRARE ====== */}
                             {step === 2 && (
                                 <>
                                     <div className="checkout-form-section">
-                                        <h2>Metodă de Livrare</h2>
+                                        <h2>Metodă de livrare</h2>
                                         <p>Alege tipul de transport potrivit pentru produsele tale.</p>
                                         
                                         <div className="transport-selectie-grid" style={{flexDirection: 'row', gap: '15px', flexWrap: 'wrap'}}>
@@ -352,7 +346,7 @@ function CosCumparaturi() {
                                     </div>
 
                                     <div className="checkout-form-section">
-                                        <h3 style={{marginBottom:'1rem'}}>Detalii Livrare</h3>
+                                        <h3 style={{marginBottom:'1rem'}}>Detalii livrare</h3>
                                         
                                         <div className="form-group">
                                             <label>Adresă completă *</label>
@@ -371,10 +365,9 @@ function CosCumparaturi() {
                                 </>
                             )}
 
-                            {/* ====== PAS 3: PLATA ====== */}
                             {step === 3 && (
                                 <div className="checkout-form-section">
-                                    <h2>Metodă de Plată</h2>
+                                    <h2>Metodă de plată</h2>
                                     <p>Alege cum dorești să achiți comanda.</p>
                                     
                                     <div className="plata-selectie-grid">
@@ -396,9 +389,8 @@ function CosCumparaturi() {
 
                         </div>
 
-                        {/* COLOANA DREAPTA: SUMAR COMANDĂ */}
                         <div className="checkout-sumar-card">
-                            <h3>Sumar Comandă</h3>
+                            <h3>Sumar comandă</h3>
                             
                             {step > 1 && (
                                 <div style={{marginBottom: '1.5rem'}}>
@@ -411,7 +403,6 @@ function CosCumparaturi() {
                                                     {getImageUrl(pDB) ? <img src={getImageUrl(pDB)} alt="" className="sumar-mini-img"/> : <div className="sumar-mini-img"></div>}
                                                     <div className="sumar-mini-text">
                                                         <h4>{p.numeProdus}</h4>
-                                                        {/* AICI APARE DECORUL SI IN MINI-SUMAR */}
                                                         {p.optiune_decor && <p style={{fontSize: '0.75rem', color: '#c97c2e', margin: '2px 0'}}>🎨 {p.optiune_decor}</p>}
                                                         <p>x{p.cantitate}</p>
                                                     </div>
@@ -427,8 +418,7 @@ function CosCumparaturi() {
                                 <span style={{color: '#9a7a5a', fontWeight:'normal'}}>Subtotal produse</span>
                                 <span>{totalProduse.toFixed(2)} RON</span>
                             </div>
-                            
-                            {/* AFISAM TRANSPORT DOAR DACA SUNTEM DUPA PASUL 1 */}
+
                             {step > 1 && (
                                 <div className="cos-total" style={{border: 'none', padding: '0.2rem 0', margin:0}}>
                                     <span style={{color: '#9a7a5a', fontWeight:'normal'}}>Transport</span>
@@ -436,7 +426,6 @@ function CosCumparaturi() {
                                 </div>
                             )}
 
-                            {/* TVA-ul ADAUGAT DE 21% (APARE DOAR LA PASUL 3) */}
                             {step === 3 && (
                                 <div className="cos-total" style={{border: 'none', padding: '0.2rem 0', margin:'0 0 1rem 0'}}>
                                     <span style={{color: '#9a7a5a', fontWeight:'normal', fontSize: '0.85rem'}}>TVA (21%)</span>
@@ -463,7 +452,6 @@ function CosCumparaturi() {
                 )}
             </div>
 
-            {/* Modal Simulatie Plata */}
             {simularePlata.activa && (
                 <div className="modal-plata-overlay">
                     <div className="modal-plata-content">

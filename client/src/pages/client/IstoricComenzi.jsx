@@ -54,7 +54,6 @@ function IstoricComenzi() {
     const comenziLivrate = comenzi.filter(c => c.status === 'livrata').length;
     const comenziInCurs = comenzi.filter(c => ['plasata', 'confirmata', 'in_preparare', 'in_livrare'].includes(c.status)).length;
     
-    // CALCUL TOTAL CHELTUIT CU TVA 21% INCLUS
     const totalCheltuit = comenzi
         .filter(c => c.status !== 'anulata')
         .reduce((acc, c) => acc + (c.total * 1.21), 0);
@@ -223,13 +222,9 @@ function IstoricComenzi() {
                                     {comenziExpandate[comanda._id] && (
                                         <div className="ic-produse" style={{background: '#fdfaf6', padding: '1.5rem 2rem'}}>
                                             <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f5eadd', paddingBottom: '0.5rem'}}>
-                                                <h5 style={{color: '#7a5230', margin: 0}}>Detalii Comandă</h5>
-                                                {/* <span style={{fontSize: '0.85rem', color: '#c97c2e', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px'}}>
-                                                    <Truck size={16}/> {transportLabels[comanda.tip_transport]?.icon} {transportLabels[comanda.tip_transport]?.nume || 'Standard'}
-                                                </span> */}
+                                                <h5 style={{color: '#7a5230', margin: 0}}>Detalii comandă</h5>
                                             </div>
 
-                                            {/* AFISARE PRODUSE CU NUME */}
                                             {comanda.detalii.map((produs, index) => (
                                                 <div key={index} className="ic-produs-rand" style={{borderBottom: '1px dashed #f5eadd'}}>
                                                     <div className="ic-produs-imagine" style={{width: '40px', height: '40px'}}>
@@ -257,7 +252,6 @@ function IstoricComenzi() {
                                                 </div>
                                             ))}
 
-                                            {/* SUMAR TAXE: TRANSPORT SI TVA */}
                                             <div style={{marginTop: '1rem', padding: '1rem', background: '#fffaf5', borderRadius: '12px', border: '1px solid #f5eadd'}}>
                                                 <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#7a5230', marginBottom: '5px'}}>
                                                     <span>Cost Transport:</span>
@@ -301,7 +295,7 @@ function IstoricComenzi() {
 
                 {favorite.length > 0 && (
                     <div style={{marginBottom: '3rem'}}>
-                        <h3 className="istoric-fav-header">Comandă Rapidă Favorite</h3>
+                        <h3 className="istoric-fav-header">Comandă rapidă - favorite</h3>
                         <div className="istoric-fav-grid">
                             {favorite.map(produs => (
                                 <div key={produs._id} className="fav-card-modern" onClick={() => navigate(`/cofetarie/${produs.cofetarieId}`)}>

@@ -117,7 +117,7 @@ router.post('/', async (req, res) => {
 
                 if (produsGasit) {
                     const numeCofetarie = produsGasit.cofetarie_id ? produsGasit.cofetarie_id.numeCofetarie : "o cofetărie parteneră";
-                    reply = `Am găsit ceva cu ${cuvantCheie}: ${produsGasit.numeProdus} la ${numeCofetarie}, la ${produsGasit.pret} RON. Îl dorești în coș?`;
+                    reply = `Am găsit ceva cu ${cuvantCheie}: ${produsGasit.numeProdus} la ${numeCofetarie}, la ${produsGasit.pret} RON.`;
                 }
             }
         }

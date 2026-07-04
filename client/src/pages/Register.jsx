@@ -23,7 +23,6 @@ function Register() {
         setFormData({ ...formData, [e.target.name]: e.target.value })
     }
 
-    // Funcție pentru a schimba rolul din butoanele toggle
     const handleRoleChange = (role) => {
         setFormData({ ...formData, rol: role })
     }
@@ -77,7 +76,6 @@ function Register() {
 
     return (
         <div className="auth-split-layout">
-            {/* Partea stângă - Formular */}
             <div className="auth-form-side">
                 <h1 className="auth-logo">SweetGo 🍰</h1>
                 
@@ -91,7 +89,6 @@ function Register() {
                     <Link to="/register" className="auth-nav-tab active">Înregistrare</Link>
                 </div>
 
-                {/* Toggle Butoane pentru Roluri */}
                 <div className="role-toggle-container">
                     <button 
                         type="button" 
@@ -112,7 +109,6 @@ function Register() {
                 {eroare && <div className="eroare">{eroare}</div>}
 
                 <form onSubmit={handleSubmit}>
-                    {/* Câmp Nume Complet */}
                     <div className="form-group">
                         <label className="form-group-label">Nume complet</label>
                         <div className="input-icon-wrapper">
@@ -128,7 +124,6 @@ function Register() {
                         </div>
                     </div>
 
-                    {/* Câmp Email */}
                     <div className="form-group">
                         <label className="form-group-label">Email</label>
                         <div className="input-icon-wrapper">
@@ -144,7 +139,6 @@ function Register() {
                         </div>
                     </div>
 
-                    {/* Câmp Parolă */}
                     <div className="form-group">
                         <label className="form-group-label">Parolă</label>
                         <div className="input-icon-wrapper">
@@ -160,7 +154,6 @@ function Register() {
                         </div>
                     </div>
 
-                    {/* Secțiune extra pentru Cofetărie */}
                     {formData.rol === 'cofetarie' && (
                         <div style={{ padding: '1rem', background: '#fffaf5', borderRadius: '16px', marginBottom: '1.5rem', border: '1px solid #f5eadd' }}>
                             <h4 style={{ color: '#c97c2e', marginBottom: '1rem', fontSize: '0.9rem' }}>Detalii Cofetărie</h4>
@@ -209,7 +202,6 @@ function Register() {
                 </form>
             </div>
 
-            {/* Partea dreaptă */}
             <div className="auth-image-side">
                 <div className="auth-image-badge">
                 </div>

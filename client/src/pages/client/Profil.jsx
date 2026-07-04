@@ -52,7 +52,6 @@ function Profile(){
             const resFav = await api.get('/client/favorite');
             const favoriteIds = resFav.data.map(f => f._id || f);
 
-            // Preluăm cofetăriile publice pentru a avea rating-ul și poza actualizate
             const resCofetarii = await api.get('/cofetarii');
             
             const favoriteReale = resCofetarii.data.filter(cof => favoriteIds.includes(cof._id));
@@ -201,8 +200,7 @@ function Profile(){
             />
 
             <div className="profil-layout-modern">
-                
-                {/* --- SIDEBAR STANGA --- */}
+ 
                 <aside className="profil-sidebar">
                     <div className="profil-user-widget">
                         <div className="profil-avatar-text">
@@ -220,7 +218,6 @@ function Profile(){
                             <User size={18}/> Profilul Meu
                         </button>
                         
-                        {/* Aici am corectat ruta pe baza fișierului tău App.jsx */}
                         <button 
                             className="profil-nav-item" 
                             onClick={() => navigate('/comenzile-mele')}
@@ -253,13 +250,11 @@ function Profile(){
                     </button>
                 </aside>
 
-                {/* --- CONTINUT DREAPTA --- */}
                 <main className="profil-content-area">
                     
                     {eroare && <div className="eroare">{eroare}</div>}
                     {succes && <div className="succes">{succes}</div>}
 
-                    {/* SECTIUNE INFORMATII PERSONALE */}
                     <section id="informatii" className="profil-sectiune-card">
                         <div className="profil-sectiune-header">
                             <h2 className="profil-sectiune-titlu"><User size={22}/> Informații personale</h2>
@@ -284,7 +279,6 @@ function Profile(){
                         </form>
                     </section>
 
-                    {/* SECTIUNE ADRESE LIVRARE */}
                     <section id="adrese" className="profil-sectiune-card">
                         <div className="profil-sectiune-header">
                             <h2 className="profil-sectiune-titlu"><MapPin size={22}/> Adresa de livrare</h2>
@@ -302,7 +296,6 @@ function Profile(){
                             
                             {editareAdresa ? (
                                 <div className="adresa-info-text adresa-editare-container">
-                                    {/* Rândul cu Inputul și butonul de locație */}
                                     <div className="adresa-input-row">
                                         <input 
                                             type="text" 
@@ -323,7 +316,6 @@ function Profile(){
                                         </button>
                                     </div>
 
-                                    {/* Rândul cu Salvare / Anulare */}
                                     <div className="adresa-actiuni-row">
                                         <button 
                                             className="profil-btn-salvare btn-salvare-mic" 
@@ -356,7 +348,6 @@ function Profile(){
                         </div>
                     </section>
 
-                    {/* SECTIUNE COFETARII FAVORITE */}
                     <section id="favorite" className="profil-sectiune-card">
                         <div className="profil-sectiune-header">
                             <h2 className="profil-sectiune-titlu"><Heart size={22}/> Cofetării favorite</h2>
@@ -369,7 +360,6 @@ function Profile(){
                         ) : (
                             <div className="favorite-grid-modern">
                                 {favorite.map(cof => {
-                                    // Aici am corectat apelând direct câmpul 'imagine_coperta' din modelul tău Cofetarie
                                     const imagineValidă = cof.imagine_coperta;
 
                                     return (
@@ -413,7 +403,6 @@ function Profile(){
                         )}
                     </section>
 
-                    {/* SECTIUNE SECURITATE */}
                     <section id="securitate" className="profil-sectiune-card">
                         <div className="profil-sectiune-header">
                             <h2 className="profil-sectiune-titlu"><Lock size={22}/> Securitate</h2>
@@ -450,7 +439,6 @@ function Profile(){
     );
 }
 
-// O componentă mică pentru afișarea stelei în funcție de rating
 const StarIcon = ({ rating }) => {
     const r = rating || 0;
     return (

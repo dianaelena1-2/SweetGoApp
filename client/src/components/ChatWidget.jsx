@@ -80,7 +80,6 @@ const ChatWidget = () => {
                     display: 'flex', flexDirection: 'column', overflow: 'hidden', 
                     border: '1px solid #f5eadd'
                 }}>
-                    {/* Header Chat Elegant */}
                     <div style={{ 
                         backgroundColor: '#c97c2e', color: 'white', padding: '16px 20px', 
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -138,7 +137,6 @@ const ChatWidget = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Butoane Rapide */}
                     {!isLoading && (
                         <div style={{ 
                             padding: '12px 16px', backgroundColor: '#fdfaf6',
@@ -164,7 +162,6 @@ const ChatWidget = () => {
                         </div>
                     )}
 
-                    {/* Formular Trimitere */}
                     <form onSubmit={handleSubmitForm} style={{ padding: '16px', backgroundColor: '#fff', borderTop: '1px solid #f5eadd', display: 'flex', gap: '10px', alignItems: 'center' }}>
                         <input
                             type="text"
@@ -196,7 +193,6 @@ const ChatWidget = () => {
                     </form>
                 </div>
             ) : (
-                /* Tab de Minimizare (Lipește de jos) */
                 <div 
                     onClick={() => setIsOpen(true)}
                     style={{

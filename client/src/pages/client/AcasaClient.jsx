@@ -111,8 +111,7 @@ function AcasaClient(){
             />
 
             <div className="acasa-continut">
-                
-                {/* === NOUL HEADER & BARĂ DE FILTRARE (Asemanator cu designul trimis) === */}
+
                 <div className="acasa-hero">
                     <h2>Alege cofetăria dorită</h2>
                     <p>Găsește cele mai bune dulciuri din zona ta</p>
@@ -150,7 +149,6 @@ function AcasaClient(){
                     </div>
                 </div>
 
-                {/* === GRID-UL DE COFETĂRII === */}
                 {loading ? (
                     <p className="loading">Se încarcă...</p>
                 ) : cofetariiFiltrate.length > 0 ? (
@@ -159,20 +157,12 @@ function AcasaClient(){
                             <div key={cofetarie._id} className="cofetarie-card" onClick={() => navigate(`/cofetarie/${cofetarie._id}`)}>
                                 
                                 <div className="cofetarie-card-imagine">
-                                    {/* BADGE STATUS */}
-                                    <span className="badge-status-poza">Deschis</span>
-                                    
-                                    {/* BADGE RATING */}
                                     <span 
                                         className="badge-rating-poza" 
                                         onClick={(e) => deschideRecenzii(e, cofetarie)}
                                         title="Vezi recenziile"
                                     >
                                         <Star size={14} fill="#f5a623" color="#f5a623" />
-                                        
-                                        {/* {cofetarie.rating_mediu !== null && cofetarie.rating_mediu !== undefined 
-                                            ? cofetarie.rating_mediu.toFixed(1) 
-                                            : 'Nou'} */}
                                     </span>
 
                                     {cofetarie.imagine_coperta ? (
@@ -189,14 +179,6 @@ function AcasaClient(){
 
                                 <div className="cofetarie-card-info">
                                     <h3>{cofetarie.numeCofetarie}</h3>
-                                    
-                                    {/* Un text simulat de categorii cum e in model
-                                    <p className="cofetarie-categorii-text">
-                                        {cofetarie.categorii_afisate && cofetarie.categorii_afisate.length > 0 
-                                        ? cofetarie.categorii_afisate.join(', ') 
-                                        : 'Cofetărie artizanală'}
-                                    </p> */}
-
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexGrow: 1, marginBottom: '15px' }}>
                                         <div className="cofetarie-locatie" style={{ marginBottom: 0 }}>
                                             <MapPin size={16} color="#c97c2e" /> 
@@ -229,7 +211,6 @@ function AcasaClient(){
                 )}
             </div>
 
-            {/* MODAL VIZUALIZARE RECENZII */}
             {modalRecenzii && (
                 <div className="modal-overlay" onClick={() => setModalRecenzii(null)}>
                     <div className="modal-continut modal-recenzii" onClick={(e) => e.stopPropagation()}>

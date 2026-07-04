@@ -86,7 +86,6 @@ function StatisticiCofetarie(){
                 </div>
 
                 <div className="dash-grid-top">
-                    {/* Graficul de Bare */}
                     <div className="dash-card">
                         {!ziSelectata ? (
                             <>
@@ -111,7 +110,6 @@ function StatisticiCofetarie(){
                             {ziSelectata && loadingZi ? (
                                 <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9a7a5a' }}>Se încarcă...</div>
                             ) : ziSelectata ? (
-                                /* Graficul PE ORE  */
                                 <ResponsiveContainer>
                                     <BarChart data={dateZi} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                         <XAxis dataKey="oraText" tick={{fontSize: 11, fill: '#95a5a6'}} axisLine={false} tickLine={false} />
@@ -126,7 +124,6 @@ function StatisticiCofetarie(){
                                     </BarChart>
                                 </ResponsiveContainer>
                             ) : (
-                                /* Graficul PE ZILE */
                                 <ResponsiveContainer>
                                     <BarChart data={statistici.evolutieVanzari} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                         <XAxis dataKey="_id" tick={{fontSize: 10, fill: '#95a5a6'}} axisLine={false} tickLine={false} />
@@ -144,7 +141,6 @@ function StatisticiCofetarie(){
                         </div>
                     </div>
 
-                    {/* Graficul Gogoașă */}
                     <div className="dash-card">
                         <h3 className="dash-card-title">Distribuție comenzi</h3>
                         <p className="dash-card-subtitle">Produse vândute pe categorii</p>

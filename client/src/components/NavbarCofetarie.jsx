@@ -41,15 +41,7 @@ function NavbarCofetarie() {
                     </button>
                 )}
 
-                {/* <button className="btn-nav-ghost" onClick={() => navigate('/cofetarie/recenzii')}>
-                    <Star size={18} /> Recenzii
-                </button> */}
-                
                 <div className="nav-separator"></div>
-{/* 
-                <div className="user-menu-btn" style={{ cursor: 'default' }}>
-                    <User size={18} color="#c97c2e" /> Bună, {prenume}!
-                </div> */}
 
                 <button className="btn-logout-vendor" onClick={handleLogout}>
                     <LogOut size={16} /> Deconectare

@@ -1,4 +1,4 @@
-/* RESET & GLOBALE */
+
 * {
     margin: 0;
     padding: 0;
@@ -11,7 +11,7 @@ body {
     color: #3d2c1e;
 }
 
-/* CLASE DE UTILITATE */
+
 .btn-nav-icon {
     display: flex;
     align-items: center;
@@ -34,7 +34,7 @@ body {
     color: #9a7a5a;
 }
 
-/* ================= AUTENTIFICARE ================= */
+
 .auth-split-layout {
     display: flex;
     min-height: 100vh;
@@ -64,20 +64,17 @@ body {
     flex: 0 0 45%; 
     background-image: url('https://i.pinimg.com/1200x/82/5c/ba/825cba126ec88a95ba2634a2d3e60faa.jpg');
     background-position: center; 
-    background-size: cover; /* 'cover' arată mai bine când avem margini rotunjite */
+    background-size: cover; 
     background-repeat: no-repeat;
-    
-    /* MAGIC: Aici rotunjim marginile și adăugăm spațiu */
-    border-radius: 40px; /* Rotunjește colțurile. Poți face numărul mai mare sau mai mic */
-    margin: 20px 20px 20px 0; /* Lasă spațiu: sus, dreapta, jos, stânga (0 ca să stea mai aproape de formular) */
-    
-    /* Opțional: o umbră subtilă pentru efect 3D */
+
+    border-radius: 40px; 
+    margin: 20px 20px 20px 0; 
+
     box-shadow: 0 20px 40px rgba(0,0,0,0.08); 
     
     display: none;
 }
 
-/* Badge-ul de pe imagine ("Status Comanda") */
 .auth-image-badge {
     position: absolute;
     top: 2rem;
@@ -107,7 +104,7 @@ body {
 .badge-text small { font-size: 0.65rem; opacity: 0.8; }
 .badge-text span { font-size: 0.85rem; font-weight: bold; }
 
-/* Tab-uri: Autentificare / Inregistrare */
+
 .auth-nav-tabs {
     display: flex;
     border-bottom: 2px solid #f5eadd;
@@ -136,7 +133,6 @@ body {
     margin-bottom: -2px;
 }
 
-/* Toggle pentru roluri (Cumpărător / Cofetărie) similar cu poza */
 .role-toggle-container {
     display: flex;
     background: #fffaf5;
@@ -170,37 +166,35 @@ body {
     align-items: center;
     background: #fffaf5;
     border: 1.5px solid #f5d5a8;
-    border-radius: 20px; /* Rotunjire ajustată pentru dimensiunea nouă */
+    border-radius: 20px; 
     transition: all 0.2s ease;
     width: 100%;
 }
 
-/* Iconița din interior */
 .input-icon {
-    padding: 0 0 0 0.8rem; /* Spațiu puțin mai mic în stânga iconiței */
-    font-size: 1rem; /* Iconiță ușor mai mică */
+    padding: 0 0 0 0.8rem; 
+    font-size: 1rem;
     color: #c97c2e;
 }
 
-/* Input-ul în sine */
 .input-field {
     width: 100%;
-    padding: 0.5rem 0.5rem; /* Redus de la 0.7rem pentru a face câmpul mai subțire */
+    padding: 0.5rem 0.5rem; 
     border: none; 
     background: transparent;
-    font-size: 0.85rem; /* Text puțin mai mic */
+    font-size: 0.85rem; 
     outline: none;
     color: #3d2c1e;
 }
 
-/* Butonul de Login */
+
 .auth-btn {
     width: 100%;
-    padding: 0.6rem 1rem; /* Subțiat considerabil (înainte era 0.9rem) */
+    padding: 0.6rem 1rem;
     background: #c97c2e;
     border: none;
-    border-radius: 25px; /* Rotunjire adaptată proporțional */
-    font-size: 0.9rem; /* Text ușor mai mic */
+    border-radius: 25px; 
+    font-size: 0.9rem;
     font-weight: 700;
     color: white;
     cursor: pointer;
@@ -224,7 +218,8 @@ body {
         padding: 2rem;
     }
 }
-/* ================= FORMULARE GENERALE ================= */
+
+
 .form-group {
     margin-bottom: 1.2rem;
 }
@@ -269,7 +264,6 @@ body {
     border: 1px solid #a8d5a8;
 }
 
-/* ================= HEADER & FILTRE ACASĂ ================= */
 .acasa-hero {
     margin-bottom: 2rem;
 }
@@ -346,10 +340,9 @@ body {
     color: white;
 }
 
-/* ================= CARDURI COFETĂRII NOU ================= */
 .cofetarie-card {
     background: white;
-    border-radius: 24px; /* Rotunjire mai mare, ca in poza */
+    border-radius: 24px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.06);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -365,7 +358,7 @@ body {
 }
 
 .cofetarie-card-imagine {
-    position: relative; /* Important pentru badge-uri absolute */
+    position: relative; 
     height: 180px;
     background: #fdfaf6;
     display: flex;
@@ -373,7 +366,6 @@ body {
     justify-content: center;
 }
 
-/* Badge-urile de pe poza */
 .badge-status-poza {
     position: absolute;
     top: 12px;
@@ -409,7 +401,7 @@ body {
     padding: 1.2rem;
     display: flex;
     flex-direction: column;
-    flex: 1; /* Ca sa impinga butonul jos */
+    flex: 1; 
 }
 .cofetarie-card-info h3 {
     font-size: 1.15rem;
@@ -431,7 +423,6 @@ body {
     margin-bottom: 1.5rem;
 }
 
-/* Butonul de la baza cardului */
 .btn-vezi-meniu {
     width: 100%;
     padding: 0.8rem;
@@ -442,14 +433,13 @@ body {
     font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
-    margin-top: auto; /* Il impinge mereu jos de tot */
+    margin-top: auto; 
     transition: background 0.2s;
 }
 .btn-vezi-meniu:hover {
     background: #a8621e;
 }
 
-/* ================= NAVBAR (CLIENT + COLECTIV) ================= */
 .navbar {
     display: flex;
     align-items: center;
@@ -488,7 +478,8 @@ body {
 .btn-logout:hover {
     background: #a8621e !important;
 }
-/* Butoane tip pastilă cu contur */
+
+
 .btn-nav-ghost {
     background: transparent !important;
     border: 1.5px solid #f5d5a8 !important;
@@ -506,7 +497,8 @@ body {
     border-color: #c97c2e !important;
     color: #c97c2e !important;
 }
-/* Buton coș principal */
+
+
 .btn-nav-cart {
     background: transparent !important;
     color: #7a5230 !important;
@@ -543,7 +535,7 @@ body {
     border: 2px solid white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-/* Buton deconectare special */
+
 .btn-logout-vendor,
 .btn-logout {
     background: transparent !important;
@@ -564,7 +556,7 @@ body {
     border-color: #c0392b !important;
     color: #c0392b !important;
 }
-/* Meniul utilizator (dropdown) */
+
 .user-menu {
     position: relative;
     margin-left: 0.5rem;
@@ -666,7 +658,7 @@ body {
     box-shadow: 0 0 0 3px rgba(201, 124, 46, 0.1);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
     .navbar-search-container {
         padding: 0 1rem;
@@ -690,7 +682,7 @@ body {
     }
 }
 
-/* ================= NOTIFICĂRI ================= */
+
 .notification-bell {
     position: relative;
 }
@@ -825,7 +817,6 @@ body {
     border-radius: 3px;
 }
 
-/* ================= PAGINA ACASĂ CLIENT ================= */
 .acasa-container {
     min-height: 100vh;
     background: #fffaf5;
@@ -918,7 +909,6 @@ body {
     color: #7a5230;
 }
 
-/* ================= DETALII COFETĂRIE ================= */
 .btn-inapoi {
     display: inline-flex;
     align-items: center;
@@ -982,7 +972,7 @@ body {
 .sectiune-titlu.fara-margine {
     margin: 0;
 }
-/* Layout sidebar filtre + produse */
+
 .detalii-layout-container {
     display: flex;
     gap: 40px;
@@ -1055,7 +1045,7 @@ body {
     padding: 4px 12px;
     border-radius: 20px;
 }
-/* GRID PRODUSE */
+
 .produse-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1196,7 +1186,6 @@ body {
     text-decoration: underline;
 }
 
-/* ================= GESTIONARE PRODUSE (cofetărie) ================= */
 .gp-card {
     background: white;
     border-radius: 16px;
@@ -1363,7 +1352,8 @@ body {
     gap: 1rem;
     margin-top: 0.5rem;
 }
-/* Listă separată pentru produse expirate / indisponibile */
+
+
 .produs-expirat-card {
     background-color: #fff5f5;
     border-left: 4px solid #d32f2f;
@@ -1388,7 +1378,7 @@ body {
     gap: 10px;
 }
 
-/* ================= COȘ Cumpărături ================= */
+
 .cos-gol {
     text-align: center;
     padding: 4rem 2rem;
@@ -1578,7 +1568,7 @@ body {
     transform: translateY(0);
     cursor: not-allowed;
 }
-/* ================= CHECKOUT BREADCRUMB ================= */
+
 .checkout-breadcrumb {
     display: flex;
     align-items: center;
@@ -1612,7 +1602,7 @@ body {
     font-size: 0.9rem;
 }
 
-/* ================= LAYOUT SUMAR COMANDĂ FIX (DREAPTA) ================= */
+
 .checkout-layout {
     display: grid;
     grid-template-columns: 1fr 380px;
@@ -1672,7 +1662,7 @@ body {
     color: #3d2c1e;
 }
 
-/* Layout Formular Pasul 2 (Livrare) */
+
 .checkout-form-section {
     background: white;
     border-radius: 24px;
@@ -1701,7 +1691,7 @@ body {
     background: #fffaf5;
     font-family: inherit;
     color: #3d2c1e;
-    resize: vertical; /* Permite redimensionarea doar pe înălțime */
+    resize: vertical; 
     min-height: 80px;
     margin-top: 4px;
 }
@@ -1716,7 +1706,7 @@ body {
     box-shadow: 0 0 0 3px rgba(201, 124, 46, 0.1);
 }
 
-/* ================= SECȚIUNE CADOU MODERNĂ ================= */
+
 .cadou-sectiune-moderna {
     background: white;
     border-radius: 20px;
@@ -1779,7 +1769,7 @@ body {
     margin-top: 2px;
 }
 
-/* ================= OPȚIUNI DECOR ================= */
+
 .gp-optiuni-decor {
     margin-top: 1rem;
     padding-top: 1rem;
@@ -1835,7 +1825,7 @@ body {
     border-color: #c97c2e;
 }
 
-/* ================= INGREDIENTE ================= */
+
 .ingrediente-selector-container {
     display: flex;
     flex-wrap: wrap;
@@ -1900,7 +1890,7 @@ body {
     font-weight: 600;
 }
 
-/* ================= MODALE ================= */
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -2105,7 +2095,6 @@ body {
     line-height: 1.4;
 }
 
-/* ================= RECENZII (Modal) ================= */
 .recenzie-item {
     padding: 15px;
     border-bottom: 1px solid #eee;
@@ -2155,7 +2144,7 @@ body {
     margin: 20px 0;
 }
 
-/* ================= ISTORIC COMENZI (client) ================= */
+
 .ic-filtre {
     display: flex;
     gap: 0.5rem;
@@ -2349,7 +2338,7 @@ body {
     color: #7a5230;
 }
 
-/* ================= DASHBOARD (cofetărie / admin) ================= */
+
 .db-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -2411,7 +2400,7 @@ body {
     color: #c97c2e;
 }
 
-/* ADMIN */
+
 .admin-tabs {
     display: flex;
     gap: 0.5rem;
@@ -2539,7 +2528,7 @@ body {
 .badge-cofetarie { background: #fdecd8; color: #c97c2e; }
 .badge-admin { background: #f8d7da; color: #721c24; }
 
-/* ================= TRANSPORT ȘI PLATĂ ================= */
+
 .transport-selectie-grid {
     display: flex;
     flex-direction: column;
@@ -2618,7 +2607,8 @@ body {
     font-size: 0.8rem;
     color: #9a7a5a;
 }
-/* Badge-uri transport pentru comenzi */
+
+
 .badge-transport {
     display: inline-flex;
     align-items: center;
@@ -2668,7 +2658,7 @@ body {
     border: 1px solid #c8e6c9;
 }
 
-/* ================= ALERTE EXPIRARE ȘI OFERTE ================= */
+
 .alerta-expirare-container {
     background-color: #fff5f5;
     border: 3px solid #ffcdd2;
@@ -2718,18 +2708,18 @@ body {
     background-color: #4CAF50;
     color: white;
     border: none;
-    padding: 10px 20px; /* Putin mai mult spațiu ca să arate bine rotund */
-    border-radius: 30px; /* Marginile complet rotunjite (tip pastilă) */
+    padding: 10px 20px; 
+    border-radius: 30px;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.2s;
-    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2); /* O umbră fină verde */
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2);
 }
 .btn-aplica-oferta:hover:not(:disabled) {
     background-color: #43a047;
     transform: translateY(-2px);
 }
-/* Afișare ofertă în client */
+
 .badge-oferta {
     background-color: #f44336;
     color: white;
@@ -2758,7 +2748,7 @@ body {
     font-size: 1.2rem;
 }
 
-/* ================= SECȚIUNI CADOU ================= */
+
 .cadou-sectiune {
     margin-top: 1.5rem;
     padding: 15px;
@@ -2845,7 +2835,7 @@ body {
     font-style: italic;
 }
 
-/* ================= PROFIL CLIENT ================= */
+
 .profile-layout {
     display: flex;
     gap: 2rem;
@@ -2859,7 +2849,6 @@ body {
     background-color: #fffaf5;
 }
 
-/* ================= MODAL SIMULARE PLATĂ ================= */
 .modal-plata-overlay {
     position: fixed;
     top: 0;
@@ -2895,7 +2884,7 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* ================= PAGINA DE SUCCES INREGISTRARE COFETARIE ==================*/
+
 .register-success-container {
     min-height: 100vh;
     display: flex;
@@ -2947,7 +2936,7 @@ body {
     text-decoration: none;
 }
 
-/* ================= RESPONSIVE ================= */
+
 @media (max-width: 900px) {
     .detalii-layout-container {
         flex-direction: column;
@@ -2972,7 +2961,7 @@ body {
     }
 }
 
-/* ================= DASHBOARD ISTORIC COMENZI ================= */
+
 .istoric-header-top {
     display: flex;
     justify-content: space-between;
@@ -2991,7 +2980,7 @@ body {
     font-size: 0.95rem;
 }
 
-/* Statistici Sus */
+
 .istoric-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -3035,7 +3024,7 @@ body {
     color: #3d2c1e;
 }
 
-/* Container Tabel Comenzi */
+
 .istoric-table-card {
     background: white;
     border-radius: 16px;
@@ -3056,7 +3045,7 @@ body {
     color: #3d2c1e;
 }
 
-/* Rânduri tip Tabel */
+
 .istoric-row-header {
     display: grid;
     grid-template-columns: 1fr 2fr 1.5fr 1fr 1fr 1.5fr;
@@ -3120,7 +3109,7 @@ body {
 }
 .btn-vezi:hover { background: #fdecd8; color: #c97c2e; border-color: #c97c2e; }
 
-/* Favorite Grid */
+
 .istoric-fav-header {
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
@@ -3213,7 +3202,7 @@ body {
     .ir-actiuni { justify-content: flex-start; margin-top: 10px; }
 }
 
-/* ================= PROFIL CLIENT MODERN ================= */
+
 .profil-page-wrapper {
     background-color: #fffaf5;
     min-height: 100vh;
@@ -3228,7 +3217,7 @@ body {
     align-items: flex-start;
 }
 
-/* --- SIDEBAR --- */
+
 .profil-sidebar {
     width: 280px;
     position: sticky;
@@ -3326,7 +3315,7 @@ body {
     color: #e74c3c;
 }
 
-/* --- CONȚINUT PRINCIPAL --- */
+
 .profil-content-area {
     flex: 1;
     display: flex;
@@ -3370,7 +3359,7 @@ body {
     margin-bottom: 1.5rem;
 }
 
-/* Formulare specifice profilului */
+
 .profil-form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -3428,7 +3417,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* Adrese Livrare */
+
 .btn-adauga-noua {
     color: #c97c2e;
     background: transparent;
@@ -3496,7 +3485,7 @@ body {
     color: #c97c2e;
 }
 
-/* Favorite Grid Modern */
+
 .favorite-grid-modern {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -3634,7 +3623,7 @@ body {
     }
 }
 
-/* ================= DASHBOARD COFETARIE MODERN (ADMIN) ================= */
+
 .cd-layout {
     display: flex;
     min-height: 100vh;
@@ -3642,7 +3631,7 @@ body {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* --- SIDEBAR LATERAL --- */
+
 .cd-sidebar {
     width: 260px;
     background: white;
@@ -3726,14 +3715,14 @@ body {
     border-color: #c0392b;
 }
 
-/* --- ZONA PRINCIPALA --- */
+
 .cd-main {
     flex: 1;
     padding: 2rem 3rem;
     overflow-y: auto;
 }
 
-/* Header Top */
+
 .cd-topbar {
     display: flex;
     justify-content: space-between;
@@ -3804,7 +3793,7 @@ body {
     box-shadow: 0 6px 12px rgba(46, 125, 50, 0.12);
 }
 
-/* Welcome Section */
+
 .cd-welcome-area {
     margin-bottom: 2rem;
     display: flex;
@@ -3823,7 +3812,7 @@ body {
     font-size: 1rem;
 }
 
-/* Statistici */
+
 .cd-stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -3865,7 +3854,7 @@ body {
     color: #3d2c1e;
 }
 
-/* Grid Inferior (Comenzi vs Top Vanzari) */
+
 .cd-bottom-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -3900,7 +3889,7 @@ body {
     text-decoration: none;
 }
 
-/* Tabel Comenzi Recente (Sectiunea stanga) */
+
 .cd-table-row {
     display: grid;
     grid-template-columns: 2fr 3fr 1.5fr 1fr;
@@ -3941,7 +3930,6 @@ body {
     font-size: 0.8rem;
 }
 
-/* Cele mai vandute (Sectiunea dreapta) */
 .cd-top-item {
     display: flex;
     align-items: center;
@@ -4014,7 +4002,7 @@ body {
         grid-template-columns: 1fr 1fr;
     }
 }
-/* ================= GESTIONARE COMENZI MODERN (ADMIN) ================= */
+
 .gc-tabs-wrapper {
     display: flex;
     align-items: center;
@@ -4131,7 +4119,7 @@ body {
     height: 6px;
     border-radius: 50%;
 }
-/* Culori specifice pentru stadiile comenzii */
+
 .gc-badge.plasata { background: #e3f2fd; color: #1565c0; } .gc-badge.plasata::before { background: #1565c0; }
 .gc-badge.confirmata { background: #fff3cd; color: #856404; } .gc-badge.confirmata::before { background: #856404; }
 .gc-badge.in_preparare { background: #fff3e0; color: #e65100; } .gc-badge.in_preparare::before { background: #e65100; }
@@ -4155,7 +4143,7 @@ body {
     background: #fdecd8;
 }
 
-/* Stats de jos */
+
 .gc-bottom-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -4215,7 +4203,7 @@ body {
     .gc-bottom-stats { grid-template-columns: 1fr 1fr; }
 }
 
-/* ================= SUMAR COMANDĂ EXPANDAT (ADMIN) ================= */
+
 .gc-detalii-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -4267,7 +4255,7 @@ body {
     font-weight: 800;
     color: #c97c2e;
     font-size: 1rem;
-    margin-left: auto; /* Împinge prețul la dreapta */
+    margin-left: auto; 
 }
 
 .gc-summary-box {
@@ -4307,14 +4295,14 @@ body {
     color: #c97c2e;
     font-size: 1.2rem;
 }
-/* ================= BUTOANE ACȚIUNI COMANDĂ ================= */
+
 .gc-butoane-status {
     display: flex;
-    justify-content: flex-end; /* Mută butoanele la dreapta */
+    justify-content: flex-end; 
     gap: 12px;
     margin-top: 1.5rem;
     padding-top: 1.5rem;
-    border-top: 1px dashed #e0e0e0; /* Linie subtilă de separare */
+    border-top: 1px dashed #e0e0e0; 
 }
 
 .btn-actiune-primar {
@@ -4338,7 +4326,7 @@ body {
 
 .btn-actiune-secundar {
     background: #fffaf5;
-    color: #c0392b; /* Roșu stins pentru anulare */
+    color: #c0392b; 
     border: 1.5px solid #f5d5a8;
     padding: 0.6rem 1.5rem;
     border-radius: 10px;
@@ -4353,7 +4341,7 @@ body {
     border-color: #f5c87a;
     color: #a93226;
 }
-/* ================= GESTIONARE PRODUSE MODERN (ADMIN) ================= */
+
 .gp-modern-card {
     background: white;
     border-radius: 24px;
@@ -4528,7 +4516,7 @@ body {
     color: #333;
 }
 
-/* Tab-uri Filtrare Produse (Produsele Tale) */
+
 .gp-tabs-modern {
     display: inline-flex;
     background: white;
@@ -4560,7 +4548,7 @@ body {
     box-shadow: 0 4px 10px rgba(192, 57, 43, 0.2);
 }
 
-/* Grid Carduri Produse */
+
 .gp-modern-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -4621,7 +4609,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-width: 0; /* Pentru a preveni overflow la texte lungi */
+    min-width: 0;
 }
 
 .gp-prod-title {
@@ -4629,7 +4617,7 @@ body {
     font-weight: 700;
     color: #3d2c1e;
     margin: 0 0 0.3rem 0;
-    padding-right: 70px; /* Loc pentru butoane */
+    padding-right: 70px; 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -4777,7 +4765,7 @@ body {
         grid-template-columns: 1fr;
     }
 }
-/* ================= RECENZII COFETARIE MODERN ================= */
+
 .rc-header-titles h2 {
     font-size: 1.8rem;
     color: #3d2c1e;
@@ -4824,14 +4812,14 @@ body {
 .rc-stat-value {
     font-size: 2.8rem;
     font-weight: 800;
-    color: #c0392b; /* Roșu pentru rating */
+    color: #c0392b;
     display: flex;
     align-items: baseline;
     line-height: 1;
 }
 
 .rc-stat-value.dark {
-    color: #3d2c1e; /* Închis pentru numărul total */
+    color: #3d2c1e; 
 }
 
 .rc-stat-value small {
@@ -4934,7 +4922,7 @@ body {
     margin: 0;
 }
 
-/* === HARTA === */
+
 .acasa-harta-sectiune {
     margin: 2rem 0;
     background: white;
@@ -4992,7 +4980,7 @@ body {
 }
 .harta-btn-vezi:hover { background: #b5631e; }
 
-/* ================= ADĂUGĂRI PENTRU EDITARE ADRESĂ PROFIL ================= */
+
 .adresa-editare-container {
     display: flex;
     flex-direction: column;
@@ -5040,7 +5028,7 @@ body {
     gap: 10px;
 }
 
-/* Stil curat pentru butoanele mici de jos (salvare/anulare) din modul editare */
+
 .btn-salvare-mic {
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
@@ -5055,7 +5043,7 @@ body {
     border: 1px solid #f5d5a8;
 }
 
-/* ================= DASHBOARD ADMIN MODERN ================= */
+
 .admin-layout {
     display: flex;
     min-height: 100vh;
@@ -5116,7 +5104,7 @@ body {
 
 .admin-nav-item.active {
     background: #fff5f5;
-    color: #c0392b; /* Roșu admin */
+    color: #c0392b;
     border-left: 4px solid #c0392b;
     border-radius: 0 12px 12px 0;
 }
@@ -5127,10 +5115,10 @@ body {
     overflow-y: auto;
 }
 
-/* Header-ul de sus (Top Bar) */
+
 .admin-topbar {
     display: flex;
-    justify-content: flex-end; /* Împinge totul spre dreapta */
+    justify-content: flex-end; 
     align-items: center;
     margin-bottom: 2rem;
 }
@@ -5167,7 +5155,7 @@ body {
     font-weight: bold;
 }
 
-/* Statistici Grid */
+
 .admin-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -5224,7 +5212,7 @@ body {
     margin-top: 5px;
 }
 
-/* Tab-uri */
+
 .admin-tabs-modern {
     display: flex;
     gap: 2rem;
@@ -5263,7 +5251,7 @@ body {
     border-radius: 3px 3px 0 0;
 }
 
-/* Tabel */
+
 .admin-table-container {
     background: white;
     border-radius: 16px;
@@ -5320,7 +5308,7 @@ body {
 .admin-badge.rol-client { background: #e8f5e9; color: #2e7d32; }
 .admin-badge.rol-cofetar { background: #fff3cd; color: #f39c12; }
 
-/* Butoane Acțiuni Tabel */
+
 .btn-icon-red {
     background: transparent;
     color: #c0392b;
@@ -5389,7 +5377,7 @@ body {
     font-size: 0.8rem;
     color: #7a5230;
 }
-/* ================= BUTON SUPORT CLIENT (FLOATING) ================= */
+
 .suport-fab-wrapper {
     position: fixed;
     bottom: 30px;
@@ -5455,7 +5443,7 @@ body {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: #e74c3c; /* Roșul aprins din poza ta */
+    background: #e74c3c; 
     color: white;
     border: none;
     box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
@@ -5471,11 +5459,10 @@ body {
     background: #c0392b;
 }
 
-/*===============GRAFICE=================*/
-/* dashboard-cofetarie.css */
+
 .dash-wrapper {
     padding: 20px;
-    font-family: 'Inter', sans-serif; /* Sau fontul aplicatiei tale */
+    font-family: 'Inter', sans-serif; 
     color: #333;
 }
 
@@ -5494,21 +5481,21 @@ body {
     font-size: 0.95rem;
 }
 
-/* Sistemul de Grid */
+
 .dash-grid-top {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Graficul mare ia 2/3, gogoașa 1/3 */
+    grid-template-columns: 2fr 1fr; 
     gap: 20px;
     margin-bottom: 20px;
 }
 
 .dash-grid-bottom {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Cartonașele de jos sunt 50/50 */
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
-/* Cardul Alb Standard */
+
 .dash-card {
     background: #ffffff;
     border-radius: 20px;
@@ -5532,7 +5519,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* Cardul Roșu (Insight de top) */
+
 .dash-card-red {
     background: linear-gradient(135deg, #bd081c 0%, #900010 100%);
     border-radius: 20px;
@@ -5570,7 +5557,7 @@ body {
     line-height: 1.5;
 }
 
-/* Element pt gogoasa centrata */
+
 .dash-pie-center {
     position: absolute;
     top: 50%;
@@ -5581,13 +5568,14 @@ body {
 .dash-pie-center h3 { font-size: 1.8rem; margin: 0; color: #2c3e50;}
 .dash-pie-center span { font-size: 0.75rem; color: #95a5a6; text-transform: uppercase; }
 
-/* Responsive pentru telefoane/tablete */
+
 @media (max-width: 900px) {
     .dash-grid-top, .dash-grid-bottom {
         grid-template-columns: 1fr;
     }
 }
-/* ================= STATISTICI COFETARIE (DASHBOARD GRAFICE) ================= */
+
+
 .dash-grid-top {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -5636,7 +5624,7 @@ body {
     position: relative;
 }
 
-/* Legenda Custom (Gogoasa) */
+
 .dash-legend-list {
     list-style: none;
     padding: 0;
@@ -5663,7 +5651,7 @@ body {
     display: inline-block;
 }
 
-/* Tooltip Custom (Gogoasa) */
+
 .dash-custom-tooltip {
     background-color: #fffaf5;
     padding: 10px 16px;
@@ -5688,7 +5676,6 @@ body {
     font-size: 1.2rem;
 }
 
-/* Centrul Gogoasei (Total) */
 .dash-pie-center {
     top: 40%;
     position: absolute;
@@ -5712,7 +5699,7 @@ body {
     text-transform: uppercase;
 }
 
-/* Card Anti-Risipa */
+
 .dash-card-anti-waste {
     display: flex;
     flex-direction: row;
@@ -5768,7 +5755,7 @@ body {
     line-height: 1.5;
 }
 
-/* Card Insight de Top */
+
 .dash-card-insight {
     border: 1.5px solid #f5d5a8;
     background: linear-gradient(145deg, #ffffff 0%, #fef3e5 100%); 
@@ -5815,7 +5802,7 @@ body {
     color: #c97c2e;
 }
 
-/* Responsive */
+
 @media (max-width: 900px) {
     .dash-grid-top, .dash-grid-bottom {
         grid-template-columns: 1fr;
@@ -5825,7 +5812,8 @@ body {
         text-align: center;
     }
 }
-/* Selectie perioada grafic */
+
+
 .dash-header-flex {
     display: flex;
     justify-content: space-between;
@@ -5833,7 +5821,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* Selectie perioada grafic - Stilizare premium */
+
 .dash-select-perioada {
     appearance: none; 
     -webkit-appearance: none;
@@ -5875,20 +5863,21 @@ body {
     font-weight: 500;
     padding: 10px;
 }
-/* ================= CARD IMPACT ECOLOGIC PREMIU (ADMIN) - TEMA PALA / VERDE ================= */
+
+
 .admin-eco-card {
-    background: linear-gradient(145deg, #ffffff 0%, #f1f8e9 100%); /* Fundal alb spre verde foarte pal */
-    border: 1.5px solid #c8e6c9; /* Contur verde pastel */
+    background: linear-gradient(145deg, #ffffff 0%, #f1f8e9 100%); 
+    border: 1.5px solid #c8e6c9; 
     border-radius: 28px;
     padding: 2.5rem 3rem;
     color: #2e7d32; 
-    box-shadow: 0 10px 30px rgba(46, 125, 50, 0.06); /* Umbra verde extrem de subtila */
+    box-shadow: 0 10px 30px rgba(46, 125, 50, 0.06);
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: relative;
     overflow: hidden;
-    margin-top: 2rem; /* FORȚEAZĂ SPAȚIUL față de textul de sus */
+    margin-top: 2rem; 
 }
 
 .eco-card-content {
@@ -5908,7 +5897,7 @@ body {
 }
 
 .eco-card-value {
-    font-size: 5rem; /* Cifră mare și vizibilă */
+    font-size: 5rem; 
     font-weight: 900;
     color: #27ae60;
     margin: 0;
@@ -5924,7 +5913,7 @@ body {
 }
 
 .eco-card-icon {
-    font-size: 6.5rem; /* O planetă mult mai mare! */
+    font-size: 6.5rem;
     line-height: 1;
     display: flex;
     align-items: center;
@@ -5932,7 +5921,6 @@ body {
     position: relative;
     z-index: 2;
     flex-shrink: 0;
-    /* Adăugăm o umbră fină direct sub planetă pentru un efect 3D mișto */
     filter: drop-shadow(0 15px 25px rgba(46, 125, 50, 0.2));
 }
 

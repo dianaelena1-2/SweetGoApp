@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 function RegisterSuccess() {
     return (
         <div className="auth-split-layout">
-            {/* Partea stângă - Mesajul de succes */}
             <div className="auth-form-side">
                 <h1 className="auth-logo">SweetGo 🍰</h1>
                 
@@ -29,7 +28,6 @@ function RegisterSuccess() {
                 </div>
             </div>
 
-            {/* Partea dreaptă*/}
             <div className="auth-image-side">
                 <div className="auth-image-badge">
                 </div>

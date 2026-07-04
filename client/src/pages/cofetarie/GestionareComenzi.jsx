@@ -161,12 +161,12 @@ function GestionareComenzi() {
                 
                 <div className="cd-topbar" style={{marginBottom: '1.5rem'}}>
                     <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
-                        <h2 style={{fontSize: '1.6rem', color: '#3d2c1e', margin: 0}}>Gestionare Comenzi</h2>
+                        <h2 style={{fontSize: '1.6rem', color: '#3d2c1e', margin: 0}}>Gestionare comenzi</h2>
                     </div>
                     
                     <div className="cd-top-actions">
                         <button className="cd-btn-urgent" onClick={() => setFiltruStatus('plasata')}>
-                            Confirmă Comenzi
+                            Confirmă comenzi
                         </button>
                     </div>
                 </div>
@@ -238,7 +238,6 @@ function GestionareComenzi() {
                                         </div>
                                     </div>
 
-                                    {/* ================= ZONA EXPANDATĂ (DETALII COMANDĂ) ================= */}
                                     {comenziExpandate[comanda._id] && (
                                         <div className="ic-produse" style={{borderTop: 'none', background: '#fafafa', borderRadius: '16px', margin: '0.5rem 0 1.5rem 0', padding: '1.5rem'}}>
                                             {esteComandaCadou(comanda) && (
@@ -254,8 +253,7 @@ function GestionareComenzi() {
                                                     )}
                                                 </div>
                                             )}
-                                            
-                                            {/* Detalii Livrare & Plată */}
+
                                             <div className="gc-detalii-grid">
                                                 <div className="gc-detalii-item">
                                                     <MapPin size={16} /> <strong>Adresa:</strong> {comanda.adresa_livrare}
@@ -273,7 +271,6 @@ function GestionareComenzi() {
                                                 </div>
                                             </div>
 
-                                            {/* Lista Produse */}
                                             {comanda.detalii.map((detaliu, index) => {
                                                 const numeProdusDetalii = detaliu.produs_id?.numeProdus || detaliu.numeProdus || 'Produs sters';
                                                 const imgUrl = detaliu.produs_id?.imagine 
@@ -303,7 +300,6 @@ function GestionareComenzi() {
                                                 );
                                             })}
 
-                                            {/* Cutie Sumar Comandă */}
                                             {(() => {
                                                 const totalProduse = comanda.detalii.reduce((sum, d) => sum + (d.pret_unitar * d.cantitate), 0);
                                                 const costLivrare = comanda.cost_livrare !== undefined ? comanda.cost_livrare : (comanda.tip_transport === 'bicicleta' ? 5 : comanda.tip_transport === 'frigorific' ? 15 : 10);
@@ -312,7 +308,7 @@ function GestionareComenzi() {
                                                 return (
                                                     <div className="gc-summary-box">
                                                         <div className="gc-summary-row">
-                                                            <span>Cost Transport:</span>
+                                                            <span>Cost transport:</span>
                                                             <span>{costLivrare.toFixed(2)} RON</span>
                                                         </div>
                                                         <div className="gc-summary-row">
@@ -320,7 +316,7 @@ function GestionareComenzi() {
                                                             <span>{tva.toFixed(2)} RON</span>
                                                         </div>
                                                         <div className="gc-summary-row gc-summary-total">
-                                                            <span>Total Final:</span>
+                                                            <span>Total final:</span>
                                                             <span>{comanda.total.toFixed(2)} RON</span>
                                                         </div>
                                                     </div>
@@ -358,7 +354,7 @@ function GestionareComenzi() {
                         </div>
                         <div>
                             <div className="gc-stat-value">{statNoi}</div>
-                            <div className="gc-stat-label">Comenzi Noi</div>
+                            <div className="gc-stat-label">Comenzi noi</div>
                         </div>
                     </div>
 

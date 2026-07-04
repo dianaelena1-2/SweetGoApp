@@ -126,7 +126,6 @@ function DetaliiCofetarie() {
         setIngredienteExtinse(false)
 
         if (produs.categorie === 'Torturi' && produs.optiuni_decor) {
-            // Nu mai facem API call, luam direct din obiect
             setOptiuniDecorModal(produs.optiuni_decor.map((opt, idx) => ({ id: idx, denumire: opt })))
         }
 
@@ -366,7 +365,6 @@ function DetaliiCofetarie() {
                 </div>
             </div>
 
-            {/* PERSONALIZARE */}
             {modalDeschis && produsMmodal && (
                 <div className="modal-overlay" onClick={inchideModal}>
                     <div className="modal-continut" onClick={(e) => e.stopPropagation()}>
@@ -482,7 +480,6 @@ function DetaliiCofetarie() {
                 </div>
             )}
 
-            {/* MODAL VIZUALIZARE RECENZII */}
             {modalRecenzii && (
                 <div className="modal-overlay" onClick={() => setModalRecenzii(null)}>
                     <div className="modal-continut modal-recenzii" onClick={(e) => e.stopPropagation()}>

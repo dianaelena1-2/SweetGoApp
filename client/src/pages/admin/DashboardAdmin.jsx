@@ -14,7 +14,7 @@ function DashboardAdmin() {
     const [loading, setLoading] = useState(true)
     const [eroare, setEroare] = useState('')
     const [succes, setSucces] = useState('')
-    const [tabActiv, setTabActiv] = useState('utilizatori') // Implicit tab-ul cu utilizatori ca în poză
+    const [tabActiv, setTabActiv] = useState('utilizatori') 
 
     useEffect(() => {
         fetchDate()
@@ -104,8 +104,7 @@ function DashboardAdmin() {
 
     return (
         <div className="admin-layout">
-            
-            {/* ================= SIDEBAR LATERAL ================= */}
+        
             <aside className="admin-sidebar">
                 <div className="admin-logo">SweetGo 🍰</div>
 
@@ -124,32 +123,25 @@ function DashboardAdmin() {
                     </button>
                 </nav>
 
-                {/* Buton Deconectare la fel ca la cofetarie, cu text rosu */}
                 <button className="cd-btn-logout" onClick={handleLogout}>
                     <LogOut size={20}/> Deconectează-te
                 </button>
             </aside>
 
-            {/* ================= CONȚINUT PRINCIPAL ================= */}
             <main className="admin-main">
                 
-                {/* Topbar: Fără search, doar admin info în dreapta */}
                 <div className="admin-topbar">
                     <div className="admin-top-user">
                         <div>
                             <h4>{utilizator?.nume || 'Administrator'}</h4>
                             
                         </div>
-                        {/* <div className="admin-avatar">
-                            {getInitials(utilizator?.nume || 'Admin')}
-                        </div> */}
                     </div>
                 </div>
 
                 {eroare && <div className="eroare">{eroare}</div>}
                 {succes && <div className="succes">{succes}</div>}
 
-                {/* STATISTICI GRID (Cele 4 carduri din poză) */}
                 <div className="admin-stats-grid">
                     <div className="admin-stat-card">
                         <div className="admin-stat-header">
@@ -184,7 +176,6 @@ function DashboardAdmin() {
                     </div>
                 </div>
 
-                {/* TAB-URI */}
                 <div className="admin-tabs-modern">
                     <button
                         className={`admin-tab-modern ${tabActiv === 'asteptare' ? 'activ' : ''}`}
@@ -207,7 +198,6 @@ function DashboardAdmin() {
                     
                 </div>
 
-                {/* TAB: UTILIZATORI */}
                 {tabActiv === 'utilizatori' && (
                     <div className="admin-table-container">
                         <table className="admin-table-modern">
@@ -252,7 +242,6 @@ function DashboardAdmin() {
                     </div>
                 )}
 
-                {/* TAB: COFETARII IN ASTEPTARE */}
                 {tabActiv === 'asteptare' && (
                     <div className="admin-table-container">
                         {date.cofetariiInAsteptare.length === 0 ? (
