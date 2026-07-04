@@ -7,7 +7,7 @@ const Cofetarie = require('../models/Cofetarie')
 const Notificare = require('../models/Notificare')
 
 const PROCENT_OFERTA = 0.6
-// plasare comandă
+
 router.post('/', verifyToken, verifyRol('client'), async (req, res) => {
     try {
         const { cofetarie_id, adresa_livrare, telefon, observatii, produse, este_cadou, mesaj_cadou, tip_transport, metoda_plata, status_plata, cost_livrare } = req.body
@@ -19,7 +19,6 @@ router.post('/', verifyToken, verifyRol('client'), async (req, res) => {
         let total = 0
         let detaliiComanda = []
 
-        // Verificam stocurile si calculam totalul
         for (const p of produse) {
             const produsDb = await Produs.findById(p.id);
             if (!produsDb) return res.status(404).json({ mesaj: `Produs invalid` });
@@ -48,7 +47,6 @@ router.post('/', verifyToken, verifyRol('client'), async (req, res) => {
             detalii: detaliiComanda 
         });
 
-        // Stocul scade
         for (const p of produse) {
             await Produs.findByIdAndUpdate(p.id, { $inc: { stoc: -p.cantitate } });
         }
@@ -57,7 +55,6 @@ router.post('/', verifyToken, verifyRol('client'), async (req, res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare interna la plasarea comenzii' }); }
 })
 
-// istoric comenzi client
 router.get('/istoricul-meu', verifyToken, verifyRol('client'), async (req, res) => {
     try {
         const comenzi = await Comanda.find({ client_id: req.utilizator.id })
@@ -68,7 +65,6 @@ router.get('/istoricul-meu', verifyToken, verifyRol('client'), async (req, res) 
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
 })
 
-// comenzile unei cofetării
 router.get('/cofetarie', verifyToken, verifyRol('cofetarie'), async (req, res) => {
     try {
         const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
@@ -80,7 +76,6 @@ router.get('/cofetarie', verifyToken, verifyRol('cofetarie'), async (req, res) =
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }); }
 })
 
-// actualizare status comandă
 router.put('/:id/status', verifyToken, verifyRol('cofetarie'), async (req, res) => {
     try {
         const statusValide = ['confirmata', 'in_preparare', 'in_livrare', 'livrata', 'anulata'];
@@ -106,20 +101,13 @@ router.put('/:id/status', verifyToken, verifyRol('cofetarie'), async (req, res) 
         if (noulStatus === 'livrata') mesajNotificare = `Comanda ${idScurt} a fost livrată cu succes. Poftă bună! 🍰`;
         if (noulStatus === 'anulata') mesajNotificare = `Ne pare rău, comanda ${idScurt} a fost anulată.`;
 
-        // === LOGICA NOUĂ DE DEBUG ===
-        console.log(`\n[DEBUG] Încerc să generez notificarea pentru statusul: "${noulStatus}"`);
-        console.log(`[DEBUG] Mesajul generat a ieșit așa: "${mesajNotificare}"`);
-        console.log(`[DEBUG] ID-ul clientului pentru baza de date este:`, comanda.client_id);
-
         try {
             const notif = await Notificare.create({
                 client_id: comanda.client_id,
-                // Dacă mesajul e gol dintr-o eroare de typing, băgăm un text de siguranță:
                 mesaj: mesajNotificare || `Statusul comenzii a fost schimbat în ${noulStatus}`,
                 tip: 'status_comanda',
                 link: '/comenzile-mele' 
             });
-            console.log(`[DEBUG] ✅ SUCCES! Notificarea a fost salvată în baza de date cu ID: ${notif._id}\n`);
         } catch (eroareNotificare) {
             console.error(`[DEBUG] ❌ EROARE MONGODB: Baza de date a refuzat salvarea! Motivul:`, eroareNotificare.message);
         }
@@ -127,19 +115,16 @@ router.put('/:id/status', verifyToken, verifyRol('cofetarie'), async (req, res) 
         res.json({ mesaj: 'Status actualizat' });
 
     } catch (err) { 
-        console.error('[DEBUG] EROARE GENERALA:', err);
         res.status(500).json({ mesaj: 'Eroare la actualizarea statusului' });
     }
 })
 
-// anulare comandă client
 router.put('/:id/anulare-client', verifyToken, verifyRol('client'), async (req, res) => {
     try {
         const comanda = await Comanda.findOne({ _id: req.params.id, client_id: req.utilizator.id });
         if (!comanda) return res.status(404).json({ mesaj: 'Comanda nu a fost găsită.' });
         if (comanda.status !== 'plasata') return res.status(400).json({ mesaj: 'Comanda nu mai poate fi anulată.' });
 
-        // Punem la loc stocurile
         for (const detaliu of comanda.detalii) {
             await Produs.findByIdAndUpdate(detaliu.produs_id, { $inc: { stoc: detaliu.cantitate } });
         }

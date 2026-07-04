@@ -10,7 +10,6 @@ const { reverseGeocode } = require('../utils/geocode');
 
 router.use(verifyToken, verifyRol('client'));
 
-// date profil
 router.get('/profil', async (req, res) => {
     try {
         const client = await User.findById(req.utilizator.id).select('-parola');
@@ -18,7 +17,6 @@ router.get('/profil', async (req, res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
 });
 
-// actualizare profil
 router.put('/profil', async (req, res) => {
     try {
         const { nume, email, adresa_default, telefon } = req.body;
@@ -33,7 +31,6 @@ router.put('/profil', async (req, res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
 });
 
-// schimbare parola
 router.put('/parola', async (req, res) => {
     try {
         const { parolaVeche, parolaNoua } = req.body;
@@ -48,10 +45,8 @@ router.put('/parola', async (req, res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
 });
 
-// lista cofetariilor favorite
 router.get('/favorite', async (req, res) => {
     try {
-        // Aducem profilul si populam array-ul de favorite cu datele cofetariilor
         const user = await User.findById(req.utilizator.id).populate({
             path: 'favorite',
             match: { status: 'aprobata' }
@@ -60,28 +55,23 @@ router.get('/favorite', async (req, res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
 });
 
-// adaugare cofetarie la favorite
 router.post('/favorite/:cofetarieId', async (req, res) => {
     try {
         const cofetarie = await Cofetarie.findOne({ _id: req.params.cofetarieId, status: 'aprobata' });
         if (!cofetarie) return res.status(404).json({ mesaj: 'Cofetăria nu există sau nu este aprobată.' });
 
-        // $addToSet adauga doar daca nu exista deja (evitam duplicatele magic)
         await User.findByIdAndUpdate(req.utilizator.id, { $addToSet: { favorite: cofetarie._id } });
         res.json({ mesaj: 'Adăugată la favorite.' });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare internă.' }) }
 });
 
-// elimina cofetarie de la favorite
 router.delete('/favorite/:cofetarieId', async (req, res) => {
     try {
-        // $pull scoate din array
         await User.findByIdAndUpdate(req.utilizator.id, { $pull: { favorite: req.params.cofetarieId } });
         res.json({ mesaj: 'Eliminată din favorite.' });
     } catch (err) { res.status(500).json({ mesaj: 'Eroare internă.' }) }
 });
 
-// notificari
 router.get('/notificari', async (req, res) => {
     try {
         const notificari = await Notificare.find({ client_id: req.utilizator.id })
@@ -103,7 +93,6 @@ router.put('/notificari/citite-toate', async (req, res) => {
     }
 });
 
-// notificare citita
 router.put('/notificari/:id/citita', async (req, res) => {
     try {
         await Notificare.findOneAndUpdate(
@@ -121,7 +110,6 @@ router.get('/notificari/necitite/count', async (req, res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
 });
 
-// cos
 router.get('/cos', async (req, res) => {
     try {
         const cos = await Cos.findOne({ client_id: req.utilizator.id });
@@ -135,7 +123,6 @@ router.get('/cos', async (req, res) => {
 
 router.put('/cos', async (req, res) => {
     try {
-        // upsert: true -> daca exista ii face update, daca nu, il creeaza!
         await Cos.findOneAndUpdate(
             { client_id: req.utilizator.id }, 
             { continut: JSON.stringify(req.body) },

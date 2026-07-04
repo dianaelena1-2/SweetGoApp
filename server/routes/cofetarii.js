@@ -13,7 +13,6 @@ async function getCofetariiCuRating(query = {}) {
             { $match: query },
             {
                 $lookup: {
-                    // Folosim direct numele colectiei pentru a fi siguri (recenzies)
                     from: 'recenzies', 
                     let: { cofetarie_id_doc: "$_id" },
                     pipeline: [
@@ -21,7 +20,6 @@ async function getCofetariiCuRating(query = {}) {
                             $match: {
                                 $expr: {
                                     $eq: [
-                                        // Ne asigurăm că ambele părți sunt tratate ca ObjectId în timpul comparației
                                         { $toObjectId: "$cofetarie_id" }, 
                                         "$$cofetarie_id_doc"
                                     ]
@@ -39,7 +37,7 @@ async function getCofetariiCuRating(query = {}) {
                         $cond: [
                             { $gt: [{ $size: "$recenzii_gasite" }, 0] },
                             { $avg: "$recenzii_gasite.rating" },
-                            null // Dacă nu sunt recenzii, returnăm null pentru a afișa "Nou"
+                            null
                         ]
                     }
                 }
@@ -51,7 +49,7 @@ async function getCofetariiCuRating(query = {}) {
         return [];
     }
 }
-// afisare cofetarii publice (cu calcul rating)
+
 router.get('/', async (req, res) => {
     try {
         const cofetarii = await getCofetariiCuRating({ status: 'aprobata' });
@@ -105,7 +103,6 @@ router.get('/distante', async (req, res) => {
     }
 });
 
-// afisare recenzii pentru o cofetarie (public)
 router.get('/:id/toate-recenziile', async (req, res) => {
     try {
         const recenzii = await Recenzie.find({ cofetarie_id: req.params.id })
@@ -115,7 +112,6 @@ router.get('/:id/toate-recenziile', async (req, res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
 });
 
-// afisare recenzii pentru dashboard-ul cofetariei
 router.get('/recenzii', verifyToken, verifyRol('cofetarie'), async (req, res) => {
     try {
         const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
@@ -131,7 +127,6 @@ router.get('/recenzii', verifyToken, verifyRol('cofetarie'), async (req, res) =>
     } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
 });
 
-//statistici cofetarie
 router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (req, res) => {
     try {
         const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
@@ -140,7 +135,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
         const dataStart = new Date();
         dataStart.setDate(dataStart.getDate() - 30);
 
-        // 1. Evoluție Vânzări 
         const evolutieVanzari = await Comanda.aggregate([
             { 
                 $match: { 
@@ -157,7 +151,7 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
             },
             { $sort: { "_id": 1 } } 
         ]);
-        // 2. Distribuție pe Categorii 
+
         const distributieCategorii = await Comanda.aggregate([
             { $match: { cofetarie_id: cofetarie._id, status: { $ne: 'anulata' } } },
             { $unwind: "$detalii" }, 
@@ -178,7 +172,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
             }
         ]);
 
-        // 3. Ora de Vârf 
         const oraDeVarfAgregare = await Comanda.aggregate([
             { $match: { cofetarie_id: cofetarie._id, status: { $ne: 'anulata' } } },
             { 
@@ -205,7 +198,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
             };
         }
 
-        // 4. Impact Anti-Risipă
         const produseSalvate = await Comanda.aggregate([
             { $match: { cofetarie_id: cofetarie._id, status: { $ne: 'anulata' } } },
             { $unwind: "$detalii" }, 
@@ -244,7 +236,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('cofetarie'), async (
     }
 });
 
-// Statistici pe ORE pentru o anumita zi ceruta
 router.get('/dashboard-statistici/ziua', verifyToken, verifyRol('cofetarie'), async (req, res) => {
     try {
         const cofetarie = await Cofetarie.findOne({ utilizator_id: req.utilizator.id });
@@ -289,7 +280,6 @@ router.get('/dashboard-statistici/ziua', verifyToken, verifyRol('cofetarie'), as
     }
 });
 
-// detalii cofetarie si produsele ei
 router.get('/:id', async (req, res) => {
     try {
         const cofetarie = await Cofetarie.findById(req.params.id).lean();
@@ -305,7 +295,6 @@ router.get('/:id', async (req, res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare la server' }); }
 });
 
-// adaugare recenzie client
 router.post('/:id/recenzii', verifyToken, verifyRol('client'), async (req, res) => {
     try {
         const { rating, comentariu, comanda_id } = req.body;

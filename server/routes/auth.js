@@ -8,7 +8,6 @@ const Cofetarie = require('../models/Cofetarie')
 const { geocodeAddress } = require('../utils/geocode')
 const { trimiteEmail } = require('../utils/mailer');
 
-// INREGISTRARE
 router.post('/register', upload.fields([
     { name: 'certificat_inregistrare', maxCount: 1 },
     { name: 'certificat_sanitar', maxCount: 1 },
@@ -101,7 +100,6 @@ router.post('/register', upload.fields([
     }
 })
 
-// AUTENTIFICARE
 router.post('/login', async (req,res) => {
     try {
         const { email, parola } = req.body

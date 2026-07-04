@@ -7,7 +7,6 @@ const Produs = require('../models/Produs')
 const Comanda = require('../models/Comanda')
 const { trimiteEmail } = require('../utils/mailer');
 
-// verifica cofetariile in asteptare
 router.get('/cofetarii/in-asteptare', verifyToken, verifyRol('admin'), async (req,res) => {
     try {
         const cofetarii = await Cofetarie.find({ status: 'in_asteptare' }).populate('utilizator_id', 'nume email')
@@ -21,7 +20,6 @@ router.get('/cofetarii/in-asteptare', verifyToken, verifyRol('admin'), async (re
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
 })
 
-// aprobare cofetarie
 router.put('/cofetarii/:id/aprobare', verifyToken, verifyRol('admin'), async (req,res) => {
     try {
         const cofetarie = await Cofetarie.findByIdAndUpdate(req.params.id, { status: 'aprobata' }, { new: true })
@@ -45,7 +43,6 @@ router.put('/cofetarii/:id/aprobare', verifyToken, verifyRol('admin'), async (re
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
 })
 
-// respingere cofetarie
 router.put('/cofetarii/:id/respingere', verifyToken, verifyRol('admin'), async (req,res) => {
     try {
         const cofetarie = await Cofetarie.findById(req.params.id);
@@ -80,7 +77,6 @@ router.put('/cofetarii/:id/respingere', verifyToken, verifyRol('admin'), async (
     }
 });
 
-// afisare utilizatori
 router.get('/utilizatori', verifyToken, verifyRol('admin'), async (req,res) => {
     try {   
         const utilizatori = await User.find().select('-parola')
@@ -88,7 +84,6 @@ router.get('/utilizatori', verifyToken, verifyRol('admin'), async (req,res) => {
     } catch (err) { res.status(500).json({ mesaj: 'Eroare' }) }
 })
 
-// stergere utilizator
 router.delete('/utilizatori/:id', verifyToken, verifyRol('admin'), async (req, res) => {
     try {
         const user = await User.findById(req.params.id)
@@ -115,7 +110,6 @@ router.delete('/utilizatori/:id', verifyToken, verifyRol('admin'), async (req, r
     } catch (err) { res.status(500).json({ mesaj: 'Eroare internă la ștergere.' }) }
 });
 
-// STATISTICI DASHBOARD ADMIN 
 router.get('/dashboard-statistici', verifyToken, verifyRol('admin'), async (req, res) => {
     try {
         const dataStart30Zile = new Date();
@@ -124,7 +118,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('admin'), async (req,
         const dataStart14Zile = new Date();
         dataStart14Zile.setDate(dataStart14Zile.getDate() - 14);
 
-        // 1. CREȘTEREA PLATFORMEI (Ultimele 30 de zile)
         const cresterePlatformaRaw = await User.aggregate([
             { 
                 $match: { 
@@ -144,7 +137,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('admin'), async (req,
             { $sort: { "_id.data": 1 } }
         ]);
 
-        // Formatăm datele pentru Recharts (o singură înregistrare per zi)
         const crestereMap = {};
         cresterePlatformaRaw.forEach(item => {
             const data = item._id.data;
@@ -155,7 +147,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('admin'), async (req,
         });
         const cresterePlatforma = Object.values(crestereMap).sort((a, b) => a.data.localeCompare(b.data));
 
-        // 2. RATA DE SUCCES COMENZI (Ultimele 14 zile)
         const rataSuccesRaw = await Comanda.aggregate([
             { 
                 $match: { 
@@ -167,7 +158,7 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('admin'), async (req,
                     _id: {
                         data: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt", timezone: "Europe/Bucharest" } },
                         statusSimplificat: {
-                            $cond: [{ $eq: ["$status", "anulata"] }, "anulate", "livrate"] // Tot ce nu e anulat consideram succes/in curs
+                            $cond: [{ $eq: ["$status", "anulata"] }, "anulate", "livrate"] 
                         }
                     },
                     total: { $sum: 1 }
@@ -183,7 +174,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('admin'), async (req,
         });
         const rataSuccesComenzi = Object.values(rataSuccesMap).sort((a, b) => a.data.localeCompare(b.data));
 
-        // 3. TOP COFETĂRII (După venit generat)
         const topCofetarii = await Comanda.aggregate([
             { $match: { status: { $ne: 'anulata' } } },
             { 
@@ -214,7 +204,6 @@ router.get('/dashboard-statistici', verifyToken, verifyRol('admin'), async (req,
             }
         ]);
 
-        // 4. IMPACT ANTI-RISIPĂ GLOBAL
         const antiRisipa = await Comanda.aggregate([
             { $match: { status: { $ne: 'anulata' } } },
             { $unwind: "$detalii" },

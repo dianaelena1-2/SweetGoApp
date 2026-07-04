@@ -85,8 +85,13 @@ function DashboardCofetarie() {
         fetchToateDatele();
 
         const checkOra = () => {
-            const now = new Date()
-            setEsteDupaOra20(now.getHours() >= 20)
+            const oraRomania = new Date().toLocaleString('en-US', { 
+                timeZone: 'Europe/Bucharest', 
+                hour: 'numeric', 
+                hour12: false 
+            });
+            const oraCurenta = parseInt(oraRomania, 10);
+            setEsteDupaOra20(oraCurenta >= 12)
         }
         checkOra()
         const interval = setInterval(checkOra, 60000)
