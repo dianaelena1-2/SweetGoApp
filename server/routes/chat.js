@@ -10,6 +10,16 @@ function normalizeazaText(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
+function creazaPatternDiacritice(text) {
+    const harta = {
+        'a': '[aăâ]',
+        'i': '[iî]',
+        's': '[sș]',
+        't': '[tț]'
+    };
+    return text.split('').map(ch => harta[ch.toLowerCase()] || ch).join('');
+}
+
 router.post('/', async (req, res) => {
     try {
         const { message } = req.body;
@@ -95,12 +105,13 @@ router.post('/', async (req, res) => {
 
             if (cuvantCheie) {
                 const cuvantSigur = escapeRegex(cuvantCheie);
+                const patternCuDiacritice = creazaPatternDiacritice(cuvantSigur);
 
                 const produsGasit = await Produs.findOne({
                     disponibil: true,
                     $or: [
-                        { numeProdus: { $regex: cuvantSigur, $options: 'i' } },
-                        { ingrediente: { $regex: cuvantSigur, $options: 'i' } }
+                        { numeProdus: { $regex: patternCuDiacritice, $options: 'i' } },
+                        { ingrediente: { $regex: patternCuDiacritice, $options: 'i' } }
                     ]
                 }).populate('cofetarie_id', 'numeCofetarie');
 
